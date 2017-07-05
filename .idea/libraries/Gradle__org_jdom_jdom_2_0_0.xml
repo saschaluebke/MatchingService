@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jdom:jdom:2.0.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jdom/jdom/2.0.0/e03447aa5a53e7ee9f0ebb9da64c5c178900173d/jdom-2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jdom/jdom/2.0.0/9d1be36e45c7ebf33d459c67caff4d2e12fecdbc/jdom-2.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

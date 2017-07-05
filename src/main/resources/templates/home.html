@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Translator</title>
+    <script type="text/javascript">
+    //alert("Hallo");
+    //TODO: failed Attempt to toggle buttton
+        var clickBtn = document.getElementById("cacheButton");
+var button = document.getElementsByClassName('btn')[0];
+
+// Disable the button on initial page load
+button.disabled = true;
+
+//add event listener
+clickBtn.addEventListener('click', function(event) {
+alert("Blub");
+    button.disabled = !button.disabled;
+    alert("hallo");
+});
+
+    </script>
+
+<style>
+     nav > ul > li {
+	position: relative;
+	display: inline-block;
+	width: 100px;
+      }
+
+      ul {
+  list-style-type: none;
+   padding-left:0;
+}
+</style>
+
+
+
+</head>
+
+<body>
+<form name="forgotpassord" action="translated" method="POST" >
+
+    <div id="inputDiv">
+        <h3>Put new Word in List or Get a Word from a languages via his name and/or Description</h3>
+
+        <h6 th:text="${result}" ></h6>
+        <select class="form-control" name="fromPut" >
+            <option th:each="language : ${languagePut}" th:value="${language.name}" th:text="${language.fullName}"></option>
+        </select>
+        <label>Word:</label> <input type='text' name='wordPut' value=""/>
+        <label>Description:</label> <input type='text' name='descPut' value=""/>
+        <input type="submit" value="Put Word" class="btn" name="request"/>
+        <input type="submit" value="Get Word" class="btn" name="request"/>
+        <nav>
+            <ul style="font-weight: bold;" >
+                <li>Translated
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${word.name}" th:href="'word/'+${word.language}+${word.name}" ></a></li>
+                    </ul>
+                </li>
+                <li>Description
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${word.description}"></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div id="translationDiv">
+        <h3>Translate a Word</h3>
+        <select class="translation-control" name="translation" >
+            <option th:each="translate : ${translationList}" th:value="${translate}" th:text="${translate}"></option>
+        </select>
+        <select class="form-control" name="from" >
+            <option th:each="language : ${languageFrom}" th:value="${language.name}" th:text="${language.fullName}"></option>
+        </select>
+        <select class="to-control" name="to">
+            <option th:each="language : ${languageTo}" th:value="${language.name}" th:text="${language.fullName}"></option>
+        </select>
+
+        <label>Word:</label> <input type='text' name='word' th:value="${initialWord.name}"/>
+        <label>&nbsp;</label> <input type="submit" value="OK" class="btn" name="request"/>
+    </div>
+    <div id = "resultDiv">
+        <h4>Result: </h4>
+        <h1  th:text = "${word.name}"></h1>
+        <h1 th:text = "${word.description}"></h1>
+        <label>New Description:</label> <input type='text' name='newDescPut' th:value="${word.description}"/>
+        <label>Prior:</label> <input type="number" name="prior" th:value="${initialWord.prior}"/>
+        <input id='cacheButton' type='submit' class="btn" name='request' value="cache result"/>
+        <nav>
+            <ul style="font-weight: bold;" >
+                <li>Name
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${initialWord.name}" ></a></li>
+                    </ul>
+                </li>
+                <li>Translated
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${word.name}" th:href="'word/'+${word.language}+${word.name}" ></a></li>
+                    </ul>
+                </li>
+                <li>Description
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${word.description}"></a></li>
+                    </ul>
+                </li>
+                <li>Prior
+                    <ul class = "menu" style="font-weight: normal;">
+
+                        <li th:each="word : ${wordList}" ><a  th:text="${word.prior}" ></a> </li>
+                    </ul>
+                </li>
+                <li>Count
+                    <ul class = "menu" style="font-weight: normal;">
+                        <li th:each="word : ${wordList}" ><a th:text="${word.count}"></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+       <!-- <input id='cacheListButton' type='submit' class="btn" name='request' value="cache list"/>
+-->
+    </div>
+
+    </form>
+</body>
+</html>
