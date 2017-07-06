@@ -1,0 +1,338 @@
+#!/bin/bash
+#----------!-Put script in directory where you want to install moses, or where moses is already installed in subdirectory mosesdecoder-!-------------
+
+basedir=$(pwd)
+OUTPUT="/tmp/mosesInput.txt"
+
+# create empty file
+>$OUTPUT
+
+fullScript(){
+basedir=$(pwd)
+echo $basedir;
+
+dialog --title "Basic Installations" \
+--backtitle "Basic Installations" \
+--yesno "Do you want to skip basic Installations like cmake or bootstrap?" 7 60
+
+response=$?
+case $response in
+   0) semi;;
+   1) full;;
+   255) exit;;
+esac
+}
+
+
+full(){
+	apt-get install git
+	apt-get install subversion
+	apt-get install libtool
+	apt-get install libboost-dev
+	apt-get install libbz2-dev
+	apt-get install python-dev
+	apt-get install automake
+	apt-get install cmake
+
+
+	sudo apt-get install build-essential git-core pkg-config automake libtool wget zlib1g-dev python-dev
+	libbz2-dev
+	
+	sudo apt-get install libsoap-lite-perl
+semi
+
+}
+
+semi(){
+echo no basic installation
+dialog --title "Install Moses" \
+	--backtitle "Install Moses" \
+	--yesno "Do you want to install Moses?" 7 60
+
+	response0=$?
+	case $response0 in
+	   0) installMoses;;
+	   1) withoutNewMoses;;
+	   255) exit;;
+	esac
+}
+
+installMoses(){
+
+git clone https://github.com/moses-smt/mosesdecoder.git
+	cd $basedir/mosesdecoder
+	make -f contrib/Makefiles/install-dependencies.gmake
+
+dialog --title "Install Moses Server" \
+	--backtitle "Install Moses Server" \
+	--yesno "Do you want to install Moses as a Server?" 7 60
+
+	response1=$?
+	case $response1 in
+	   0) installMosesAsServer;;
+	   1) echo Normal;;
+	   255) exit;;
+	esac
+	
+	./compile.sh
+
+installGizza
+
+}
+
+installMosesAsServer(){
+
+dialog --backtitle MosesScript --title "xmlr-rpc Installation" --inputbox "Install xml-rpc and type in path:" 15 60 2>$OUTPUT
+	xmlpath=$(<$OUTPUT)
+	
+
+	./compile.sh --with-xmlrpc-c=$xmlpath
+cd ..
+installGizza
+}
+
+withoutNewMoses(){
+echo no mosesInstallation
+	dialog --title "Install Gizza" \
+	--backtitle "Install Gizza" \
+	--yesno "Do you want to install Gizza?" 7 60
+
+	response2=$?
+	case $response2 in
+	   0) installGizza;;
+	   1) newMosesScript;;
+	   255) exit;;
+	esac
+}
+
+installGizza(){
+	cd $basedir
+	git clone https://github.com/moses-smt/giza-pp.git
+	cd $basedir/giza-pp
+ 	make
+
+	cd $basedir/mosesdecoder
+ 	mkdir tools
+ 	cp $basedir/giza-pp/GIZA++-v2/GIZA++ $basedir/giza-pp/GIZA++-v2/snt2cooc.out \
+   	$basedir/giza-pp/mkcls-v2/mkcls tools
+
+newMosesScript
+}
+	
+
+
+newMosesScript(){
+
+dialog --title "Get Files" \
+	--backtitle "Get Files" \
+	--yesno "Do you want to get Trainingsdata from Repository" 7 60
+
+	response3=$?
+	case $response3 in
+	   0) 
+		cd $basedir
+		git clone https://github.com/saschaluebke/Trainfiles.git;;
+	   1) echo no Files;;
+	   255) exit;;
+	esac
+
+	dialog --inputbox "Enter project name:" 8 40 2>$OUTPUT
+	name=$(<$OUTPUT)
+
+#TODO schauen obs das Project schon gibt
+
+	dir=$basedir/$name
+	mkdir /$basedir/$name
+echo /$basedir/$name
+
+	cd /$basedir/$name
+	mkdir corpus
+	
+	cd corpus
+	mkdir training
+	trainDir=$dir/corpus/training
+
+#TODO auswahl an Sprachen vorgeben?
+
+dialog --backtitle MosesScript --title "Source Language" --inputbox "What is your source Language" 15 60 2>$OUTPUT
+	sourceLanguage=$(<$OUTPUT)
+
+	dialog --backtitle MosesScript --title "Target Language" --inputbox "What is your target Language" 15 60 2>$OUTPUT
+	targetLanguage=$(<$OUTPUT)
+
+targetfile="training_language."$targetLanguage
+sourcefile="training_language."$sourceLanguage
+filesplaced='no'
+source='no'
+target='no'
+while [[ "$source" == "no" || "$target" == "no" ]]
+do
+	dialog --backtitle MosesScript --title "New Project" --msgbox "Put your training data in the $name/corpus/training direcotry and name it $sourcefile and $targetfile" 15 60
+
+#check if there is trainingsourcelanguage!
+FILES=$trainDir/*
+
+	for f in $FILES
+	do
+		echo $f
+  		if [ $f == $trainDir/$sourcefile ]
+			then 
+				source=yes 
+		elif  [ $f == $trainDir/$targetfile ]
+			then
+				target=yes
+		fi
+	done
+
+ 	
+done
+
+
+#The tokenisation can be run as follows: 
+	 $basedir/mosesdecoder/scripts/tokenizer/tokenizer.perl -l $targetLanguage \
+    < $dir/corpus/training/"training_language."$targetLanguage    \
+    > $dir/corpus/"training_language.tok."$targetLanguage
+ $basedir/mosesdecoder/scripts/tokenizer/tokenizer.perl -l $sourceLanguage \
+    < $dir/corpus/training/$"training_language."$sourceLanguage    \
+    > $dir/corpus/"training_language.tok."$sourceLanguage
+
+#The truecaser first requires training, in order to extract some statistics about the text: 
+ $basedir/mosesdecoder/scripts/recaser/train-truecaser.perl \
+     --model $dir/corpus/truecase-model.$targetLanguage --corpus     \
+     $dir/corpus/"training_language.tok."$targetLanguage
+ $basedir/mosesdecoder/scripts/recaser/train-truecaser.perl \
+     --model $dir/corpus/truecase-model.$sourceLanguage --corpus     \
+     $dir/corpus/"training_language.tok."$sourceLanguage
+
+#Truecasing uses another script from the Moses distribution: 	
+ $basedir/mosesdecoder/scripts/recaser/truecase.perl \
+   --model $dir/corpus/truecase-model.$targetLanguage         \
+   < $dir/corpus/"training_language.tok."$targetLanguage \
+   > $dir/corpus/"training_language.true."$targetLanguage
+ $basedir/mosesdecoder/scripts/recaser/truecase.perl \
+   --model $dir/corpus/truecase-model.$sourceLanguage         \
+   < $dir/corpus/"training_language.tok."$sourceLanguage \
+   > $dir/corpus/"training_language.true."$sourceLanguage
+
+#Finally we clean, limiting sentence length to 80: 
+ $basedir/mosesdecoder/scripts/training/clean-corpus-n.perl \
+    $dir/corpus/"training_language.true" $sourceLanguage $targetLanguage \
+   $dir/corpus/training_language.clean 1 80
+ mkdir $dir/lm
+ cd $dir/lm
+ $basedir/mosesdecoder/bin/lmplz -o 3 <$dir/corpus/"training_language.true."$targetLanguage > "training_language.arpa."$targetLanguage
+
+$basedir/mosesdecoder/bin/build_binary \
+  "training_language.arpa."$targetLanguage \
+   "training_language.blm."$targetLanguage
+
+mkdir $dir/working
+ cd $dir/working
+
+ nohup nice $basedir/mosesdecoder/scripts/training/train-model.perl -root-dir train \
+ -corpus $dir/corpus/training_language.clean                            \
+ -f $sourceLanguage -e $targetLanguage -alignment grow-diag-final-and -reordering msd-bidirectional-fe \
+ -lm 0:3:$dir/lm/"training_language.blm."$targetLanguage:8                          \
+ -external-bin-dir $basedir/mosesdecoder/tools >& training.out &
+
+#Tuning 
+
+cd $dir/corpus
+mkdir dev
+
+tuneDir=$dir/corpus/dev
+targetTuningFile="tuning."$targetLanguage
+sourceTuningFile="tuning."$sourceLanguage
+sourcetuning="no"
+targettuning="no"
+while [[ "$sourcetuning" == "no" || "$targettuning" == "no" ]]
+do
+	dialog --backtitle MosesScript --title "New Project" --msgbox " Please wait until training.out tell that it created moses.ini ... Then put your tuning data in the $name/corpus/dev direcotry and name it tuning.$sourceLanguage and tuning.$targetLanguage" 15 60
+
+#check if there is tuningSource and Target language!
+FILES=$tuneDir/*
+
+	for f in $FILES
+	do
+		echo $f
+  		if [ $f == $tuneDir/$sourceTuningFile ]
+			then 
+				sourcetuning=yes 
+		elif  [ $f == $tuneDir/$targetTuningFile ]
+			then
+				targettuning=yes
+		fi
+	done
+
+ 	
+done
+
+cd $dir/corpus
+ $basedir/mosesdecoder/scripts/tokenizer/tokenizer.perl -l $targetLanguage \
+   < dev/"tuning."$targetLanguage > "tuning.tok."$targetLanguage
+ $basedir/mosesdecoder/scripts/tokenizer/tokenizer.perl -l $sourceLanguage \
+   < dev/"tuning."$sourceLanguage > "tuning.tok."$sourceLanguage
+ $basedir/mosesdecoder/scripts/recaser/truecase.perl --model truecase-model.$targetLanguage \
+   <  "tuning.tok."$targetLanguage >  "tuning.true."$targetLanguage
+ $basedir/mosesdecoder/scripts/recaser/truecase.perl --model truecase-model.$sourceLanguage \
+   < "tuning.tok."$sourceLanguage > "tuning.true."$sourceLanguage
+
+cd $dir/working
+ nohup nice $basedir/mosesdecoder/scripts/training/mert-moses.pl \
+  $dir/corpus/"tuning.true.$sourceLanguage" $dir/corpus/"tuning.true.$targetLanguage" \
+  $basedir/mosesdecoder/bin/moses train/model/moses.ini --mertdir $basedir/mosesdecoder/bin/ \
+  &> mert.out &
+
+dialog --title "Wait" \
+	--backtitle "Wait" \
+	--yesno "Please wait until tuning is complete. Look at mert.out!" 7 60
+
+	response2=$?
+	case $response2 in
+	   0) echo complet;;
+	   1) echo not complete?;;
+	   255) exit;;
+	esac
+
+echo Start moses with  $basedir/mosesdecoder/bin/moses -f $dir/working/mert-work/moses.ini or run the script a second time.
+
+
+
+}
+
+
+
+#Main
+INPUT=/tmp/menu.sh.$$
+dialog --menu "Choose one:" 10 30 3 1 "Full installation" 2 "New Moses Project" 3 "Run a Moses Project" 2>"${INPUT}"
+menuitem=$(<"${INPUT}")
+echo $menuitem
+
+if [ $menuitem -eq 0 ]
+  then
+    echo "Cancel"
+    exit 255
+fi
+
+if [ $menuitem -eq 1 ]
+  then
+    dialog --backtitle MosesScript --title FullScript --msgbox "Moses GIZA++ will be installed. Then a new Moses Project will be started." 15 40
+fullScript
+fi
+
+if [ $menuitem -eq 2 ]
+  then
+    dialog --backtitle MosesScript --title newMosesScript --msgbox "New Moses Project will be started." 15 40
+newMosesScript
+fi
+
+if [ $menuitem -eq 3 ]
+  then
+     dialog --backtitle MosesScript --title FullScript --msgbox "Choose the Moses Project and press SPACE then ENTER." 15 40
+    dialog --dselect "$HOME/" 10 60 2>"${INPUT}"
+
+    result=$(<"${INPUT}")
+
+    echo $result
+    $basedir/mosesdecoder/bin/moses -f $result/working/mert-work/moses.ini
+fi
