@@ -5,6 +5,7 @@ import components.MatchResultSet;
 import components.Relation;
 import components.Word;
 import database.dbStrategy.DBStrategy;
+import translators.Translator;
 import utils.FileReader;
 
 import java.sql.ResultSet;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 
 public class DBHelper{
     private DBStrategy dbStrategy;
+    private Translator translator;
 
-    public DBHelper(DBStrategy dbStrategy){
+    public DBHelper(DBStrategy dbStrategy, Translator translator){
         this.dbStrategy = dbStrategy;
+        this.translator = translator;
     }
 
     public int putWord(Word word) {
@@ -95,4 +98,8 @@ public class DBHelper{
     public int getLastWordId(String language){
         return dbStrategy.getLastWordId(language);
     }
+
+    public ArrayList<String> translate(Word input){
+        return dbStrategy.translate(translator,input);
+    };
 }

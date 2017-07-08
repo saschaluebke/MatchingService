@@ -26,7 +26,7 @@ public class DictReaderTest {
         dbh = new DBHelper(new SimpleStrategy());
         dr = new DictReader("/src/main/resources/Dict/de_en_Dict.txt","de","en");
     }
-
+/*
     @Test
     public void getSmallFileContentTest() {
         dbh.newLanguage("de");
@@ -44,6 +44,17 @@ public class DictReaderTest {
 
         assertEquals(50000,dr.getWordList().size());
         //TODO: Noch mehr testen sind sie wirklich drinne sind die translations richtig?
+    }
+  */
+    @Test
+    public void printCorpus(){
+        dbh.newLanguage("de");//I dont use them in this test but .getContent needs them!
+        dbh.newLanguage("en");
+        dr.setFromEntry(0);
+        dr.setToEntry(Integer.MAX_VALUE);
+        dr.getFileContent();
+        dr.makeParallelCorpus();
+        assertEquals(1136891,dr.getWordList().size());
     }
 
 }

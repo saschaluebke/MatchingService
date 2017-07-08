@@ -7,6 +7,7 @@ import database.dbStrategy.simpleStrategy.SimpleStrategy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -116,6 +117,34 @@ int count = 0;
         this.toEntry = toEntry;
     }
 
+    public void makeParallelCorpus(){
+        try{
+            PrintWriter writer = new PrintWriter("Dict.de", "UTF-8");
+
+            for(int i=0;i<firstWordList.size();i++){
+                String deutsch = firstWordList.get(i).getName();
+                writer.println(deutsch);
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            // do something
+        }
+
+        try{
+            PrintWriter writer = new PrintWriter("Dict.en", "UTF-8");
+
+            for(int i=0;i<firstWordList.size();i++){
+                String englisch = secondWordList.get(i).getName();
+                writer.println(englisch);
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            // do something
+        }
+
+    }
 
 
 }

@@ -13,20 +13,13 @@ import translators.Transltr;
 @ComponentScan
 public class AppConfig {
     public static void main(String[] args) {
-
-
-
-        //TODO: This is just a Dirty initial call
+//TODO: This is just a Dirty initial call
         MySQLQuery dbq = new MySQLQuery();
         DBHelper dbh = new DBHelper(new SimpleStrategy());
         dbq.dropAllTables();
         dbq.truncate("languages");
-        Transltr th = new Transltr();
-        for (Language l:th.getLanguages()){
-            dbh.newLanguage(l.getName());
-        }
-
-
+        dbh.newLanguage("de");
+        dbh.newLanguage("en");
         SpringApplication.run(AppConfig.class, args);
    }
 

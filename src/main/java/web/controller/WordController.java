@@ -11,6 +11,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import translators.MosesClient;
 import translators.Transltr;
 
 import java.util.ArrayList;
@@ -20,12 +21,12 @@ import java.util.Map;
 /**
  * TODO: Wie Seite Designen vorallem die Ergebnisse. Vielleicht in anderen Dateiformaten zugänglich machen?
  */
-@Controller
+//@Controller
 public class WordController {
     static Logger log = Logger.getLogger(WordController.class.getName());
 
 
-    @RequestMapping(value="/translated", method=RequestMethod.POST)
+    //@RequestMapping(value="/translated", method=RequestMethod.POST)
     public String recoverPass(@RequestParam Map<String, String> params, @RequestParam("word") String word, @RequestParam("to") String to, @RequestParam("from") String from,
                               @RequestParam("request") String request, @RequestParam("translation") String translate, @RequestParam("descPut") String descPut,
                               @RequestParam("wordPut") String wordPut, @RequestParam("fromPut") String fromPut, @RequestParam("prior") int prior,
@@ -34,6 +35,7 @@ public class WordController {
         //System.out.println(params.toString());
         DBHelper dbh = new DBHelper(new SimpleStrategy());
         Transltr translator = new Transltr();
+        MosesClient mosesClient = new MosesClient();
         translator.setFromLanguage(from);
         translator.setToLanguage(to);
 
@@ -69,9 +71,9 @@ public class WordController {
 
         //Create translationModeList
         List<String> translationModes = new ArrayList<>();
-        for(Language l : translator.getLanguages()){
-            translationModes.add(translator.getLanguages().get(0).getName());
-        }
+        //translationList.add("Transltr"); Not online anymore!
+        translationModes.add("Database");
+        translationModes.add("Moses");
         List<String> translationList = new ArrayList<>();
         for (int i = 0;i<translationModes.size();i++){
             if (translationModes.get(i).equals(translate)){
@@ -117,7 +119,20 @@ public class WordController {
                     dbh.putRelation(initialWord,selectedWord);
                     //TODO auch die andere Relation und welche prior da?
                 }
-            }else{
+            }else if(translate.equals("Moses")) {
+                String translation = mosesClient.translation(word);
+                selectedWord = new Word(0,translation,to);
+                wordList.add(selectedWord);
+                if (request.equals("cache result")){
+                    initialWord.setId(dbh.putWord(initialWord));
+                    selectedWord.setPrior(prior);
+                    selectedWord.setDescription(newDescPut);
+                    selectedWord.setId(dbh.putWord(selectedWord));
+                    dbh.putRelation(initialWord,selectedWord);
+                    //TODO auch die andere Relation und welche prior da?
+                }
+            }else
+             {
                 if (request.equals("cache result")){
                     selectedWord = new Word(0,"!Only After Translation Request!","en");
 
@@ -164,7 +179,7 @@ public class WordController {
         return "home";
     }
 */
-    @RequestMapping("/")
+   // @RequestMapping("/")
     public String home(ModelMap modelMap) {
         /*
         Initialization for Home - page
@@ -187,9 +202,9 @@ public class WordController {
 
         //Inizialize TranslationMode List
         List<String> translationList = new ArrayList<>();
-        for(Language l : translator.getLanguages()){
-            translationList.add(translator.getLanguages().get(0).getName());
-        }
+        //translationList.add("Transltr"); Not online anymore!
+        translationList.add("Database");
+        translationList.add("Moses");
         modelMap.addAttribute("translationList", translationList);
 
 

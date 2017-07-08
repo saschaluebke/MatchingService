@@ -33,6 +33,6 @@ public interface DBStrategy {
     boolean newLanguage(String name);
     boolean updateTables();
     int getLastWordId(String query);
-    MatchResultSet translate(Translator translator, Word input);
+    ArrayList<String> translate(Translator translator, Word input);
 
 }

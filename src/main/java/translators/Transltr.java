@@ -18,11 +18,19 @@ import java.util.*;
 public class Transltr implements Translator{
 	private String to = "de";
 	private String from = "en";
-	
-	public String translate(String input){
-		String[] container = token(input);
-		String word = retokenizer(container);
 
+	public String translate(String input){
+		String output="";
+		String[] tokens = tokenizer(input);
+		for(int i=0;i<tokens.length;i++){
+			String t = transform(tokens[i]);
+			tokens[i] = t;
+		}
+		output = retokenizer(tokens);
+		return output;
+	}
+	
+	public String transform(String word){
 		String response = "!! Translation Error !!";
 		String url = "http://www.transltr.org/api/translate?text="+word+"&to="+to+"&from="+from;
 		URL obj=null;
@@ -128,15 +136,6 @@ public class Transltr implements Translator{
 	@Override
 	public String getToLanguage() {
 		return to;
-	}
-
-	public String[] token(String sentence){
-		String[] tokens = tokenizer(sentence);
-		for(int i=0;i<tokens.length;i++){
-			String t = translate(tokens[i]);
-			tokens[i] = t;
-		}
-		return tokens;
 	}
 
 	public String[] tokenizer(String sentence){

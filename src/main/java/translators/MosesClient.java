@@ -1,10 +1,12 @@
 package translators;
 
 
+import database.TranslatorGetProperties;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -31,23 +33,38 @@ public class MosesClient implements Translator {
         }
     }
 
+    public MosesClient(){
+        TranslatorGetProperties tgp = new TranslatorGetProperties();
+        try {
+            String path = tgp.getPropValues("MosesClient.path");
+            config = new XmlRpcClientConfigImpl();
+            config.setServerURL(new URL(path));
+            client = new XmlRpcClient();
+            client.setConfig(config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //Moses normal output is something like this: Hypotonie|UNK|UNK|UNK has something to tun.|UNK|UNK|UNK with blood [1111111]
     //We want: "Hypotonie has somethin to tun. with blood"
     public String translation(String input){
-        input = pureTranslation(input);
-        String[] container = input.split("\\|");
+
+        String translation = pureTranslation(input);
+
+        String[] container = translation.split("\\|");
         String output = "";
         int count=2;
         for(String s : container){
             if(s.contains("UNK")){
-
+                return input;
             }else{
                 if (count%2==0){
                     output = output + s;
                 }
                 count++;
             }
-            System.out.println(output);
+            //System.out.println(output);
         }
         output = output.replaceAll("  "," ");
         return output;

@@ -399,20 +399,20 @@ public class SimpleStrategy implements DBStrategy {
     }
 
     @Override
-    public MatchResultSet translate(Translator translator, Word input) {
+    public ArrayList<String> translate(Translator translator, Word input) {
 
         Matcher matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
         ArrayList<Word> allWords = getAllWords(translator.getFromLanguage());
         MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
-
+        ArrayList<String> translations = new ArrayList<>();
         for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
             if(mrlist.get(0).getScore() == 0){
-                Word wordFromDB = getWordById(mrlist.get(0).getID(),translator.getFromLanguage());
+               translations.add(getWordById(mrlist.get(0).getID(),translator.getFromLanguage()).getName());
 
             }
         }
 
-        return mrs;
+        return translations;
     }
 
 
