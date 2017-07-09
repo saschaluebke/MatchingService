@@ -19,16 +19,16 @@ import java.util.Iterator;
 /**
  * Created by sascha on 02.07.17.
  */
-public class WordNetHelper implements FileReader {
+public class WordNetReader implements FileReader {
     ArrayList<Word> wordList;
-    ArrayList<Relation> synonymList;
+    ArrayList<ArrayList<Word>> synonymList;
     String language,path;
     private IDictionary dict;
     private File wnDir;
     private DBHelper dbh;
     private int fromEntry, toEntry;
 
-    public WordNetHelper(String path, String language){
+    public WordNetReader(String path, String language){
         this.path = path;
         this.language = language;
         dbh = new DBHelper(new SimpleStrategy(),null);
@@ -133,15 +133,14 @@ public class WordNetHelper implements FileReader {
                 Word word  = new Word(lastId,w.getLemma(),language);
                 wordList.add(word);
                 ISynset synset = w.getSynset();
-
+                ArrayList<Word> synonyms = new ArrayList<>();
                 for(IWord word1 : synset.getWords()){
                    // System.out.println(word1.getLemma());
                     lastId++;
                     Word synonym = new Word(lastId,word1.getLemma(),language);
-                    wordList.add(synonym);
-                    Relation relation = new Relation(0,word.getId(),lastId);
-                    synonymList.add(relation);
+                    synonyms.add(synonym);
                 }
+                synonymList.add(synonyms);
 
             }
 
@@ -168,11 +167,6 @@ public class WordNetHelper implements FileReader {
     }
 
     @Override
-    public ArrayList<Relation> getRelations() {
-        return synonymList;
-    }
-
-    @Override
     public String getFirstLanguage() {
         return language;
     }
@@ -184,7 +178,7 @@ public class WordNetHelper implements FileReader {
 
     @Override
     public ArrayList<ArrayList<Word>> getSynonyms() {
-        return null;
+        return synonymList;
     }
 
     public void setToEntry(int toEntry) {

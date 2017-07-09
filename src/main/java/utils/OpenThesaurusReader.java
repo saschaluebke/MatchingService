@@ -89,11 +89,6 @@ public class OpenThesaurusReader implements FileReader {
         return null;
     }
 
-    @Override
-    public ArrayList<Relation> getRelations() {
-        return null;
-    }
-
     public ArrayList<ArrayList<Word>> getSynonyms() {
         return synonyms;
     }

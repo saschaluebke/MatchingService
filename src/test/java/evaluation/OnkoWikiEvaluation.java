@@ -1,19 +1,16 @@
 package evaluation;
 
 
-import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
-import database.dbStrategy.simpleStrategy.SynonymStrategy;
-import databaseTests.DBQueryTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
 import utils.OwlReader;
 import utils.SpecialistReader;
-import utils.WordNetHelper;
+import utils.WordNetReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,19 +47,19 @@ public class OnkoWikiEvaluation {
         //Load Words with Synonyms
         SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon/LEXICON","en");
         OwlReader owlr = new OwlReader("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","de");
-        WordNetHelper wnh = new WordNetHelper("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","en");
+        WordNetReader wnh = new WordNetReader("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","en");
 
         sr.setFromEntry(0);
         sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
-        dbh.takeFromFileReader(sr);
+        dbh.storeFromFile(sr);
 
         owlr.setFromEntry(0);
         owlr.setToEntry(Integer.MAX_VALUE);
-        dbh.takeFromFileReader(owlr);
+        dbh.storeFromFile(owlr);
 
         wnh.setFromEntry(0);
         wnh.setToEntry(Integer.MAX_VALUE);
-        dbh.takeFromFileReader(wnh);
+        dbh.storeFromFile(wnh);
 
         //Set Translator
         mc = new MosesClient();

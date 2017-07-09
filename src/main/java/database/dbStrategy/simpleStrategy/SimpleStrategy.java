@@ -113,13 +113,11 @@ public class SimpleStrategy implements DBStrategy {
         String[] pars = parList.toArray(new String[parList.size()]);
         dbq.queryUpdate(querry.toString(), pars);
     }
-
+/*
     @Override
     public int takeFromFileReader(FileReader fr) {
         fr.getFileContent();
-
         ArrayList<Word> wordList = fr.getWordList();
-        ArrayList<Relation> relationList = fr.getRelations();
         String firstLanguage = fr.getFirstLanguage();
         String secondLanguage = fr.getSecondLanguage();
         ArrayList<Word> wordList2 = fr.getSecondWordList();
@@ -128,9 +126,6 @@ public class SimpleStrategy implements DBStrategy {
 
         if (wordList != null && wordList.size()>0){
             putWordList(wordList,secondLanguage);
-        }
-        if (relationList != null && relationList.size()>0){
-            putRelationList(relationList,firstLanguage,secondLanguage);
         }
         if (wordList2 != null && wordList2.size()>0){
             putWordList(wordList2,secondLanguage);
@@ -149,10 +144,10 @@ public class SimpleStrategy implements DBStrategy {
         }
 
         putWordList(wordList,language);
-        */
+
         return wordList.size();
     }
-
+*/
     @Override
     public void storeFromFile(FileReader fr) {
         for(Word word : fr.getWordList()){
@@ -433,6 +428,24 @@ public class SimpleStrategy implements DBStrategy {
         }
 
         return translations;
+    }
+
+    //TODO: Output of Translations and single Wordlists
+    public String print(String language1, String language2){
+        StringBuilder output = new StringBuilder();
+        if (language1.equals(language2)){
+            ArrayList<Word> allWords = getAllWords(language1);
+
+            for(Word word : allWords){
+                ArrayList<Word> allSynonyms = getWordFromRelation(word,language1,language2);
+                output.append(word.getName()+": ");
+                for(Word synonym : allSynonyms){
+                    output.append(synonym.getName()+"/");
+                }
+                output.append("."+System.lineSeparator());
+            }
+        }
+        return output.toString();
     }
 
 

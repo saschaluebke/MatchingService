@@ -95,11 +95,6 @@ int count = 0;
     }
 
     @Override
-    public ArrayList<Relation> getRelations() {
-        return null;
-    }
-
-    @Override
     public String getFirstLanguage() {
         return languageFrom;
     }

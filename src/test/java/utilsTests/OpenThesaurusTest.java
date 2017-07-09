@@ -77,19 +77,24 @@ public class OpenThesaurusTest{
         otr.setToEntry(100);
         dbh.storeFromFile(otr);
 
+        System.out.println(dbh.print("de","de"));
 
-        ArrayList<Word> allWords = dbh.getAllWords("de");
-
-        for(Word word : allWords){
-            ArrayList<Word> allSynonyms = dbh.getWordFromRelation(word,"de","de");
-            System.out.print(word+": ");
-            for(Word synonym : allSynonyms){
-                System.out.print(synonym+"/");
-            }
-            System.out.println(".");
-        }
         assertEquals(100, otr.getWordList().size());
 
 
     }
 }
+
+/*
+  ArrayList<Word> allWords = dbh.getAllWords("de");
+
+        for(Word word : allWords){
+            ArrayList<Word> allSynonyms = dbh.getWordFromRelation(word,"de","de");
+            System.out.print(word.getName()+": ");
+            for(Word synonym : allSynonyms){
+                System.out.print(synonym.getName()+"/");
+            }
+            System.out.println(".");
+        }
+
+ */

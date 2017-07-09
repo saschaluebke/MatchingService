@@ -15,7 +15,7 @@ import java.util.Scanner;
  */
 public class SpecialistReader implements FileReader {
     private ArrayList<Word> wordlist;
-    private ArrayList<Relation> relationList;
+    private ArrayList<ArrayList<Word>> allSynonyms;
     private String language, path;
     private int entryCount, fromEntry, toEntry;
     private DBHelper dbh;
@@ -30,7 +30,7 @@ public class SpecialistReader implements FileReader {
     public void getFileContent() {
         entryCount=0;
         wordlist = new ArrayList<>();
-        relationList = new ArrayList<>();
+        allSynonyms = new ArrayList<>();
         int lastWordId = dbh.getLastWordId(language);
         try {
             for (Scanner sc = new Scanner(new File(System.getProperty("user.dir") + path)); sc.hasNext(); ) {
@@ -121,13 +121,13 @@ public class SpecialistReader implements FileReader {
                 lastWordId++;
                 Word w = new Word(lastWordId,name,language);
                 wordlist.add(w);
+                ArrayList<Word> synonyms = new ArrayList<>();
                 for(String s : acronyms){
                     lastWordId++;
                     Word acronym = new Word(lastWordId,s,language);
-                    Relation r = new Relation(0,w.getId(),lastWordId);
-                    relationList.add(r);
-                    wordlist.add(acronym);
+                    synonyms.add(acronym);
                 }
+                allSynonyms.add(synonyms);
             }
 
         } catch (FileNotFoundException e) {
@@ -155,11 +155,6 @@ public class SpecialistReader implements FileReader {
     }
 
     @Override
-    public ArrayList<Relation> getRelations() {
-        return relationList;
-    }
-
-    @Override
     public String getFirstLanguage() {
         return language;
     }
@@ -171,7 +166,7 @@ public class SpecialistReader implements FileReader {
 
     @Override
     public ArrayList<ArrayList<Word>> getSynonyms() {
-        return null;
+        return allSynonyms;
     }
 
     public void setFromEntry(int fromEntry) {

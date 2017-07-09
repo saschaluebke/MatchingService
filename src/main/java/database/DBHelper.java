@@ -37,10 +37,6 @@ public class DBHelper{
         dbStrategy.putRelationList(relations,language1,language2);
     }
 
-    public void takeFromFileReader(FileReader fr) {
-        dbStrategy.takeFromFileReader(fr);
-    }
-
     public void storeFromFile(FileReader fr){
         dbStrategy.storeFromFile(fr);
     }
@@ -114,4 +110,8 @@ public class DBHelper{
     public ArrayList<String> translate(Word input){
         return dbStrategy.translate(translator,input);
     };
+
+    public String print(String language1, String language2){
+        return dbStrategy.print(language1,language2);
+    }
 }

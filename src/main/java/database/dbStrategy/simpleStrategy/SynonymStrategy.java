@@ -28,6 +28,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
     public void storeFromFile(FileReader fr){
         if(fr.getWordList()!=null && fr.getSynonyms()!=null && fr.getSecondWordList()==null){
             //Put all words into the wordList
+            fr.getFileContent();
             ArrayList<Word> words = fr.getWordList();
             ArrayList<ArrayList<Word>> synonyms = fr.getSynonyms();
             System.out.println(words.size()+"/"+synonyms.size());

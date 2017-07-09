@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class OwlReaderTest {
     static MySQLQuery dbq;
     static DBHelper dbh;
-    static OwlReader fr;
+    static OwlReader owlReader;
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
@@ -28,7 +28,7 @@ public class OwlReaderTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SimpleStrategy());
-        fr = new OwlReader("/src/main/resources/NCI/Thesaurus-byName.owl","en");
+        owlReader = new OwlReader("/src/main/resources/NCI/Thesaurus-byName.owl","en");
 
     }
 /*
@@ -61,11 +61,19 @@ public class OwlReaderTest {
     @Test
     public void synonymTest(){
         dbh.newLanguage("en");
-        fr.setFromEntry(0);
-        fr.setToEntry(1000);
-        fr.getFileContent();
+        owlReader.setFromEntry(0);
+        owlReader.setToEntry(1000);
+        dbh.storeFromFile(owlReader);
 
-        ArrayList<Word> wordlist = fr.getWordList();
+       System.out.println(dbh.print("en","en"));
+       assertEquals(1000,dbh.getAllWords("en"));
+    }
+
+
+}
+
+/*
+ ArrayList<Word> wordlist = fr.getWordList();
         ArrayList<Relation> relationArrayList = fr.getRelations();
         ArrayList<ArrayList<Word>> wordsWithSynonyms = new ArrayList<>();
 
@@ -91,7 +99,4 @@ public class OwlReaderTest {
             }
             System.out.println(".");
         }
-    }
-
-
-}
+ */

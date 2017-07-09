@@ -90,11 +90,6 @@ public class TSVFileReader implements utils.FileReader {
     }
 
     @Override
-    public ArrayList<Relation> getRelations() {
-        return null;
-    }
-
-    @Override
     public String getFirstLanguage() {
         return language;
     }

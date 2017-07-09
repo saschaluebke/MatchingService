@@ -11,7 +11,7 @@ import org.junit.Test;
 import translators.MosesClient;
 import utils.OwlReader;
 import utils.SpecialistReader;
-import utils.WordNetHelper;
+import utils.WordNetReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,19 +47,19 @@ public class ICD10Evaluation {
         //Load Words with Synonyms
         SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon","en");
         OwlReader owlr = new OwlReader("/src/main/resources/Thesaurus-byName.owl","de");
-        WordNetHelper wnh = new WordNetHelper("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
+        WordNetReader wnh = new WordNetReader("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
 
         sr.setFromEntry(0);
         sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
-        dbh.takeFromFileReader(sr);
+        dbh.storeFromFile(sr);
 
         owlr.setFromEntry(0);
         owlr.setToEntry(Integer.MAX_VALUE);
-        dbh.takeFromFileReader(owlr);
+        dbh.storeFromFile(owlr);
 
         wnh.setFromEntry(0);
         wnh.setToEntry(Integer.MAX_VALUE);
-        dbh.takeFromFileReader(wnh);
+        dbh.storeFromFile(wnh);
 
         //Set Translator
         mc = new MosesClient();

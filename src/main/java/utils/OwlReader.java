@@ -14,7 +14,8 @@ public class OwlReader implements FileReader {
     private DBHelper dbh;
     private String path;
     private ArrayList<Word> wordList;
-    private ArrayList<Relation> relationList;
+    private ArrayList<Word> synonyms;
+    private ArrayList<ArrayList<Word>> allSynonyms;
     private int fromEntry, toEntry;
     private String firstLanguage, secondLanguage;
 
@@ -45,7 +46,7 @@ public class OwlReader implements FileReader {
     public void getFileContent() {
         int wordCount = 0;
         int entryCount = 0;
-
+        allSynonyms = new ArrayList<>();
         int lastId = dbh.getLastWordId(firstLanguage);
         //ArrayList<Word> currentWordsInDB = dbh.getAllWords(firstLanguage); Too slow for testing
         //ArrayList<String> currentWords = new ArrayList<>();
@@ -63,7 +64,7 @@ public class OwlReader implements FileReader {
                 if (line.contains("<owl:Class")){
                     String definition = "";
                     String name = "";
-                    ArrayList<String> synonyms = new ArrayList<>();
+                    ArrayList<String> stringSynonyms = new ArrayList<>();
 
                     while(!line.contains("</owl:Class>")){
                         line = line + sc.nextLine();
@@ -110,7 +111,7 @@ public class OwlReader implements FileReader {
                         //System.out.println(start + "/"+end);
                         String synonym = line.substring(start,end);
                         if (!synonym.equals(name)){
-                            synonyms.add(synonym);
+                            stringSynonyms.add(synonym);
                         }
                         //System.out.println(synonyms.size());
                         line = line.substring(end+18);
@@ -126,21 +127,12 @@ public class OwlReader implements FileReader {
                     Word w = new Word(lastId,name,firstLanguage);
                     w.setDescription(definition);
                     allWords.add(w);
-                    for(String s : synonyms){
-                        //                        if (currentWords.contains(s)){
-                        //TODO: What if word is a Homonym?
-                        //                          }else{
+                    for(String s : stringSynonyms){
                         lastId++;
                         Word synonym = new Word(lastId,s,firstLanguage);
-                        allWords.add(synonym);
-                        Relation relation = new Relation(0,w.getId(),synonym.getId());
-                        allRelation.add(relation);
-                        //                         }
-                        //                  }
+                        synonyms.add(synonym);
                     }
-
-
-
+                    allSynonyms.add(synonyms);
                 }
             }
             //Put all Words and Synonym Relations into the db in one step to avoid too many transactions
@@ -149,7 +141,7 @@ public class OwlReader implements FileReader {
             //    dbh.putWordList(allWords,language);
             //   dbh.putRelationList(allRelation,language,language);
             wordList = allWords;
-            relationList = allRelation;
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -177,11 +169,6 @@ public class OwlReader implements FileReader {
     }
 
     @Override
-    public ArrayList<Relation> getRelations() {
-        return relationList;
-    }
-
-    @Override
     public String getFirstLanguage() {
         return firstLanguage;
     }
@@ -193,7 +180,7 @@ public class OwlReader implements FileReader {
 
     @Override
     public ArrayList<ArrayList<Word>> getSynonyms() {
-        return null;
+        return allSynonyms;
     }
 
     public void setFromEntry(int fromEntry) {

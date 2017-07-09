@@ -7,8 +7,7 @@ import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utils.OwlReader;
-import utils.WordNetHelper;
+import utils.WordNetReader;
 
 import java.util.ArrayList;
 
@@ -20,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 public class WordNetTest {
     static MySQLQuery dbq;
     static DBHelper dbh;
-    static WordNetHelper wnh;
+    static WordNetReader wnh;
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
@@ -28,7 +27,7 @@ public class WordNetTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SimpleStrategy());
-        wnh = new WordNetHelper("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
+        wnh = new WordNetReader("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
     }
 
     @Test
@@ -36,35 +35,11 @@ public class WordNetTest {
         dbh.newLanguage("en");
         wnh.setFromEntry(0);
         wnh.setToEntry(100);
-        wnh.getFileContent();
+        dbh.storeFromFile(wnh);
       //  fr.setFromEntry(0);
       //  fr.setToEntry(50000);
         //dbh.takeFromFileReader(wnh);
-        ArrayList<Relation> relationArrayList = wnh.getRelations();
-        ArrayList<Word> wordlist = wnh.getWordList();
-        ArrayList<ArrayList<Word>> wordsWithSynonyms = new ArrayList<>();
-        for(int i=0;i<100;i++)
-        {
-            Word w = wordlist.get(i);
-            ArrayList<Word> synonyms = new ArrayList<>();
-            for(Relation r : relationArrayList){
-                if(r.getIdFrom()==w.getId()){
-                    for(Word w2 : wordlist){
-                        if (w2.getId()==r.getIdTo()){
-                            synonyms.add(w2);
-                        }
-                    }
-                }
-            }
-            wordsWithSynonyms.add(synonyms);
-        }
-        for(int i = 0; i<100;i++){
-            System.out.print(wordlist.get(i).getName()+": ");
-            for(Word word : wordsWithSynonyms.get(i)){
-                System.out.print(word.getName()+"/");
-            }
-            System.out.println(".");
-        }
+        System.out.println(dbh.print("en","en"));
         assertEquals(360, wnh.getWordList().size());
 
     }

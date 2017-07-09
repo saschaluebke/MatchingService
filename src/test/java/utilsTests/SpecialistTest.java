@@ -55,12 +55,20 @@ System.out.println("----First Round-----");
         dbh.newLanguage("en");
         sr.setFromEntry(0);
         sr.setToEntry(100);
-        sr.getFileContent();
+        dbh.storeFromFile(sr);
         //  fr.setFromEntry(0);
         //  fr.setToEntry(50000);
         //dbh.takeFromFileReader(wnh);
-        ArrayList<Relation> relationArrayList = sr.getRelations();
-        ArrayList<Word> wordlist = sr.getWordList();
+
+        System.out.println(dbh.print("en","en"));
+        assertEquals(194, sr.getWordList().size());
+
+    }
+
+}
+
+/*
+   ArrayList<Word> wordlist = sr.getWordList();
         ArrayList<ArrayList<Word>> wordsWithSynonyms = new ArrayList<>();
         for(int i=0;i<100;i++)
         {
@@ -84,8 +92,4 @@ System.out.println("----First Round-----");
             }
             System.out.println(".");
         }
-        assertEquals(194, sr.getWordList().size());
-
-    }
-
-}
+ */

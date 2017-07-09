@@ -17,7 +17,6 @@ public interface DBStrategy {
     void putWordList(ArrayList<Word> wordList, String language);
     int putRelation(Word word1, Word word2);
     void putRelationList(ArrayList<Relation> relations, String language1, String language2);
-    int takeFromFileReader(FileReader fr);
     void storeFromFile(FileReader fr);
 
     MatchResultSet searchWord(Word word);
@@ -36,5 +35,7 @@ public interface DBStrategy {
     boolean updateTables();
     int getLastWordId(String query);
     ArrayList<String> translate(Translator translator, Word input);
+
+    String print(String language1, String language2);
 
 }
