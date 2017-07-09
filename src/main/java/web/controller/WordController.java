@@ -21,12 +21,12 @@ import java.util.Map;
 /**
  * TODO: Wie Seite Designen vorallem die Ergebnisse. Vielleicht in anderen Dateiformaten zugänglich machen?
  */
-//@Controller
+@Controller
 public class WordController {
     static Logger log = Logger.getLogger(WordController.class.getName());
 
 
-    //@RequestMapping(value="/translated", method=RequestMethod.POST)
+    @RequestMapping(value="/translated", method=RequestMethod.POST)
     public String recoverPass(@RequestParam Map<String, String> params, @RequestParam("word") String word, @RequestParam("to") String to, @RequestParam("from") String from,
                               @RequestParam("request") String request, @RequestParam("translation") String translate, @RequestParam("descPut") String descPut,
                               @RequestParam("wordPut") String wordPut, @RequestParam("fromPut") String fromPut, @RequestParam("prior") int prior,
@@ -34,13 +34,12 @@ public class WordController {
 
         //System.out.println(params.toString());
         DBHelper dbh = new DBHelper(new SimpleStrategy());
-        Transltr translator = new Transltr();
         MosesClient mosesClient = new MosesClient();
-        translator.setFromLanguage(from);
-        translator.setToLanguage(to);
+        mosesClient.setFromLanguage(from);
+        mosesClient.setToLanguage(to);
 
         //Create Language Lists
-        List<Language> languages =  translator.getLanguages();
+        List<Language> languages =  getLanguages();
         List<Language> languageFrom =  new ArrayList<>();
         for (int i = 0;i<languages.size();i++){
             if (languages.get(i).getName().equals(from)){
@@ -105,21 +104,24 @@ public class WordController {
                 selectedWord = new Word(0,"!No Word found!","en");
             }
         }else {
+             /*
             if (translate.equals("Transltr")){
-                String translation = translator.translate(word);
+
+                //String translation = translator.translate(word);
                 selectedWord = new Word(0,translation,to);
                 wordList.add(selectedWord);
-                //TODO: Was soll passieren wenn das Wort schon in der Datenbank ist? und Beschreibung gleich....
-                //TODO: Was passiert mit dem initial Wort (Problem wenn es das noch nicht gibt...) Neues Fenster?
+
                 if (request.equals("cache result")){
                      initialWord.setId(dbh.putWord(initialWord));
                     selectedWord.setPrior(prior);
                     selectedWord.setDescription(newDescPut);
                     selectedWord.setId(dbh.putWord(selectedWord));
                     dbh.putRelation(initialWord,selectedWord);
-                    //TODO auch die andere Relation und welche prior da?
+
                 }
-            }else if(translate.equals("Moses")) {
+
+            } */
+            if(translate.equals("Moses")) {
                 String translation = mosesClient.translation(word);
                 selectedWord = new Word(0,translation,to);
                 wordList.add(selectedWord);
@@ -129,7 +131,6 @@ public class WordController {
                     selectedWord.setDescription(newDescPut);
                     selectedWord.setId(dbh.putWord(selectedWord));
                     dbh.putRelation(initialWord,selectedWord);
-                    //TODO auch die andere Relation und welche prior da?
                 }
             }else
              {
@@ -179,21 +180,20 @@ public class WordController {
         return "home";
     }
 */
-   // @RequestMapping("/")
+    @RequestMapping("/")
     public String home(ModelMap modelMap) {
         /*
         Initialization for Home - page
          */
-        Transltr translator = new Transltr();
 
     //Initialize language Dropdown Menues
-        List<Language> languages =  translator.getLanguages();
+        List<Language> languages =  getLanguages();
         List<Language> languageFrom =  new ArrayList<>();
-        languageFrom.add(new Language("de","German"));
+        languageFrom.add(languages.get(0));
         languageFrom.addAll(languages);
         modelMap.addAttribute("languageFrom", languageFrom);
         List<Language> languageTo =  new ArrayList<>();
-        languageTo.add(new Language("en","English"));
+        languageTo.add(languages.get(1));
         languageTo.addAll(languages);
         modelMap.addAttribute("languageTo", languageTo);
         List<Language> languagePut = new ArrayList<>();
@@ -218,6 +218,15 @@ public class WordController {
         wordList.add(w);
         modelMap.addAttribute("wordList",wordList);
         return "home";
+    }
+
+    public List<Language> getLanguages(){
+        List<Language> languages = new ArrayList<>();
+        Language de = new Language("de","Deutsch");
+        Language en = new Language("en","English");
+        languages.add(de);
+        languages.add(en);
+        return languages;
     }
 
 }

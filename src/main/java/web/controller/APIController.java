@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 
 
-@Controller
+//@Controller
 public class APIController {
 
     @RequestMapping("/")
