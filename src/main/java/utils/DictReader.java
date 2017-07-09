@@ -109,6 +109,11 @@ int count = 0;
         return languageTo;
     }
 
+    @Override
+    public ArrayList<ArrayList<Word>> getSynonyms() {
+        return null;
+    }
+
     public void setFromEntry(int fromEntry){
         this.fromEntry = fromEntry;
     }

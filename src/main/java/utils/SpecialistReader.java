@@ -44,6 +44,9 @@ public class SpecialistReader implements FileReader {
 
                 entryCount++;
                 if (entryCount < fromEntry || entryCount > toEntry){
+                    if (entryCount>toEntry){
+                        break;
+                    }
                     if (entryCount%10000 == 0){
                         System.out.println("EntryCount: "+entryCount);
                     }
@@ -69,15 +72,19 @@ public class SpecialistReader implements FileReader {
                     }
                     tmp = line;
                     line = line.substring(end+1);
-                    System.out.println(line+line.indexOf("\t")+"/"+end);
+                    //System.out.println(line+line.indexOf("\t")+"/"+end);
                     if(line.contains("acronym_of=")){
                         continue;
                     }else{
                         line = tmp;
                     }
 
-                    System.out.println(line.indexOf("acronym_of")+11+"/"+end+line);
+                    //System.out.println(line.indexOf("acronym_of")+11+"/"+end+line);
                     String acronym = line.substring(line.indexOf("acronym_of")+11,end);
+                    if (acronym.indexOf("|")>0){
+                        acronym = acronym.substring(0,acronym.indexOf("|"));
+                    }
+
                     //System.out.println(line.indexOf("acronym_of")+11+"/"+line.indexOf("|"));
                     acronyms.add(acronym);
                     line = line.substring(end+1);
@@ -94,13 +101,16 @@ public class SpecialistReader implements FileReader {
                     }
                     tmp = line;
                     line = line.substring(end+1);
-                    System.out.println(line+line.indexOf("\t")+"/"+end);
+                    //System.out.println(line+line.indexOf("\t")+"/"+end);
                     if(line.contains("abbreviation_of=")){
                         continue;
                     }else{
                         line = tmp;
                     }
                     String abbreviation = line.substring(line.indexOf("abbreviation_of=")+16,end);
+                    if (abbreviation.indexOf("|")>0){
+                        abbreviation = abbreviation.substring(0,abbreviation.indexOf("|"));
+                    }
                     acronyms.add(abbreviation);
                     line = line.substring(end+1);
                 }
@@ -157,6 +167,11 @@ public class SpecialistReader implements FileReader {
     @Override
     public String getSecondLanguage() {
         return language;
+    }
+
+    @Override
+    public ArrayList<ArrayList<Word>> getSynonyms() {
+        return null;
     }
 
     public void setFromEntry(int fromEntry) {

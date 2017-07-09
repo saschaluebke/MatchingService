@@ -71,6 +71,9 @@ public class OwlReader implements FileReader {
 
                     entryCount++;
                     if (entryCount < fromEntry || entryCount > toEntry){
+                        if (entryCount > toEntry){
+                            break;
+                        }
                         if (entryCount%10000 == 0){
                             System.out.println("EntryCount: "+entryCount);
                         }
@@ -186,6 +189,11 @@ public class OwlReader implements FileReader {
     @Override
     public String getSecondLanguage() {
         return secondLanguage;
+    }
+
+    @Override
+    public ArrayList<ArrayList<Word>> getSynonyms() {
+        return null;
     }
 
     public void setFromEntry(int fromEntry) {

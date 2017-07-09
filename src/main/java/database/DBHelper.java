@@ -21,6 +21,10 @@ public class DBHelper{
         this.translator = translator;
     }
 
+    public DBHelper(DBStrategy dbStrategy){
+        this.dbStrategy = dbStrategy;
+    }
+
     public int putWord(Word word) {
         return dbStrategy.putWord(word);
     }
@@ -35,6 +39,10 @@ public class DBHelper{
 
     public void takeFromFileReader(FileReader fr) {
         dbStrategy.takeFromFileReader(fr);
+    }
+
+    public void storeFromFile(FileReader fr){
+        dbStrategy.storeFromFile(fr);
     }
 
     public void putWordList(ArrayList<Word> wordList, String language){
@@ -59,6 +67,10 @@ public class DBHelper{
 
     public ArrayList<Relation> getRelation(Word word, String from, String to) {
         return dbStrategy.getRelation(word,from, to);
+    }
+
+    public ArrayList<Word> getWordFromRelation(Word word, String fromLanguage, String toLanguage){
+        return dbStrategy.getWordFromRelation(word,fromLanguage,toLanguage);
     }
 
     public int getRelationFromId(int id, String fromLanguage, String toLanguage) {

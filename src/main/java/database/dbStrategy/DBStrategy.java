@@ -18,6 +18,7 @@ public interface DBStrategy {
     int putRelation(Word word1, Word word2);
     void putRelationList(ArrayList<Relation> relations, String language1, String language2);
     int takeFromFileReader(FileReader fr);
+    void storeFromFile(FileReader fr);
 
     MatchResultSet searchWord(Word word);
     Word getWordById(int id, String language);
@@ -26,6 +27,7 @@ public interface DBStrategy {
     void removeWord(Word word, String language);
 
     ArrayList<Relation> getRelation(Word word, String from, String to);
+    ArrayList<Word> getWordFromRelation(Word word, String LanguageFrom, String LanguageTo);
     ArrayList<Relation> getAllRelations(String languageFrom, String languageTo);
     int getRelationFromId(int id, String fromLanguage, String toLanguage);
     void removeRelation(Relation relation, String fromLanguage, String toLanguage);

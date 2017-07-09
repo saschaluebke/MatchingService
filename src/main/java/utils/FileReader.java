@@ -14,4 +14,5 @@ public interface FileReader {
     ArrayList<Relation> getRelations(); //for Synonyms
     String getFirstLanguage();
     String getSecondLanguage();
+    ArrayList<ArrayList<Word>> getSynonyms();
 }

@@ -92,7 +92,10 @@ public class SimpleStrategy implements DBStrategy {
     @Override
     public void putRelationList(ArrayList<Relation> relations, String language1, String language2) {
         ArrayList<String> parList = new ArrayList<>();
-
+        if(relations==null || relations.size()<1){
+            System.out.println("SimpleStrategyError: "+relations+" null or 0");
+            return;
+        }
         StringBuilder querry = new StringBuilder("INSERT INTO rel_" + language1+"_"+language2 + " VALUES ");
         for (int i = 0; i < relations.size(); i++) {
             Relation rel = relations.get(i);
@@ -148,6 +151,13 @@ public class SimpleStrategy implements DBStrategy {
         putWordList(wordList,language);
         */
         return wordList.size();
+    }
+
+    @Override
+    public void storeFromFile(FileReader fr) {
+        for(Word word : fr.getWordList()){
+            word.setId(putWord(word));
+        }
     }
 
     @Override
@@ -296,7 +306,7 @@ public class SimpleStrategy implements DBStrategy {
     public ArrayList<Relation> getRelation(Word word, String from, String to) {
         ArrayList<Relation> relationList = new ArrayList<>();
         String[] par = {Integer.toString(word.getId())};
-        ResultSet rs = dbq.query("SELECT * FROM rel_" + from + "_" + to + " WHERE id_" + from + " = ? ", par);
+        ResultSet rs = dbq.query("SELECT * FROM rel_" + from + "_" + to + " WHERE idFrom = ? ", par);
         try {
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -315,6 +325,16 @@ public class SimpleStrategy implements DBStrategy {
         }
 
         return relationList;
+    }
+
+    @Override
+    public ArrayList<Word> getWordFromRelation(Word word, String languageFrom, String languageTo) {
+        ArrayList<Relation> relations = getRelation(word,languageFrom,languageTo);
+        ArrayList<Word> words = new ArrayList<>();
+        for(Relation r : relations){
+            words.add(getWordById(r.getIdTo(),languageTo));
+        }
+        return words;
     }
 
     @Override

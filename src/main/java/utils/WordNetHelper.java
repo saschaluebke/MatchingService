@@ -31,9 +31,9 @@ public class WordNetHelper implements FileReader {
     public WordNetHelper(String path, String language){
         this.path = path;
         this.language = language;
-        dbh = new DBHelper(new SimpleStrategy());
-        String wnhome = System.getProperty("user.dir");
-        path = wnhome + File.separator + "dict";
+        dbh = new DBHelper(new SimpleStrategy(),null);
+        //String wnhome = System.getProperty("user.dir");
+        //path = wnhome + File.separator + "dict";
         URL url = null;
         try {
             url = new URL("file", null, path);
@@ -106,6 +106,7 @@ public class WordNetHelper implements FileReader {
 
     @Override
     public void getFileContent() {
+        synonymList = new ArrayList<>();
         int entryCount = 0;
         wordList = new ArrayList<>();
             int lastId = dbh.getLastWordId(language);
@@ -114,6 +115,9 @@ public class WordNetHelper implements FileReader {
 
                 entryCount++;
                 if (entryCount < fromEntry || entryCount > toEntry){
+                    if (entryCount > toEntry){
+                        break;
+                    }
                     if (entryCount%10000 == 0){
                         System.out.println("EntryCount: "+entryCount);
                     }
@@ -129,6 +133,7 @@ public class WordNetHelper implements FileReader {
                 Word word  = new Word(lastId,w.getLemma(),language);
                 wordList.add(word);
                 ISynset synset = w.getSynset();
+
                 for(IWord word1 : synset.getWords()){
                    // System.out.println(word1.getLemma());
                     lastId++;
@@ -175,6 +180,11 @@ public class WordNetHelper implements FileReader {
     @Override
     public String getSecondLanguage() {
         return language;
+    }
+
+    @Override
+    public ArrayList<ArrayList<Word>> getSynonyms() {
+        return null;
     }
 
     public void setToEntry(int toEntry) {

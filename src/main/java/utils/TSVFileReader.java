@@ -104,6 +104,11 @@ public class TSVFileReader implements utils.FileReader {
         return null;
     }
 
+    @Override
+    public ArrayList<ArrayList<Word>> getSynonyms() {
+        return null;
+    }
+
     public ArrayList<Word> getFileContentWords(String language) {
         ArrayList<Word> wordList = new ArrayList<>();
 

@@ -24,6 +24,41 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
         matcher = getMatcher();
     }
 
+    @Override
+    public void storeFromFile(FileReader fr){
+        if(fr.getWordList()!=null && fr.getSynonyms()!=null && fr.getSecondWordList()==null){
+            //Put all words into the wordList
+            ArrayList<Word> words = fr.getWordList();
+            ArrayList<ArrayList<Word>> synonyms = fr.getSynonyms();
+            System.out.println(words.size()+"/"+synonyms.size());
+            ArrayList<Relation> relations = new ArrayList<>();
+            for(int i=0;i<words.size();i++){
+                Word word = words.get(i);
+                word.setId(putWord(word));
+                for(Word synonym : synonyms.get(i)){
+                    synonym.setId(putWord(synonym));
+                }
+                //Create relations and put them into the relationList
+                synonyms.get(i).add(word);
+                for(int x=0;x<synonyms.get(i).size();x++){
+                    Word w = synonyms.get(i).get(x);
+                    for(int y=0;y<synonyms.get(i).size();y++){
+                        if(x!=y){
+                            Relation r = new Relation(0,w.getId(),synonyms.get(i).get(y).getId());
+                            relations.add(r);
+                        }
+                    }
+
+                }
+            }
+
+            putRelationList(relations,fr.getFirstLanguage(),fr.getSecondLanguage());
+
+        }else if(fr.getWordList()!=null && fr.getSecondWordList()!=null && fr.getSynonyms()==null){
+            //TODO: insert Translations
+        }
+    }
+
     /**
      * 1. Try to Match with WordList of same language then input
      * 2. When you find something equal look at the synonym table

@@ -1,13 +1,11 @@
 package evaluation;
 
-
 import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
-import databaseTests.DBQueryTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
@@ -25,10 +23,9 @@ import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Evaluation as Test because Spring looks after main classes and the only main class has
- * to be AppConfig!
+ * Created by sashbot on 08.07.17.
  */
-public class OnkoWikiEvaluation {
+public class ICD10Evaluation {
     static MosesClient mc;
     static ArrayList<String> input;
     static DBStrategy strategy;
@@ -48,9 +45,9 @@ public class OnkoWikiEvaluation {
         dbh.newLanguage("en");
 
         //Load Words with Synonyms
-        SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon/LEXICON","en");
-        OwlReader owlr = new OwlReader("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","de");
-        WordNetHelper wnh = new WordNetHelper("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","en");
+        SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon","en");
+        OwlReader owlr = new OwlReader("/src/main/resources/Thesaurus-byName.owl","de");
+        WordNetHelper wnh = new WordNetHelper("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
 
         sr.setFromEntry(0);
         sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
@@ -66,15 +63,15 @@ public class OnkoWikiEvaluation {
 
         //Set Translator
         mc = new MosesClient();
-        mc.setFromLanguage("de");
-        mc.setToLanguage("en");
+        mc.setFromLanguage("en");
+        mc.setToLanguage("de");
 
         //Get Evaluaton Words
         input = new ArrayList<>();
         try {
-            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/test/java/evaluation/OnkoWikiDaten.txt")); sc.hasNext(); ) {
+            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/test/java/evaluation/icd10.txt")); sc.hasNext(); ) {
                 String line = sc.nextLine();
-                line = line.replace("\t","");
+                line = line.substring(7);
                 if(line.equals("")){
 
                 }else{
@@ -119,6 +116,20 @@ public class OnkoWikiEvaluation {
         assertEquals(true,true);
     }
 
+    @Test
+    public void synonymEvalution() {
+        strategy = new SynonymStrategy();
+        dbh = new DBHelper(strategy,mc);
+
+
+        ArrayList<ArrayList<String>> output = new ArrayList<>();
+        for(String in : input){
+            ArrayList<String> translation = dbh.translate(new Word(0,in,"en"));
+            output.add(translation);
+        }
+        printEvaluation("SynonymEvaluation",output);
+    }
+
     public void printSimpleEvaluation(String name, ArrayList<String> output){
         try{
             PrintWriter writer = new PrintWriter(name+".txt", "UTF-16");//UTF-8?
@@ -144,27 +155,6 @@ public class OnkoWikiEvaluation {
 
     }
 
-    /**
-     * No need for Synonym Testing because currently I have no Synonyms in German
-     */
-
-    /*
-    @Test
-    public void synonymEvalution() {
-        strategy = new SynonymStrategy();
-        dbh = new DBHelper(strategy,mc);
-
-
-        ArrayList<ArrayList<String>> output = new ArrayList<>();
-        for(String in : input){
-            ArrayList<String> translation = dbh.translate(new Word(0,in,"en"));
-            output.add(translation);
-        }
-        printEvaluation("SynonymEvaluation",output);
-    }
-*/
-
-/*
     public void printEvaluation(String name, ArrayList<ArrayList<String>> translations){
         try{
             PrintWriter writer = new PrintWriter(name+".txt", "UTF-16");//UTF-8?
@@ -183,66 +173,4 @@ public class OnkoWikiEvaluation {
             // do something
         }
     }
-
-    /*
-    @Test
-    public void getSmallFileContentTest() {
-        input = new ArrayList<>();
-        try {
-            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/test/java/evaluation/OnkoWikiDaten.txt")); sc.hasNext(); ) {
-                String line = sc.nextLine();
-                line = line.replace("\t","");
-//System.out.println(line);
-                if(line.equals("")){
-
-                }else{
-                    input.add(line);
-                }
-
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-System.out.println("-----------Beginning of translation------------");
-        System.out.println("Input Words: "+input.size());
-        ArrayList<String> output = new ArrayList<>();
-        for(String in : input){
-            output.add(mc.translation(in));
-        }
-        System.out.println("Output Words: "+output.size());
-
-
-        try{
-            PrintWriter writer = new PrintWriter("OnkoOut3.txt", "UTF-8");
-            String writeString = "";
-            int sameCounter = 0;
-            for(int i=0;i<output.size();i++){
-                String inputWord = input.get(i);
-                String outputWord = output.get(i);
-                String equalMarker = "0";
-                if(inputWord.contains(outputWord)){
-                    equalMarker = "X";
-                    sameCounter++;
-                }
-                writeString = String.format("%20s %50s %50s \r\n", equalMarker, inputWord, outputWord);
-                writer.println(writeString);
-            }
-            System.out.println("Same Words: "+sameCounter);
-             writer.print(writeString);
-            writer.close();
-        } catch (IOException e) {
-            // do something
-        }
-
-        assertEquals(136,output.size());
-
-
-        //When the Words are the same probably Moses could not translate it!
-        //make table for an overview.
-
-
-
-
-    }
-    */
 }
