@@ -1,12 +1,10 @@
 package utilsTests;
 
 import org.junit.Test;
-import utils.SpringerReader;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static utilsTests.SpecialistTest.sr;
 
 /**
  * Created by SashBot on 09.07.2017.

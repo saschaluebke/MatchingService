@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-
+/**
+ * Die Klasse ist zum rumspielen mit Spring da.
+ * http://www.hameister.org/SpringMvcRestExample.html hier wird beschrieben wie man mittels curl die requests abfängt
+ * außerdem wird hier auch erwähnt dass eine war datei im tomcat employed wurde... dass wäre doch genau das was verlangt wird oder?
+ */
 //@Controller
 public class APIController {
 

@@ -69,7 +69,7 @@ public class ICD10Evaluation {
         //Get Evaluaton Words
         input = new ArrayList<>();
         try {
-            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/test/java/evaluation/icd10.txt")); sc.hasNext(); ) {
+            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/ICD10/icd10Input.txt")); sc.hasNext(); ) {
                 String line = sc.nextLine();
                 line = line.substring(7);
                 if(line.equals("")){
