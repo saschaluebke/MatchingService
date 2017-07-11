@@ -25,13 +25,6 @@ public class Matcher {
         iterateStrategy.setWordFromDB(wordFromDB);
         iterateStrategy.setSearchString(searchString.getName());
         ArrayList<MatchResult> matchResults = iterateStrategy.getMatchList(distanceStrategy);
-/*
-        for(MatchResult mr : matchResults){
-            mr.setScore(distanceStrategy.getDistance(mr.getSearchString(),mr.getDbString()));
-        }
-*/
-
-
         ArrayList<MatchResult> sortedResults = sortStrategy.sort(matchResults);
         mrs.addMatchResults(sortedResults,wordFromDB);
         return mrs;
@@ -47,8 +40,6 @@ public class Matcher {
             if (result.getMatchResults().size()>0){
                 mrs.addMatchResults(result.getMatchResults().get(0), w);
             }
-           // count++;
-           // System.out.println(count+": "+w.getName());
         }
         return mrs;
     }

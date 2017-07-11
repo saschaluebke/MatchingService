@@ -1,8 +1,5 @@
 package components;
 
-/**
- * Created by sascha on 07.06.17.
- */
 public class MatchResult implements Comparable<MatchResult> {
     private double score;
     private int sourceStart, sourceEnd, targetStart, targetEnd;
@@ -10,6 +7,16 @@ public class MatchResult implements Comparable<MatchResult> {
     private final Word wordFromDB;
     private final int ID;
 
+    /**
+     *
+     * @param wordFromDB
+     * @param targetText    Input String
+     * @param score         Score of Distance Function
+     * @param sourceStart   Parameter where source and target match
+     * @param sourceEnd
+     * @param targetStart
+     * @param targetEnd
+     */
     public MatchResult(Word wordFromDB, String targetText, double score,int sourceStart,int sourceEnd, int targetStart, int targetEnd){
         this.wordFromDB = wordFromDB;
         this.searchString = targetText;

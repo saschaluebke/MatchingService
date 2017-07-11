@@ -116,7 +116,7 @@ public class SpringerCorpusMaker{
 
     private void print(String path ,ArrayList<String> lines){
         try {
-            PrintWriter writer = new PrintWriter(path, "UTF-16");//UTF-8?
+            PrintWriter writer = new PrintWriter(path, "UTF-8");
             for(String line : lines){
                 writer.println(line);
             }

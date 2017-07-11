@@ -27,7 +27,7 @@ public class WordNetTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SimpleStrategy());
-        wnh = new WordNetReader("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
+        wnh = new WordNetReader("/src/main/resources/WordNet/WordNet-3.0/dict","en");
     }
 
     @Test

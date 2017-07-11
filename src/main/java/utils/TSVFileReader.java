@@ -2,6 +2,7 @@ package utils;
 
 import components.Relation;
 import components.Word;
+import database.DBHelper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,6 +19,12 @@ public class TSVFileReader implements utils.FileReader {
 
     private int numberOfTerms = 0;
 
+    public TSVFileReader(String filename, String language) {
+        this.path = System.getProperty("user.dir")+filename;
+        this.language = language;
+
+    }
+
     // Simple file reader
     public String[] readLines(String filename) throws IOException {
         FileReader fileReader = new FileReader(filename);
@@ -31,13 +38,6 @@ public class TSVFileReader implements utils.FileReader {
         return lines.toArray(new String[lines.size()]);
     }
 
-    // Constructer, which reads a file
-    public TSVFileReader(String filename, String language) {
-       this.path = filename;
-       this.language = language;
-
-    }
-
     public String cleanString(String s){
         String temp[] = s.split("\t");
         s = temp[0];
@@ -45,6 +45,11 @@ public class TSVFileReader implements utils.FileReader {
         s = s.replaceAll("  ", " ").toLowerCase();
         s = s.trim();
         return s;
+    }
+
+    public ArrayList<String> getFiles(){
+        getFileContent();
+        return fileContent;
     }
 
     public void getFileContent(){

@@ -8,6 +8,7 @@ import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
+import utils.OnkoWikiReader;
 import utils.OwlReader;
 import utils.SpecialistReader;
 import utils.WordNetReader;
@@ -46,8 +47,8 @@ public class OnkoWikiEvaluation {
 
         //Load Words with Synonyms
         SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon/LEXICON","en");
-        OwlReader owlr = new OwlReader("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","de");
-        WordNetReader wnh = new WordNetReader("/src/main/resources/NCI_Thesaurus/Thesaurus-byName.owl","en");
+        OwlReader owlr = new OwlReader("/src/main/resources/NCI/Thesaurus-byName.owl","de");
+        WordNetReader wnh = new WordNetReader("/src/main/resources/WordNet/WordNet-3.0/dict","en");
 
         sr.setFromEntry(0);
         sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
@@ -67,21 +68,9 @@ public class OnkoWikiEvaluation {
         mc.setToLanguage("en");
 
         //Get Evaluaton Words
-        input = new ArrayList<>();
-        try {
-            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/test/java/evaluation/OnkoWikiDaten.txt")); sc.hasNext(); ) {
-                String line = sc.nextLine();
-                line = line.replace("\t","");
-                if(line.equals("")){
+        OnkoWikiReader owr = new OnkoWikiReader();
+        input = owr.getLines("src/main/resources/OnkoWiki/OnkoWikiDaten.txt");
 
-                }else{
-                    input.add(line);
-                }
-
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
 
         System.out.println("End of init.");
     }
@@ -118,7 +107,7 @@ public class OnkoWikiEvaluation {
 
     public void printSimpleEvaluation(String name, ArrayList<String> output){
         try{
-            PrintWriter writer = new PrintWriter(name+".txt", "UTF-16");//UTF-8?
+            PrintWriter writer = new PrintWriter(name+".txt", "UTF-8");
             String writeString = "";
             int sameCounter = 0;
             for(int i=0;i<output.size();i++){

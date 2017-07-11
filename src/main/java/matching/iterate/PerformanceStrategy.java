@@ -27,7 +27,7 @@ public class PerformanceStrategy implements IterateStrategy {
     public ArrayList<MatchResult> getMatchList(DistanceStrategy distanceStrategy) {
         matchResults = new ArrayList<>();
         if (searchString.length()>wordFromDB.getLanguage().length()){
-            matchResults.add(new MatchResult(wordFromDB,searchString,distanceStrategy.getDistance(searchString,wordFromDB.getName()),0,searchString.length(),0,searchString.length()));
+            matchResults.add(new MatchResult(wordFromDB,searchString,distanceStrategy.getDistance(searchString,wordFromDB.getName()),0,wordFromDB.getName().length(),0,wordFromDB.getName().length()));
         }else{
 
             //String[] splitted = dbString.split(REGEX);

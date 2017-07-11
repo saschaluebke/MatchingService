@@ -29,7 +29,7 @@ public class WordNetReader implements FileReader {
     private int fromEntry, toEntry;
 
     public WordNetReader(String path, String language){
-        this.path = path;
+        this.path = System.getProperty("user.dir")+path;
         this.language = language;
         dbh = new DBHelper(new SimpleStrategy(),null);
         //String wnhome = System.getProperty("user.dir");

@@ -22,7 +22,8 @@ public class SpringerCorpusMakerTest {
     @Test
     public void annotetedDataTest() {
         int lines =sr.getFileContentByLine();
-        assertEquals(1000, lines);
+        assertEquals(10051, lines);
+        sr.getFileContent();
     }
 
 }
