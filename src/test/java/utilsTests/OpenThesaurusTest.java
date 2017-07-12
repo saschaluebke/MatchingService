@@ -29,7 +29,7 @@ public class OpenThesaurusTest{
             dbq.dropAllTables();
             dbq.truncate("languages");
             dbh = new DBHelper(new SynonymStrategy());
-            otr = new OpenThesaurusReader("/src/main/resources/openThesaurus/openthesaurus.txt","de");
+            otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
         }
 /*
         @Test
@@ -72,14 +72,22 @@ public class OpenThesaurusTest{
         */
     @Test
     public void dbTest(){
+        dbh = new DBHelper(new SynonymStrategy());
+        ArrayList<String> allLines = otr.getAllLines();
+        int lineCount = allLines.size();
         dbh.newLanguage("de");
-        otr.setFromEntry(0);
-        otr.setToEntry(100);
-        dbh.storeFromFile(otr);
+        int tmp=0;
+        for(int i = 0; i<lineCount+100000; i=i+100000){
 
-        System.out.println(dbh.print("de","de"));
+            otr.setFromEntry(tmp);
+            otr.setToEntry(i);
+            dbh.storeFromFile(otr);
+            tmp=i;
+        }
+        //System.out.println(dbh.print("de","de"));
 
-        assertEquals(100, otr.getWordList().size());
+        assertEquals(102093, dbh.getAllWords("de").size());
+        assertEquals(537338,dbh.getAllRelations("de","de").size());
 
 
     }

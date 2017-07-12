@@ -5,6 +5,7 @@ import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import utils.FileReader;
@@ -21,14 +22,15 @@ public class OwlReaderTest {
     static MySQLQuery dbq;
     static DBHelper dbh;
     static OwlReader owlReader;
+    static int lineCount;
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
         dbq = new MySQLQuery();
         dbq.dropAllTables();
         dbq.truncate("languages");
-        dbh = new DBHelper(new SimpleStrategy());
-        owlReader = new OwlReader("/src/main/resources/NCI/Thesaurus-byName.owl","en");
+        dbh = new DBHelper(new SynonymStrategy());
+        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/Thesaurus-byName.owl","en");
 
     }
 /*
@@ -58,15 +60,32 @@ public class OwlReaderTest {
         assertEquals(326718,dbh.getAllRelations("de","de").size());
     }
 */
+
+    @Test
+    public void getAllWordsTest(){
+        ArrayList<String> allLines = owlReader.getAllLines();
+        lineCount = allLines.size();
+        assertEquals(1238696,lineCount);
+    }
+
+
     @Test
     public void synonymTest(){
-        dbh.newLanguage("en");
-        owlReader.setFromEntry(0);
-        owlReader.setToEntry(1000);
-        dbh.storeFromFile(owlReader);
 
-       System.out.println(dbh.print("en","en"));
-       assertEquals(1000,dbh.getAllWords("en"));
+        ArrayList<String> allLines = owlReader.getAllLines();
+        lineCount = allLines.size();
+        dbh.newLanguage("en");
+        int tmp=0;
+        for(int i = 0; i<lineCount+100000; i=i+100000){
+
+            owlReader.setFromEntry(tmp);
+            owlReader.setToEntry(i);
+            dbh.storeFromFile(owlReader);
+            tmp=i;
+        }
+
+       //System.out.println(dbh.print("en","en"));
+       assertEquals(1591354,dbh.getAllWords("en").size());
     }
 
 

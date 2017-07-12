@@ -26,29 +26,42 @@ public class SpecialistReader implements FileReader {
         dbh = new DBHelper(new SimpleStrategy());
     }
 
+    public ArrayList<String> getAllLines(){
+        ArrayList<String> allLines = new ArrayList<>();
+
+        try {
+            for (Scanner sc = new Scanner(new File(System.getProperty("user.dir") + path)); sc.hasNext(); ) {
+                String line = sc.nextLine();
+
+                if (line.contains("{base=")) {
+                    while (!line.contains("}")) {
+                        line = line + sc.nextLine();
+                    }
+                }
+                allLines.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return allLines;
+    }
+
     @Override
     public void getFileContent() {
         entryCount=0;
         wordlist = new ArrayList<>();
         allSynonyms = new ArrayList<>();
         int lastWordId = dbh.getLastWordId(language);
-        try {
-            for (Scanner sc = new Scanner(new File(System.getProperty("user.dir") + path)); sc.hasNext(); ) {
-                String line = sc.nextLine();
-
-                if(line.contains("{base=")){
-                    while(!line.contains("}")){
-                        line = line + sc.nextLine();
-                    }
-                }
-
+        ArrayList<String> allLines = getAllLines();
+        for(String line : allLines){
                 entryCount++;
                 if (entryCount < fromEntry || entryCount > toEntry){
                     if (entryCount>toEntry){
                         break;
                     }
                     if (entryCount%10000 == 0){
-                        System.out.println("EntryCount: "+entryCount);
+                       //System.out.println("EntryCount: "+entryCount);
                     }
 
                     continue;
@@ -130,10 +143,8 @@ public class SpecialistReader implements FileReader {
                 allSynonyms.add(synonyms);
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
-    }
+
         @Override
     public ArrayList<Word> getWordList() {
         return wordlist;

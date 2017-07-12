@@ -1,17 +1,16 @@
 package evaluation;
 
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
-import utils.OnkoWikiReader;
-import utils.OwlReader;
-import utils.SpecialistReader;
-import utils.WordNetReader;
+import utils.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,6 +31,7 @@ public class OnkoWikiEvaluation {
     static DBStrategy strategy;
     static DBHelper dbh;
     static MySQLQuery sqlQuery;
+    static Boolean setUpDatabase=true;
 
 
     @BeforeClass
@@ -40,27 +40,26 @@ public class OnkoWikiEvaluation {
         strategy = new SimpleStrategy();
         dbh = new DBHelper(strategy,mc);
         sqlQuery = new MySQLQuery();
-        sqlQuery.dropAllTables();
-        sqlQuery.truncate("languages");
-        dbh.newLanguage("de");
-        dbh.newLanguage("en");
 
-        //Load Words with Synonyms
-        SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon/LEXICON","en");
-        OwlReader owlr = new OwlReader("/src/main/resources/NCI/Thesaurus-byName.owl","de");
-        WordNetReader wnh = new WordNetReader("/src/main/resources/WordNet/WordNet-3.0/dict","en");
+        if (setUpDatabase) {
+            sqlQuery.dropAllTables();
+            sqlQuery.truncate("languages");
+            dbh.newLanguage("de");
+            dbh.newLanguage("en");
 
-        sr.setFromEntry(0);
-        sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
-        dbh.storeFromFile(sr);
+            //Load Words with Synonyms
+            OpenThesaurusReader otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
 
-        owlr.setFromEntry(0);
-        owlr.setToEntry(Integer.MAX_VALUE);
-        dbh.storeFromFile(owlr);
-
-        wnh.setFromEntry(0);
-        wnh.setToEntry(Integer.MAX_VALUE);
-        dbh.storeFromFile(wnh);
+            ArrayList<String> allLines = otr.getAllLines();
+            int lineCount = allLines.size();
+            int tmp=0;
+            for(int i = 0; i<lineCount+100000; i=i+100000){
+                otr.setFromEntry(tmp);
+                otr.setToEntry(i);
+                dbh.storeFromFile(otr);
+                tmp=i;
+            }
+        }
 
         //Set Translator
         mc = new MosesClient();
@@ -69,7 +68,7 @@ public class OnkoWikiEvaluation {
 
         //Get Evaluaton Words
         OnkoWikiReader owr = new OnkoWikiReader();
-        input = owr.getLines("src/main/resources/OnkoWiki/OnkoWikiDaten.txt");
+        input = owr.getLines("src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt");
 
 
         System.out.println("End of init.");

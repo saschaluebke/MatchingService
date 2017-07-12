@@ -35,23 +35,23 @@ public class SpringerCorpusMaker{
             for (int i = 0; i < listOfEnglishFiles.length; i++) {
                 //for English
 
-                BufferedReader br = new BufferedReader(new FileReader(listOfEnglishFiles[i]));
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(listOfEnglishFiles[i]),"iso-8859-1")); //find out with file -i <filename>
                 listOfEnglishLines.add(br.readLine());
                 br.close();
 
                 //for German
-                br = new BufferedReader(new FileReader(listOfGermanFiles[i]));
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(listOfGermanFiles[i]),"iso-8859-1"));
                 listOfGermanLines.add(br.readLine());
+
                 br.close();
             }
-
             if (listOfEnglishLines.size()== listOfGermanLines.size()){
                 print("SpringerChunk.en", listOfEnglishLines);
                 print("SpringerChunk.de", listOfGermanLines);
             }else{
                 System.out.println(listOfEnglishLines.size()+ " != " +listOfGermanLines.size());
             }
-
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -96,7 +96,8 @@ public class SpringerCorpusMaker{
         ArrayList<String> lines = new ArrayList<>();
         try {
             String line = "";
-            BufferedReader br = new BufferedReader(new FileReader(file));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),"iso-8859-1")); //find out with file -i <filename>
+
 
             line = br.readLine();
             while (line.indexOf(".") > 0) {
@@ -115,18 +116,20 @@ public class SpringerCorpusMaker{
     }
 
     private void print(String path ,ArrayList<String> lines){
+
+        BufferedWriter writer = null;
         try {
-            PrintWriter writer = new PrintWriter(path, "UTF-8");
+            writer = new BufferedWriter(new FileWriter(new File(path)));
+
             for(String line : lines){
-                writer.println(line);
+                writer.write(line+System.lineSeparator());
             }
 
             writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     //EnglishFiles = 7823; GermanFiles = 7808 so you have to sort the Files that doesn't match

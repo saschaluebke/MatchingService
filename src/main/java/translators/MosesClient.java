@@ -37,6 +37,7 @@ public class MosesClient implements Translator {
         TranslatorGetProperties tgp = new TranslatorGetProperties();
         try {
             String path = tgp.getPropValues("MosesClient.path");
+            System.out.println("Starting Connection to Moses with "+path);
             config = new XmlRpcClientConfigImpl();
             config.setServerURL(new URL(path));
             client = new XmlRpcClient();

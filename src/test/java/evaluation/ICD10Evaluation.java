@@ -9,6 +9,7 @@ import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
+import utils.OpenThesaurusReader;
 import utils.OwlReader;
 import utils.SpecialistReader;
 import utils.WordNetReader;
@@ -31,57 +32,72 @@ public class ICD10Evaluation {
     static DBStrategy strategy;
     static DBHelper dbh;
     static MySQLQuery sqlQuery;
+    static Boolean setUpDatabase=true;
 
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
-        //Clean System
         strategy = new SimpleStrategy();
         dbh = new DBHelper(strategy,mc);
         sqlQuery = new MySQLQuery();
-        sqlQuery.dropAllTables();
-        sqlQuery.truncate("languages");
-        dbh.newLanguage("de");
-        dbh.newLanguage("en");
 
-        //Load Words with Synonyms
-        SpecialistReader sr = new SpecialistReader("/src/main/resources/SpecialistLexicon","en");
-        OwlReader owlr = new OwlReader("/src/main/resources/Thesaurus-byName.owl","de");
-        WordNetReader wnh = new WordNetReader("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/WordNet/WordNet-3.0/dict","en");
+        if (setUpDatabase) {
+            sqlQuery.dropAllTables();
+            sqlQuery.truncate("languages");
+            dbh.newLanguage("de");
+            dbh.newLanguage("en");
 
-        sr.setFromEntry(0);
-        sr.setToEntry(Integer.MAX_VALUE);//TODO: Have to be smaller!
-        dbh.storeFromFile(sr);
 
-        owlr.setFromEntry(0);
-        owlr.setToEntry(Integer.MAX_VALUE);
-        dbh.storeFromFile(owlr);
+            //Load Words with Synonyms
+            SpecialistReader sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON", "en");
+            OwlReader owlr = new OwlReader("/src/main/resources/ontologies/NCI/Thesaurus-byName.owl", "de");
+            WordNetReader wnh = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict", "en");
 
-        wnh.setFromEntry(0);
-        wnh.setToEntry(Integer.MAX_VALUE);
-        dbh.storeFromFile(wnh);
+            //--- SpecialistLEXICON ---
+            ArrayList<String> allLines = sr.getAllLines();
+            int lineCount = allLines.size();
+            dbh.newLanguage("en");
+            int tmp = 0;
+            for (int i = 0; i < lineCount + 100000; i = i + 100000) {
+
+                sr.setFromEntry(tmp);
+                sr.setToEntry(i);
+                dbh.storeFromFile(sr);
+                tmp = i;
+            }
+
+            //--- NCI ---
+            allLines = owlr.getAllLines();
+            lineCount = allLines.size();
+            dbh.newLanguage("en");
+            tmp = 0;
+            for (int i = 0; i < lineCount + 100000; i = i + 100000) {
+
+                owlr.setFromEntry(tmp);
+                owlr.setToEntry(i);
+                dbh.storeFromFile(owlr);
+                tmp = i;
+            }
+
+            //--- WordNet ---
+            lineCount = wnh.getAllLines();
+            tmp = 0;
+            for (int i = 0; i < lineCount + 100000; i = i + 100000) {
+
+                wnh.setFromEntry(tmp);
+                wnh.setToEntry(i);
+                dbh.storeFromFile(wnh);
+                tmp = i;
+            }
+        }
+
 
         //Set Translator
         mc = new MosesClient();
         mc.setFromLanguage("en");
         mc.setToLanguage("de");
 
-        //Get Evaluaton Words
-        input = new ArrayList<>();
-        try {
-            for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/ICD10/icd10Input.txt")); sc.hasNext(); ) {
-                String line = sc.nextLine();
-                line = line.substring(7);
-                if(line.equals("")){
 
-                }else{
-                    input.add(line);
-                }
-
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
 
         System.out.println("End of init.");
     }
@@ -107,27 +123,71 @@ public class ICD10Evaluation {
         strategy = new SimpleStrategy();
         dbh = new DBHelper(strategy,mc);
 
-        ArrayList<String> output = new ArrayList<>();
-        for(String in : input){
-            output.add(mc.translation(in));
+        ArrayList<String> output=null;
+        for(int i  = 1; i<4 ; i++){
+            output = new ArrayList<>();
+            input = new ArrayList<>();
+            //Get Evaluaton Words
+            input = new ArrayList<>();
+            int counter = 0;
+            try {
+                for(Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion"+i+".txt")); sc.hasNext(); ) {
+                    String line = sc.nextLine();
+                    if(line.equals("")){
+
+                    }else{
+                        counter++;
+                        input.add(line);
+                        System.out.print(counter+": "+line+" --> ");
+                        String translation = mc.translation(line);
+                        System.out.println(translation);
+                        output.add(translation);
+
+                    }
+
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            printSimpleEvaluation("simpleTranslation_Emea"+i,output);
         }
 
-        printSimpleEvaluation("simpleTranslation",output);
-        assertEquals(true,true);
+
+
+        assertEquals(179,output.size());
     }
 
     @Test
     public void synonymEvalution() {
         strategy = new SynonymStrategy();
-        dbh = new DBHelper(strategy,mc);
-
-
+        dbh = new DBHelper(strategy, mc);
         ArrayList<ArrayList<String>> output = new ArrayList<>();
-        for(String in : input){
-            ArrayList<String> translation = dbh.translate(new Word(0,in,"en"));
-            output.add(translation);
+        for (int i = 1; i < 4; i++) {
+            //Get Evaluaton Words
+            input = new ArrayList<>();
+            output = new ArrayList<>();
+            try {
+                for (Scanner sc = new Scanner(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion" + i+".txt")); sc.hasNext(); ) {
+                    ArrayList<String> translation=new ArrayList<>();
+                    String line = sc.nextLine();
+                    line = line.substring(6);
+                    if (line.equals("")) {
+
+                    } else {
+                        input.add(line);
+                        translation = dbh.translate(new Word(0, line, "en"));
+                        output.add(translation);
+                    }
+
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            printEvaluation("SynonymEvaluation"+i, output);
+            assertEquals(1000, output.size());
         }
-        printEvaluation("SynonymEvaluation",output);
     }
 
     public void printSimpleEvaluation(String name, ArrayList<String> output){

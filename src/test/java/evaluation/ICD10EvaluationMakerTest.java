@@ -18,12 +18,12 @@ public class ICD10EvaluationMakerTest {
 
     @Test
     public void makeInputFiles(){
-        String input = "/src/main/resources/ICD10/icd10.txt";
-        String output = "/src/main/resources/ICD10/icd10InputVersion1.txt";
+        String input = "/src/main/resources/evaluation/ICD10/icd10.txt";
+        String output = "/src/main/resources/evaluation/ICD10/icd10InputVersion1.txt";
         em = new ICD10EvaluationMaker(input,output);
         ArrayList<Integer> lines = new ArrayList<>();
         for(int i=0; i<3 ;i++){
-            em.setOutput("/src/main/resources/ICD10/icd10InputVersion"+(i+1)+".txt");
+            em.setOutput("/src/main/resources/evaluation/ICD10/icd10InputVersion"+(i+1)+".txt");
             lines.add(em.generateICDFile(400+i));
         }
 

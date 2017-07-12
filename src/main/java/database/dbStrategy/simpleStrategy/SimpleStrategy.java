@@ -150,8 +150,10 @@ public class SimpleStrategy implements DBStrategy {
 */
     @Override
     public void storeFromFile(FileReader fr) {
-        for(Word word : fr.getWordList()){
-            word.setId(putWord(word));
+        fr.getFileContent();
+        ArrayList<Word> words = fr.getWordList();
+        if (words != null && words.size()>0){
+            putWordList(words,words.get(0).getLanguage());
         }
     }
 
@@ -430,7 +432,7 @@ public class SimpleStrategy implements DBStrategy {
         return translations;
     }
 
-    //TODO: Output of Translations and single Wordlists
+    //TODO: Output of Translations and single Wordlists // error if to many
     public String print(String language1, String language2){
         StringBuilder output = new StringBuilder();
         if (language1.equals(language2)){

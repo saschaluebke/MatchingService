@@ -27,15 +27,27 @@ public class OpenThesaurusReader implements FileReader {
         synonyms = new ArrayList<>();
     }
 
-    @Override
-    public void getFileContent() {
-        int entryCount=0;
+    public ArrayList<String> getAllLines() {
+        ArrayList<String> allLines = new ArrayList<>();
         try {
             for (Scanner sc = new Scanner(new File(System.getProperty("user.dir") + path)); sc.hasNext(); ) {
                 String line = sc.nextLine();
-                if(line.charAt(0)=='#'){
+                if (line.charAt(0) == '#') {
                     continue;
                 }
+                allLines.add(line);
+            }
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        return allLines;
+    }
+
+        @Override
+    public void getFileContent() {
+        int entryCount=0;
+       ArrayList<String> allLines = getAllLines();
+       for(String line : allLines){
                 entryCount++;
                 if (entryCount < fromEntry || entryCount > toEntry){
                     if (entryCount>toEntry){
@@ -64,8 +76,7 @@ public class OpenThesaurusReader implements FileReader {
                 }
 
 
-            } } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
         }
     }
 

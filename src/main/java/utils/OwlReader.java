@@ -42,7 +42,34 @@ public class OwlReader implements FileReader {
         this.path = path;
     }
 
-    @Override
+    public ArrayList<String> getAllLines() {
+        ArrayList<String> allLines = new ArrayList<>();
+
+        try {
+
+            for (Scanner sc = new Scanner(new File(System.getProperty("user.dir") + path)); sc.hasNext(); ) {
+                String line = sc.nextLine();
+
+                if (line.contains("<owl:Class")) {
+
+
+
+                    while (!line.contains("</owl:Class>")) {
+                        line = line + sc.nextLine();
+                    }
+
+                }
+                allLines.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return allLines;
+    }
+
+
+        @Override
     public void getFileContent() {
         int wordCount = 0;
         int entryCount = 0;
@@ -56,27 +83,18 @@ public class OwlReader implements FileReader {
 */
         ArrayList<Word> allWords = new ArrayList<>();
         ArrayList<Relation> allRelation = new ArrayList<>();
-        try {
-
-            for(Scanner sc = new Scanner(new File(System.getProperty("user.dir")+path)); sc.hasNext(); ) {
-                String line = sc.nextLine();
-
-                if (line.contains("<owl:Class")){
-                    String definition = "";
-                    String name = "";
-                    ArrayList<String> stringSynonyms = new ArrayList<>();
-
-                    while(!line.contains("</owl:Class>")){
-                        line = line + sc.nextLine();
-                    }
-
+        ArrayList<String> allLines = getAllLines();
+        for(String line : allLines){
+            ArrayList<String> stringSynonyms = new ArrayList<>();
+            String definition = "";
+            String name = "";
                     entryCount++;
                     if (entryCount < fromEntry || entryCount > toEntry){
                         if (entryCount > toEntry){
                             break;
                         }
                         if (entryCount%10000 == 0){
-                            System.out.println("EntryCount: "+entryCount);
+                            //System.out.println("EntryCount: "+entryCount);
                         }
 
                         continue;
@@ -87,7 +105,13 @@ public class OwlReader implements FileReader {
                     if (line.contains(firstLine)){
                         int start = line.indexOf(firstLine)+firstLine.length()+1;
                         int end = line.indexOf("</rdfs:label>");
-                        name = line.substring(start,end);
+                        if (end != -1){
+                            name = line.substring(start,end);
+                        }else{
+                            continue;
+                            //TODO was könnte da kaputt gegangen sein? 1. Nachschauen 2. Einfach überspringen!
+                        }
+
                         int trimmer = name.indexOf(">");
                         if(trimmer != -1){
                             name = name.substring(trimmer+1);
@@ -127,6 +151,7 @@ public class OwlReader implements FileReader {
                     Word w = new Word(lastId,name,firstLanguage);
                     w.setDescription(definition);
                     allWords.add(w);
+                    synonyms = new ArrayList<>();
                     for(String s : stringSynonyms){
                         lastId++;
                         Word synonym = new Word(lastId,s,firstLanguage);
@@ -134,19 +159,10 @@ public class OwlReader implements FileReader {
                     }
                     allSynonyms.add(synonyms);
                 }
-            }
-            //Put all Words and Synonym Relations into the db in one step to avoid too many transactions
-            System.out.println("------Only time when something is put into db------");
-
-            //    dbh.putWordList(allWords,language);
-            //   dbh.putRelationList(allRelation,language,language);
             wordList = allWords;
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
-    }
+
+
 
     @Override
     public ArrayList<Word> getWordList() {

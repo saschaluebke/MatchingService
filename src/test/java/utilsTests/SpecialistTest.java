@@ -5,6 +5,7 @@ import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import utils.DictReader;
@@ -21,14 +22,15 @@ public class SpecialistTest {
     static MySQLQuery dbq;
     static DBHelper dbh;
     static SpecialistReader sr;
+    static int lines;
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
         dbq = new MySQLQuery();
         dbq.dropAllTables();
         dbq.truncate("languages");
-        dbh = new DBHelper(new SimpleStrategy());
-        sr = new SpecialistReader("/src/main/resources/SpecialistLexicon/LEXICON","en");
+        dbh = new DBHelper(new SynonymStrategy());
+        sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
     }
 /*
     @Test
@@ -50,19 +52,31 @@ System.out.println("----First Round-----");
     }
 
     */
+@Test
+public void getAllLinesTest() {
+    ArrayList<String> allLines = sr.getAllLines();
+    lines = allLines.size();
+    assertEquals(498432,allLines.size());
+}
+
+
     @Test
     public void synonymsTest() {
-        dbh.newLanguage("en");
-        sr.setFromEntry(0);
-        sr.setToEntry(100);
+        ArrayList<String> allLines = sr.getAllLines();
+        lines = allLines.size();
+    dbh.newLanguage("en");
+    int tmp=0;
+    for(int i = 0; i<lines+100000; i=i+100000){
+
+        sr.setFromEntry(tmp);
+        sr.setToEntry(i);
         dbh.storeFromFile(sr);
-        //  fr.setFromEntry(0);
-        //  fr.setToEntry(50000);
-        //dbh.takeFromFileReader(wnh);
+        tmp=i;
+    }
 
-        System.out.println(dbh.print("en","en"));
-        assertEquals(194, sr.getWordList().size());
-
+        //System.out.println(dbh.print("en","en"));
+        assertEquals(544796, dbh.getAllWords("en").size());
+        assertEquals(96534,dbh.getAllRelations("en","en").size());
     }
 
 }

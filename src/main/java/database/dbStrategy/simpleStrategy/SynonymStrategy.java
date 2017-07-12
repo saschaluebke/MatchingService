@@ -26,19 +26,56 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
 
     @Override
     public void storeFromFile(FileReader fr){
-        if(fr.getWordList()!=null && fr.getSynonyms()!=null && fr.getSecondWordList()==null){
-            //Put all words into the wordList
-            fr.getFileContent();
+
+        fr.getFileContent();
+        if(fr.getWordList()!=null && fr.getWordList().size() > 0 && fr.getSynonyms()!=null && fr.getSecondWordList()==null){
             ArrayList<Word> words = fr.getWordList();
+            String language = words.get(0).getLanguage();
             ArrayList<ArrayList<Word>> synonyms = fr.getSynonyms();
-            System.out.println(words.size()+"/"+synonyms.size());
+        /*    System.out.println(words.size());
+
+            for(int i= 0;i<words.size();i++){
+
+                if (synonyms.get(i)!=null){
+
+                    for(Word w : synonyms.get(i)){
+                        System.out.println(w.getName());
+                    }
+
+                }
+            }
+*/
+//Create a Wordlist with just new Words
+            //putWordList(words,words.get(0).getLanguage());
+
+            //these list will be in the database so there must be no dublicates!
+            ArrayList<Word> newWordsForDB = new ArrayList<>();
+            ArrayList<String> stringsOfNewWords = new ArrayList<>(); //list to prevent dublicates
+           int lastId = getLastWordId(language);
+
             ArrayList<Relation> relations = new ArrayList<>();
             for(int i=0;i<words.size();i++){
                 Word word = words.get(i);
-                word.setId(putWord(word));
-                for(Word synonym : synonyms.get(i)){
-                    synonym.setId(putWord(synonym));
+                if(!newWordsForDB.contains(word)){
+                    lastId++;
+                    word.setId(lastId);
+                    newWordsForDB.add(word);
+                    stringsOfNewWords.add(word.getName());
                 }
+                ArrayList<Word> removedSynonyms = new ArrayList<>();
+                for(Word synonym : synonyms.get(i)){
+                    if(!stringsOfNewWords.contains(synonym.getName())){
+                        lastId++;
+                        synonym.setId(lastId);
+                        newWordsForDB.add(synonym);
+                        stringsOfNewWords.add(synonym.getName());
+                    }else{
+                        removedSynonyms.add(synonym);
+                    }
+                }
+
+                synonyms.get(i).removeAll(removedSynonyms);
+
                 //Create relations and put them into the relationList
                 synonyms.get(i).add(word);
                 for(int x=0;x<synonyms.get(i).size();x++){
@@ -51,6 +88,18 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
                     }
 
                 }
+            }
+
+            putWordList(newWordsForDB,language);
+
+            //check if the auto-Identifier of MySQL is the same as in the newWords list
+            Word checkWord = getWordById(lastId,language);
+            if(checkWord.getId()!= newWordsForDB.get(newWordsForDB.size()-1).getId()){
+                System.out.println("SynonymStrategy error: Not the same Id in storeFromFile");
+                int lastIdinDB = getLastWordId(language);
+                System.out.println("LastId: "+lastId+". Last Id in DB: "+lastIdinDB);
+                Word lastWord = getWordById(lastIdinDB,language);
+                System.out.println("Last Word: "+lastWord.getName()+"/"+lastWord.getId());
             }
 
             putRelationList(relations,fr.getFirstLanguage(),fr.getSecondLanguage());
@@ -96,4 +145,6 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
 
         return translations;
     }
+
+    
 }

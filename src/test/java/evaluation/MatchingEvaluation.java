@@ -9,7 +9,9 @@ import matching.BoyerMatcher;
 import matching.Matcher;
 import matching.SimpleMatcher;
 import matching.distance.Levenshtein;
+import matching.iterate.CharacterStrategy;
 import matching.iterate.PerformanceStrategy;
+import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,7 +40,7 @@ public class MatchingEvaluation {
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
-        matcher = new Matcher(new PerformanceStrategy(),new Levenshtein(), new ScoreSort());
+
         simpleMatcher = new SimpleMatcher();
         boyerMatcher = new BoyerMatcher();
         tsvReader = new TSVFileReader("/src/main/resources/TSV/source.tsv","en");
@@ -85,6 +87,35 @@ public class MatchingEvaluation {
 
     @Test
     public void performanceMatchingEvaluation(){
+        matcher = new Matcher(new PerformanceStrategy(),new Levenshtein(), new ScoreSort());
+        //Get matching from the String.indexOf Method loop through the data
+        MatchResultSet mrs=null;
+
+        for(Word s: source){
+            for(Word t : target){
+                mrs = matcher.getMatchResult(s,t);
+            }
+        }
+
+    }
+
+    @Test
+    public void wordStrategyMatchingEvaluation(){
+        matcher = new Matcher(new WordStrategy(),new Levenshtein(), new ScoreSort());
+        //Get matching from the String.indexOf Method loop through the data
+        MatchResultSet mrs=null;
+
+        for(Word s: source){
+            for(Word t : target){
+                mrs = matcher.getMatchResult(s,t);
+            }
+        }
+
+    }
+
+    @Test
+    public void characterStrategyMatchingEvaluation(){
+        matcher = new Matcher(new CharacterStrategy(),new Levenshtein(), new ScoreSort());
         //Get matching from the String.indexOf Method loop through the data
         MatchResultSet mrs=null;
 
