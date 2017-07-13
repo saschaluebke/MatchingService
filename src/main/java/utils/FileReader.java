@@ -14,4 +14,9 @@ public interface FileReader {
     String getFirstLanguage();
     String getSecondLanguage();
     ArrayList<ArrayList<Word>> getSynonyms();
+    int getFromEntry();
+    void setFromEntry(int entry);
+    int getToEntry();
+    void setToEntry(int entry);
+    int getAllLinesCount();
 }

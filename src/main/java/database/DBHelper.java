@@ -111,6 +111,13 @@ public class DBHelper{
         return dbStrategy.translate(translator,input);
     };
 
+    public ArrayList<String> translate(Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelations){
+        if(translator==null){
+            System.out.println("Translator is null in DBHelper");
+        }
+        return dbStrategy.translate(translator,input,allWords,allRelations);
+    }
+
     public String print(String language1, String language2){
         return dbStrategy.print(language1,language2);
     }

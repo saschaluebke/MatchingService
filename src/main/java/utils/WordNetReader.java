@@ -38,21 +38,6 @@ public class WordNetReader implements FileReader {
         //dbh = new DBHelper(new SimpleStrategy());
     }
 
-public int getAllLines(){
-    int allLines=0;
-
-
-    Iterator<IIndexWord> iter = getIter();
-    while(iter.hasNext()){
-        allLines++;
-        IIndexWord indexWord = iter.next();
-        IWordID wordID = indexWord.getWordIDs().get(0);
-        IWord w = dict.getWord(wordID);
-        //System.out.println(w.getLemma());
-    }
-    return allLines;
-}
-
     public Iterator<IIndexWord> getIter() {
         URL url = null;
         try {
@@ -91,7 +76,7 @@ public int getAllLines(){
                         break;
                     }
                     if (entryCount%10000 == 0){
-                        System.out.println("EntryCount: "+entryCount);
+                        //System.out.println("EntryCount: "+entryCount);
                     }
 
                     continue;
@@ -102,14 +87,31 @@ public int getAllLines(){
                 IWord w = dict.getWord(wordID);
                 //lastId++;
                 //System.out.println(lastId+":"+w.getLemma());
-                Word word  = new Word(0,w.getLemma(),language);
+
+            /**
+             * There are curly Braces in WordNet but Moses don't like them!
+             */
+            String lemma = w.getLemma();
+            int curlyStart = lemma.indexOf("{");
+            if(curlyStart != -1){
+                lemma = lemma.substring(0,curlyStart);
+                lemma = lemma.trim();
+            }
+
+
+            Word word  = new Word(0,lemma,language);
                 wordList.add(word);
                 ISynset synset = w.getSynset();
                 ArrayList<Word> synonyms = new ArrayList<>();
                 for(IWord word1 : synset.getWords()){
-                   // System.out.println(word1.getLemma());
-                  //  lastId++;
-                    Word synonym = new Word(0,word1.getLemma(),language);
+
+                    String syn = word1.getLemma();
+                    curlyStart = syn.indexOf("{");
+                    if(curlyStart != -1){
+                        syn = syn.substring(0,curlyStart);
+                        syn = syn.trim();
+                    }
+                    Word synonym = new Word(0,syn,language);
                     synonyms.add(synonym);
                 }
                 synonymList.add(synonyms);
@@ -153,12 +155,38 @@ public int getAllLines(){
         return synonymList;
     }
 
+    @Override
+    public int getFromEntry() {
+        return 0;
+    }
+
     public void setToEntry(int toEntry) {
         this.toEntry = toEntry;
     }
 
+    @Override
+    public int getAllLinesCount() {
+        int allLines=0;
+
+
+        Iterator<IIndexWord> iter = getIter();
+        while(iter.hasNext()){
+            allLines++;
+            IIndexWord indexWord = iter.next();
+            IWordID wordID = indexWord.getWordIDs().get(0);
+            IWord w = dict.getWord(wordID);
+            //System.out.println(w.getLemma());
+        }
+        return allLines;
+    }
+
     public void setFromEntry(int fromEntry) {
         this.fromEntry = fromEntry;
+    }
+
+    @Override
+    public int getToEntry() {
+        return 0;
     }
 
 }

@@ -50,12 +50,17 @@ int count = 0;
 
                     continue;
                 }
+
                 String[] splitString = line.split("\t");
                 if(splitString.length < 2){
                     continue;
                 }
-                String firstWord = splitString[0];
-                String secondWord = splitString[1];
+
+                /**
+                 * Moses doesn't like curly braces
+                 */
+                String firstWord = StringCleaner.clean(splitString[0]);
+                String secondWord = StringCleaner.clean(splitString[1]);
 
                 firstLanguageId++;
                 firstWordList.add(new Word(firstLanguageId,firstWord,getFirstLanguage()));
@@ -109,13 +114,29 @@ int count = 0;
         return null;
     }
 
+    @Override
+    public int getFromEntry() {
+        return 0;
+    }
+
     public void setFromEntry(int fromEntry){
         this.fromEntry = fromEntry;
+    }
+
+    @Override
+    public int getToEntry() {
+        return 0;
     }
 
     public void setToEntry(int toEntry){
         this.toEntry = toEntry;
     }
+
+    @Override
+    public int getAllLinesCount() {
+        return 0;
+    }
+
 
     public void makeParallelCorpus(){
         try{

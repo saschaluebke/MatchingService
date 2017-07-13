@@ -30,7 +30,7 @@ public class OwlReaderTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
-        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/Thesaurus-byName.owl","en");
+        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
 
     }
 /*
@@ -65,10 +65,25 @@ public class OwlReaderTest {
     public void getAllWordsTest(){
         ArrayList<String> allLines = owlReader.getAllLines();
         lineCount = allLines.size();
-        assertEquals(1238696,lineCount);
+        assertEquals(121520,lineCount);
     }
 
+    @Test
+    public void simpleTest(){
 
+        //ArrayList<String> allLines = owlReader.getAllLines();
+        //lineCount = allLines.size();
+        dbh.newLanguage("en");
+        owlReader.setFromEntry(0);
+        owlReader.setToEntry(1000);
+        dbh.storeFromFile(owlReader);
+
+
+        //System.out.println(dbh.print("en","en"));
+        assertEquals(3175,dbh.getAllWords("en").size());
+    }
+
+/*
     @Test
     public void synonymTest(){
 
@@ -87,7 +102,7 @@ public class OwlReaderTest {
        //System.out.println(dbh.print("en","en"));
        assertEquals(1591354,dbh.getAllWords("en").size());
     }
-
+*/
 
 }
 

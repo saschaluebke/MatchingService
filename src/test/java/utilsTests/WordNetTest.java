@@ -32,7 +32,18 @@ public class WordNetTest {
     }
 
     @Test
-    public void getSimpleWordNetTest() {
+    public void lemmaTest(){
+        String lemma = "Vogel {f}";
+        int curlyStart = lemma.indexOf("{");
+        if(curlyStart != -1){
+            lemma = lemma.substring(0,curlyStart);
+            lemma = lemma.trim();
+        }
+        assertEquals("Vogel",lemma);
+    }
+
+    @Test
+    public void simpleWordNetTest() {
         dbh = new DBHelper(new SimpleStrategy());
         dbh.newLanguage("en");
         wnh.setFromEntry(0);
@@ -48,7 +59,7 @@ public class WordNetTest {
 
     @Test
     public void getAllLinesTest() {
-        int lineCount = wnh.getAllLines();
+        int lineCount = wnh.getAllLinesCount();
         assertEquals(117798,lineCount);
     }
 
@@ -56,7 +67,7 @@ public class WordNetTest {
     @Test
     public void getSynonymWordNetTest() {
         dbh = new DBHelper(new SynonymStrategy());
-        int lineCount = wnh.getAllLines();
+        int lineCount = wnh.getAllLinesCount();
         dbh.newLanguage("en");
         int tmp=0;
         for(int i = 0; i<lineCount+100000; i=i+100000){

@@ -45,12 +45,14 @@ public class OpenThesaurusReader implements FileReader {
 
         @Override
     public void getFileContent() {
-        int entryCount=0;
+        int entryCount=-1;
        ArrayList<String> allLines = getAllLines();
+       words = new ArrayList<>();
+       synonyms = new ArrayList<>();
        for(String line : allLines){
-                entryCount++;
-                if (entryCount < fromEntry || entryCount > toEntry){
-                    if (entryCount>toEntry){
+           entryCount++;
+                if (entryCount < fromEntry || entryCount >= toEntry){
+                    if (entryCount>=toEntry){
                         break;
                     }
                     if (entryCount%10000 == 0){
@@ -66,12 +68,19 @@ public class OpenThesaurusReader implements FileReader {
                     Word firstInput = new Word(0,word,firstLanguage);
                     words.add(firstInput);
                     ArrayList<Word> synonymList = new ArrayList<>();
-                while(line.indexOf(";")>0){
-                    String synonym = line.substring(0,line.indexOf(";"));
-                    line = line.substring(line.indexOf(";")+1,line.length());
-                    Word synonymInput = new Word(0,synonym,firstLanguage);
-                    synonymList.add(synonymInput);
-                }
+
+                    //When there is just one Word like Cat;cat then you have to create one Relation between Cat and cat
+                    //And put both in the specific WordList
+                    while(line.indexOf(";")>0){
+                        String synonym = line.substring(0,line.indexOf(";"));
+                        line = line.substring(line.indexOf(";")+1,line.length());
+                        Word synonymInput = new Word(0,synonym,firstLanguage);
+                        synonymList.add(synonymInput);
+                    }
+                        if(line.indexOf(";")<0 && !line.equals("")){
+                            synonymList.add(new Word(0,line,firstLanguage));
+                    }
+
                 synonyms.add(synonymList);
                 }
 
@@ -105,6 +114,11 @@ public class OpenThesaurusReader implements FileReader {
     }
 
     @Override
+    public int getFromEntry() {
+        return 0;
+    }
+
+    @Override
     public String getFirstLanguage() {
         return firstLanguage;
     }
@@ -118,7 +132,18 @@ public class OpenThesaurusReader implements FileReader {
         this.fromEntry = fromEntry;
     }
 
+    @Override
+    public int getToEntry() {
+        return 0;
+    }
+
     public void setToEntry(int toEntry) {
         this.toEntry = toEntry;
+    }
+
+    @Override
+    public int getAllLinesCount() {
+        ArrayList<String> allLines = getAllLines();
+        return allLines.size();
     }
 }

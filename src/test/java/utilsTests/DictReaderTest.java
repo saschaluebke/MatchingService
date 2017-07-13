@@ -24,7 +24,7 @@ public class DictReaderTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SimpleStrategy());
-        dr = new DictReader("/src/main/resources/Dict/de_en_Dict.txt","de","en");
+        dr = new DictReader("/src/main/resources/translation/Dict/de_en_Dict.txt","de","en");
     }
 /*
     @Test

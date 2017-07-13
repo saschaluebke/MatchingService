@@ -7,6 +7,7 @@ import components.Word;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
+import matching.SimpleMatcher;
 import matching.distance.DistanceStrategy;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.IterateStrategy;
@@ -32,7 +33,7 @@ public class SimpleStrategy implements DBStrategy {
     public SimpleStrategy() {
         dbq = new MySQLQuery();
         matcher = new Matcher(new PerformanceStrategy(), new LevenshteinNormalized(), new ScoreSort());
-
+//matcher = new SimpleMatcher();
         if (!dbq.isTable("languages")) {
             dbq.queryUpdate("CREATE TABLE languages"
                     + " (id INT NOT NULL AUTO_INCREMENT,name VARCHAR(45) NULL,"
@@ -425,6 +426,22 @@ public class SimpleStrategy implements DBStrategy {
         for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
             if(mrlist.get(0).getScore() == 0){
                translations.add(getWordById(mrlist.get(0).getID(),translator.getFromLanguage()).getName());
+
+            }
+        }
+
+        return translations;
+    }
+
+    @Override
+    public ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelation) {
+
+        Matcher matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
+        MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
+        ArrayList<String> translations = new ArrayList<>();
+        for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
+            if(mrlist.get(0).getScore() == 0){
+                translations.add(getWordById(mrlist.get(0).getID(),translator.getFromLanguage()).getName());
 
             }
         }

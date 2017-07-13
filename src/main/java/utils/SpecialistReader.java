@@ -49,12 +49,16 @@ public class SpecialistReader implements FileReader {
 
     @Override
     public void getFileContent() {
-        entryCount=0;
+        entryCount=-1;
         wordlist = new ArrayList<>();
         allSynonyms = new ArrayList<>();
         int lastWordId = dbh.getLastWordId(language);
         ArrayList<String> allLines = getAllLines();
         for(String line : allLines){
+
+            if(allSynonyms.size()>100000){
+                System.out.println(allSynonyms.size()+"above");
+            }
                 entryCount++;
                 if (entryCount < fromEntry || entryCount > toEntry){
                     if (entryCount>toEntry){
@@ -66,6 +70,11 @@ public class SpecialistReader implements FileReader {
 
                     continue;
                 }
+
+            if(allSynonyms.size()>100000){
+                System.out.println(allSynonyms.size()+"above");
+            }
+
                 String firstline = "{base=";
                 String name = "";
                 if(line.contains(firstline)){
@@ -77,59 +86,74 @@ public class SpecialistReader implements FileReader {
                     name = line.substring(firstline.length(),end);
                 }
                 ArrayList<String> acronyms = new ArrayList<>();
-                String tmp=line;
+
+            if(allSynonyms.size()>100000){
+                System.out.println(allSynonyms.size()+"aboveAcronym");
+            }
+
                 while(line.contains("acronym_of=")){
+                    int realend = -1;
                     int end = line.indexOf("\t");
                     if(end == -1){
-                        end = line.indexOf("}");
-                    }
-                    tmp = line;
-                    line = line.substring(end+1);
-                    //System.out.println(line+line.indexOf("\t")+"/"+end);
-                    if(line.contains("acronym_of=")){
-                        continue;
+                       end = line.length()-1;
+                       realend = line.indexOf("}");
+                       // line = line.substring(end+1);
                     }else{
-                        line = tmp;
+                        if(!(line.charAt(0)=='a'&&line.charAt(10)=='=')){
+                            line = line.substring(end+1);
+                            continue;
+                        }
                     }
 
-                    //System.out.println(line.indexOf("acronym_of")+11+"/"+end+line);
-                    String acronym = line.substring(line.indexOf("acronym_of")+11,end);
+                    String acronym = line.substring(11,end);
                     if (acronym.indexOf("|")>0){
                         acronym = acronym.substring(0,acronym.indexOf("|"));
                     }
 
                     //System.out.println(line.indexOf("acronym_of")+11+"/"+line.indexOf("|"));
                     acronyms.add(acronym);
-                    line = line.substring(end+1);
-
-                    //System.out.println(line);
+                    end = line.indexOf("\t");
+                    if (realend==-1){
+                        line = line.substring(end+1);
+                    }else{
+                        line = line.substring(realend+1);
+                    }
                 }
+
+            if(allSynonyms.size()>100000){
+                System.out.println(allSynonyms.size()+"aboveAbbreviation");
+            }
+
                 while(line.contains("abbreviation_of=")){
+                    int realend = -1;
                     int end = line.indexOf("\t");
                     if(end == -1){
-                        end = line.indexOf("}");
-                        if (end == -1){
-                            break;
+                        end = line.length()-1;
+                        realend = line.indexOf("}");
+                        // line = line.substring(end+1);
+                    }else{
+                        if(!(line.charAt(0)=='a'&&line.charAt(15)=='=')){
+                            line = line.substring(end+1);
+                            continue;
                         }
                     }
-                    tmp = line;
-                    line = line.substring(end+1);
-                    //System.out.println(line+line.indexOf("\t")+"/"+end);
-                    if(line.contains("abbreviation_of=")){
-                        continue;
-                    }else{
-                        line = tmp;
-                    }
+
                     String abbreviation = line.substring(line.indexOf("abbreviation_of=")+16,end);
                     if (abbreviation.indexOf("|")>0){
                         abbreviation = abbreviation.substring(0,abbreviation.indexOf("|"));
                     }
                     acronyms.add(abbreviation);
-                    line = line.substring(end+1);
+                    //System.out.println(line.indexOf("acronym_of")+11+"/"+line.indexOf("|"));
+                    end = line.indexOf("\t");
+                    if (realend==-1){
+                        line = line.substring(end+1);
+                    }else{
+                        line = line.substring(realend+1);
+                    }
                 }
-                //System.out.println(name+"/");
-                //TODO: doublications?
-
+            if(allSynonyms.size()>100000){
+                System.out.println(allSynonyms.size()+"aboveEnd");
+            }
 
                 lastWordId++;
                 Word w = new Word(lastWordId,name,language);
@@ -140,7 +164,13 @@ public class SpecialistReader implements FileReader {
                     Word acronym = new Word(lastWordId,s,language);
                     synonyms.add(acronym);
                 }
+
                 allSynonyms.add(synonyms);
+            int counter = allSynonyms.size();
+            if(counter>100000){
+                System.out.println(allSynonyms.size());
+            }
+
             }
 
         }
@@ -180,11 +210,27 @@ public class SpecialistReader implements FileReader {
         return allSynonyms;
     }
 
+    @Override
+    public int getFromEntry() {
+        return 0;
+    }
+
     public void setFromEntry(int fromEntry) {
         this.fromEntry = fromEntry;
     }
 
+    @Override
+    public int getToEntry() {
+        return 0;
+    }
+
     public void setToEntry(int toEntry) {
         this.toEntry = toEntry;
+    }
+
+    @Override
+    public int getAllLinesCount() {
+        ArrayList<String> allLines = getAllLines();
+        return allLines.size();
     }
 }

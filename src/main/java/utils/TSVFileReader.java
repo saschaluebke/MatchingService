@@ -109,6 +109,31 @@ public class TSVFileReader implements utils.FileReader {
         return null;
     }
 
+    @Override
+    public int getFromEntry() {
+        return 0;
+    }
+
+    @Override
+    public void setFromEntry(int entry) {
+
+    }
+
+    @Override
+    public int getToEntry() {
+        return 0;
+    }
+
+    @Override
+    public void setToEntry(int entry) {
+
+    }
+
+    @Override
+    public int getAllLinesCount() {
+        return 0;
+    }
+
     public ArrayList<Word> getFileContentWords(String language) {
         ArrayList<Word> wordList = new ArrayList<>();
 

@@ -2,6 +2,7 @@ package evaluation;
 
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
@@ -19,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.W;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -68,7 +70,7 @@ public class OnkoWikiEvaluation {
 
         //Get Evaluaton Words
         OnkoWikiReader owr = new OnkoWikiReader();
-        input = owr.getLines("src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt");
+        input = owr.getLines("/src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt");
 
 
         System.out.println("End of init.");
@@ -133,7 +135,7 @@ public class OnkoWikiEvaluation {
      * No need for Synonym Testing because currently I have no Synonyms in German
      */
 
-    /*
+
     @Test
     public void synonymEvalution() {
         strategy = new SynonymStrategy();
@@ -142,14 +144,14 @@ public class OnkoWikiEvaluation {
 
         ArrayList<ArrayList<String>> output = new ArrayList<>();
         for(String in : input){
-            ArrayList<String> translation = dbh.translate(new Word(0,in,"en"));
+            ArrayList<String> translation = dbh.translate(new Word(0,in,"de"));
             output.add(translation);
         }
         printEvaluation("SynonymEvaluation",output);
     }
-*/
 
-/*
+
+
     public void printEvaluation(String name, ArrayList<ArrayList<String>> translations){
         try{
             PrintWriter writer = new PrintWriter(name+".txt", "UTF-16");//UTF-8?

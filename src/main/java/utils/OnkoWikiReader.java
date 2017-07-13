@@ -14,7 +14,7 @@ public class OnkoWikiReader {
         ArrayList<String> output = new ArrayList<>();
         path = System.getProperty("user.dir")+path;
         try {
-            for(Scanner sc = new Scanner(new File(System.getProperty("user.dir")+path)); sc.hasNext(); ) {
+            for(Scanner sc = new Scanner(new File(path)); sc.hasNext(); ) {
                 String line = sc.nextLine();
                 line = line.replace("\t","");
                 if(line.equals("")){

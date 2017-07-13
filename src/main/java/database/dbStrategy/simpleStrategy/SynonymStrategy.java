@@ -4,12 +4,14 @@ import components.MatchResult;
 import components.MatchResultSet;
 import components.Relation;
 import components.Word;
+import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import matching.Matcher;
 import translators.Translator;
 import utils.FileReader;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
@@ -56,7 +58,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
             ArrayList<Relation> relations = new ArrayList<>();
             for(int i=0;i<words.size();i++){
                 Word word = words.get(i);
-                if(!newWordsForDB.contains(word)){
+                if(!stringsOfNewWords.contains(word.getName())){
                     lastId++;
                     word.setId(lastId);
                     newWordsForDB.add(word);
@@ -109,15 +111,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
         }
     }
 
-    /**
-     * 1. Try to Match with WordList of same language then input
-     * 2. When you find something equal look at the synonym table
-     * 3. Translate input and all of its synonyms
-     *
-     * @param translator
-     * @param input
-     * @return
-     */
+    /*
     @Override
     public ArrayList<String> translate(Translator translator, Word input) {
         MatchResultSet mrs = matcher.getMatchingWordList(input,getAllWords(input.getLanguage()));
@@ -145,6 +139,79 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
 
         return translations;
     }
+   */
+    /**
+     * 1. Try to Match with WordList of same language then input
+     * 2. When you find something equal look at the synonym table
+     * 3. Translate input and all of its synonyms
+     *
+     * @param translator
+     * @param input
+     * @return
+     */
+    public ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords,
+                                       ArrayList<Relation> allRelation){
+        MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
+        ArrayList<Integer> idOfPerfectMatch = new ArrayList<>();
+        TranslatorGetProperties tgp = new TranslatorGetProperties();
+        double accuracy=0;
+        try {
+            accuracy = Double.parseDouble(tgp.getPropValues("Translate.accuracy"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-    
+        /**
+         * Search for matchings in DB when they are similar enough (accuracy) then fetch them
+         */
+        for(ArrayList<MatchResult> matchResults : mrs.getMatchResults()){
+            if (matchResults.get(0).getScore()<accuracy){
+                idOfPerfectMatch.add(matchResults.get(0).getID());
+                //System.out.println(input.getName()+" : "+matchResults.get(0).getDbString());
+            }
+        }
+
+        /**
+         * Search for Synonyms of the words get the IDENTIFIERS
+         */
+
+        ArrayList<Relation> synonyms = allRelation;
+        ArrayList<Integer> synonymsOfPerfectMatch = new ArrayList<>();
+        for(Relation r : synonyms){
+            if (idOfPerfectMatch.contains(r.getIdFrom())){
+                synonymsOfPerfectMatch.add(r.getIdTo());
+            }
+        }
+
+        /**
+         * Find all Words from the Wordlist and translate them
+         */
+        ArrayList<String> translations = new ArrayList<>();
+        String inputTrans =translator.translation(input.getName());
+        translations.add(inputTrans);
+        System.out.println("Input: "+input.getName()+" --> "+inputTrans);
+
+        for(int id:idOfPerfectMatch){
+            for(Word w:allWords){
+                if(id==w.getId()){
+                    String trans = translator.translation(w.getName());
+                    translations.add(trans);
+                    System.out.println("Match: "+w.getName()+" --> "+trans);
+                }
+            }
+        }
+        for(int id:synonymsOfPerfectMatch){
+            for(Word w : allWords){
+                if(id==w.getId()){
+                    String trans = translator.translation(w.getName());
+                    translations.add(trans);
+                    System.out.println("Syn: "+w.getName()+" --> "+trans);
+                }
+            }
+        }
+
+        return translations;
+
+    }
+
 }

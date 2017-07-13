@@ -1,0 +1,15 @@
+{base=Cat
+entry=E0000048
+	cat=noun
+	variants=metareg
+	variants=uncount
+	acronym_of=cat|E0006859
+}
+{base=Dog
+entry=E0000048
+	cat=noun
+	variants=metareg
+	variants=uncount
+	acronym_of=dog|E0006859
+	acronym_of=hound|E0006859
+}

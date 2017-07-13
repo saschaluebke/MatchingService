@@ -30,7 +30,7 @@ public class SpecialistTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
-        sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
+
     }
 /*
     @Test
@@ -52,8 +52,21 @@ System.out.println("----First Round-----");
     }
 
     */
+
+    @Test
+    public void simpleTest() {
+        sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/TestOntology","en");
+        dbh.newLanguage("en");
+        sr.setFromEntry(0);
+        sr.setToEntry(2);
+        dbh.storeFromFile(sr);
+        assertEquals(5,dbh.getAllWords("en").size());
+        assertEquals(8,dbh.getAllRelations("en","en").size());
+    }
+
 @Test
 public void getAllLinesTest() {
+    sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
     ArrayList<String> allLines = sr.getAllLines();
     lines = allLines.size();
     assertEquals(498432,allLines.size());
@@ -62,6 +75,7 @@ public void getAllLinesTest() {
 
     @Test
     public void synonymsTest() {
+        sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
         ArrayList<String> allLines = sr.getAllLines();
         lines = allLines.size();
     dbh.newLanguage("en");

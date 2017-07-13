@@ -26,12 +26,20 @@ public class SimpleMatcher extends Matcher {
         String stringFromDB = wordFromDB.getName();
         ArrayList<MatchResult> mrlist = new ArrayList<>();
         int index = 0;
-        String partOfStringFromDB = stringFromDB;
-        index = matchIndex(stringFromDB,partOfStringFromDB);
-        MatchResult mr = new MatchResult(wordFromDB,stringFromDB,1,index,
-                    searchWord.getName().length()+index,0,searchWord.getName().length());
-        mrlist.add(mr);
-        output.add(mrlist);
+        index = matchIndex(searchWord.getName(),stringFromDB);
+                if(index!=-1){
+                    MatchResult mr = new MatchResult(wordFromDB,stringFromDB,1,index,
+                            searchWord.getName().length()+index,0,searchWord.getName().length());
+                    mrlist.add(mr);
+                    output.add(mrlist);
+                    mrs.setMatchResults(output);
+                }else{
+                    MatchResult mr = new MatchResult(wordFromDB,stringFromDB,0,0,
+                            searchWord.getName().length()+index,0,searchWord.getName().length());
+                    mrlist.add(mr);
+                    output.add(mrlist);
+                }
+
         mrs.setMatchResults(output);
         return mrs;
     }

@@ -29,7 +29,7 @@ public class OpenThesaurusTest{
             dbq.dropAllTables();
             dbq.truncate("languages");
             dbh = new DBHelper(new SynonymStrategy());
-            otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
+
         }
 /*
         @Test
@@ -70,8 +70,48 @@ public class OpenThesaurusTest{
 
         }
         */
+@Test
+public void simpleTest(){
+    otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/TestOntology","en");
+    dbh = new DBHelper(new SynonymStrategy());
+    dbh.newLanguage("en");
+   /*
+    int allLinesCount = otr.getAllLinesCount();
+    int tmp=0;
+    for(int i = 0; i<allLinesCount+100000; i=i+100000){
+
+        otr.setFromEntry(tmp);
+        otr.setToEntry(i);
+        dbh.storeFromFile(otr);
+        tmp=i;
+    }
+    */
+    otr.setFromEntry(0);
+    otr.setToEntry(1);
+    dbh.storeFromFile(otr);
+    /**
+     * Wordlist Cat,cat
+     * Relations Cat->cat and cat->Cat
+     */
+    assertEquals(2, dbh.getAllWords("en").size());
+    assertEquals(2,dbh.getAllRelations("en","en").size());
+
+    otr.setFromEntry(1);
+    otr.setToEntry(2);
+    dbh.storeFromFile(otr);
+    /**
+     * WordList Cat, cat, dog, Dog, Hound
+     * Relations Cat->cat,cat->Cat and dog->Dog,Dog->dog,dog->Hound,Hound->Dog,Dog->Hound,Hound->Dog
+     */
+    assertEquals(5, dbh.getAllWords("en").size());
+    assertEquals(8,dbh.getAllRelations("en","en").size());
+
+
+}
+/*
     @Test
-    public void dbTest(){
+    public void fullTest(){
+        otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
         dbh = new DBHelper(new SynonymStrategy());
         ArrayList<String> allLines = otr.getAllLines();
         int lineCount = allLines.size();
@@ -91,6 +131,7 @@ public class OpenThesaurusTest{
 
 
     }
+    */
 }
 
 /*
