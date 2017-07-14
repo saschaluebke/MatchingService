@@ -415,7 +415,7 @@ public class SimpleStrategy implements DBStrategy {
         String query = "SELECT MAX(id) FROM wordlist_" + language;
         return dbq.getLastWordId(query);
     }
-
+/*
     @Override
     public ArrayList<String> translate(Translator translator, Word input) {
 
@@ -432,11 +432,16 @@ public class SimpleStrategy implements DBStrategy {
 
         return translations;
     }
-
+*/
     @Override
     public ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelation) {
-
-        Matcher matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
+        /**
+         * Just translate input
+         */
+        ArrayList<String> translations = new ArrayList<>();
+        translations.add(translator.translation(input.getName()));
+        return translations;
+        /*matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
         MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
         ArrayList<String> translations = new ArrayList<>();
         for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
@@ -447,6 +452,7 @@ public class SimpleStrategy implements DBStrategy {
         }
 
         return translations;
+        */
     }
 
     //TODO: Output of Translations and single Wordlists // error if to many

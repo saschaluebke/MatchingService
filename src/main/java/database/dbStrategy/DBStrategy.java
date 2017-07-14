@@ -34,7 +34,7 @@ public interface DBStrategy {
     boolean newLanguage(String name);
     boolean updateTables();
     int getLastWordId(String query);
-    ArrayList<String> translate(Translator translator, Word input);
+    //ArrayList<String> translate(Translator translator, Word input);
     ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords,
     ArrayList<Relation> allRelation);
 

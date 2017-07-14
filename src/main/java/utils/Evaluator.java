@@ -71,7 +71,7 @@ public class Evaluator {
         }
     }
 
-    public ArrayList<ArrayList<String>> simpleTranslate(ArrayList<File> files, boolean noInit) {
+    public ArrayList<ArrayList<String>> simpleTranslate(String trainingsDataName, ArrayList<File> files, boolean noInit) {
         ArrayList<ArrayList<String>> fullOutput = new ArrayList<>();
         if(noInit){
 
@@ -106,13 +106,13 @@ public class Evaluator {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            printSimpleEvaluation(strategy.getClass().getSimpleName() + "SimpleEvaluation" + i, output);
+            printSimpleEvaluation("SimpleFrom_"+files.get(0).getName()+"_translated"+trainingsDataName, output);
             fullOutput.add(output);
         }
         return fullOutput;
     }
 
-    public ArrayList<ArrayList<String>> synonymTranslate(String nameOfTranslator, DBStrategy strategy, ArrayList<FileReader> fileReaders, ArrayList<File> files, boolean noInit){
+    public ArrayList<ArrayList<String>> synonymTranslate(String trainingsDataName, DBStrategy strategy, ArrayList<FileReader> fileReaders, ArrayList<File> files, boolean noInit){
         if(noInit){
             dbh = new DBHelper(new SynonymStrategy(),translator);
         }else{
@@ -147,14 +147,14 @@ public class Evaluator {
 
                     } else {
                         input.add(line);
-                        translation = dbh.translate(new Word(0, line, "en"),allWords,allRelations);
+                        translation = dbh.translate(new Word(0, line, fromLanguage),allWords,allRelations);
                         output.add(translation);
                     }
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            printEvaluation(System.getProperty("user.dir")+"/out/From_"+files.get(i).getName()+"_translated"+nameOfTranslator+"_"+strategy.getClass().getSimpleName() + "_Number" + i, output);
+            printEvaluation("SynonymFrom_"+files.get(i).getName()+"_translated"+trainingsDataName+"_Number" + i, output);
 
         }
         return output;

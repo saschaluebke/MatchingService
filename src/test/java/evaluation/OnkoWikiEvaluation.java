@@ -33,7 +33,7 @@ public class OnkoWikiEvaluation {
     static DBStrategy strategy;
     static DBHelper dbh;
     static MySQLQuery sqlQuery;
-    static Boolean setUpDatabase=true;
+    static Boolean setUpDatabase=false;
 
 
     @BeforeClass
@@ -103,7 +103,7 @@ public class OnkoWikiEvaluation {
         }
 
         printSimpleEvaluation("simpleTranslation",output);
-        assertEquals(true,true);
+        assertEquals(150,output.size());
     }
 
     public void printSimpleEvaluation(String name, ArrayList<String> output){
@@ -134,7 +134,7 @@ public class OnkoWikiEvaluation {
     /**
      * No need for Synonym Testing because currently I have no Synonyms in German
      */
-
+/*
 
     @Test
     public void synonymEvalution() {

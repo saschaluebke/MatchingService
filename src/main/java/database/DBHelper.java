@@ -106,11 +106,11 @@ public class DBHelper{
     public int getLastWordId(String language){
         return dbStrategy.getLastWordId(language);
     }
-
+/*
     public ArrayList<String> translate(Word input){
         return dbStrategy.translate(translator,input);
     };
-
+*/
     public ArrayList<String> translate(Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelations){
         if(translator==null){
             System.out.println("Translator is null in DBHelper");

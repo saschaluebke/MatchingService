@@ -76,12 +76,6 @@ public class SynonymStrategyTest {
 
         dbh.putRelation(glucose,sugar);
         dbh.putRelation(sugar,glucose);
-
-        ArrayList<String> translations = strategy.translate(testTranslate,glucose);
-
-        assertEquals(2,translations.size());
-        assertEquals("Zucker",translations.get(0));
-        assertEquals("Glukose",translations.get(1));
     }
 
 

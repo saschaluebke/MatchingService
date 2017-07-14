@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 //TODO: nur rausnehmen nicht abschneiden!
  public  class StringCleaner {
-     static String[] specialSigns = {"[","]","{","}"};
+     static String[] specialSigns = {"[","{","]","}"};
 
      public static String clean(String input){
          for(String sign : specialSigns){

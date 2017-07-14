@@ -30,7 +30,7 @@ public class OwlReaderTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
-        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
+        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","de");
 
     }
 /*
@@ -73,14 +73,14 @@ public class OwlReaderTest {
 
         //ArrayList<String> allLines = owlReader.getAllLines();
         //lineCount = allLines.size();
-        dbh.newLanguage("en");
+        dbh.newLanguage("de");
         owlReader.setFromEntry(0);
         owlReader.setToEntry(1000);
         dbh.storeFromFile(owlReader);
 
 
         //System.out.println(dbh.print("en","en"));
-        assertEquals(3175,dbh.getAllWords("en").size());
+        assertEquals(3175,dbh.getAllWords("de").size());
     }
 
 /*

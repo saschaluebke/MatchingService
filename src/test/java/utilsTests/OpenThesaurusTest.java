@@ -72,9 +72,9 @@ public class OpenThesaurusTest{
         */
 @Test
 public void simpleTest(){
-    otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/TestOntology","en");
+    otr = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/TestOntology","de");
     dbh = new DBHelper(new SynonymStrategy());
-    dbh.newLanguage("en");
+    dbh.newLanguage("de");
    /*
     int allLinesCount = otr.getAllLinesCount();
     int tmp=0;
@@ -93,8 +93,8 @@ public void simpleTest(){
      * Wordlist Cat,cat
      * Relations Cat->cat and cat->Cat
      */
-    assertEquals(2, dbh.getAllWords("en").size());
-    assertEquals(2,dbh.getAllRelations("en","en").size());
+    assertEquals(2, dbh.getAllWords("de").size());
+    assertEquals(2,dbh.getAllRelations("de","de").size());
 
     otr.setFromEntry(1);
     otr.setToEntry(2);
@@ -103,8 +103,8 @@ public void simpleTest(){
      * WordList Cat, cat, dog, Dog, Hound
      * Relations Cat->cat,cat->Cat and dog->Dog,Dog->dog,dog->Hound,Hound->Dog,Dog->Hound,Hound->Dog
      */
-    assertEquals(5, dbh.getAllWords("en").size());
-    assertEquals(8,dbh.getAllRelations("en","en").size());
+    assertEquals(5, dbh.getAllWords("de").size());
+    assertEquals(8,dbh.getAllRelations("de","de").size());
 
 
 }

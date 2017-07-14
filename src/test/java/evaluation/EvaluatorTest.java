@@ -47,7 +47,7 @@ public class EvaluatorTest {
 
     @Test
     public void simpleTranslateTest(){
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate(files,false);
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,false);
         String outString = output.get(0).get(0);
         outString = outString.trim();
         assertEquals("Hallo", outString);

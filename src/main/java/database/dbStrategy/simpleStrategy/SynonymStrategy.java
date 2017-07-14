@@ -165,10 +165,13 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
          * Search for matchings in DB when they are similar enough (accuracy) then fetch them
          */
         for(ArrayList<MatchResult> matchResults : mrs.getMatchResults()){
-            if (matchResults.get(0).getScore()<accuracy){
-                idOfPerfectMatch.add(matchResults.get(0).getID());
-                //System.out.println(input.getName()+" : "+matchResults.get(0).getDbString());
+            if (matchResults.size()>0){
+                if (matchResults.get(0).getScore()<accuracy){
+                    idOfPerfectMatch.add(matchResults.get(0).getID());
+                    //System.out.println(input.getName()+" : "+matchResults.get(0).getDbString());
+                }
             }
+
         }
 
         /**

@@ -25,10 +25,10 @@ public class EngToGerICD10Evaluation {
         evaluator = new Evaluator("en","de",new MosesClient());
         fileReaders = new ArrayList<>();
         SpecialistReader sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON", "en");
-        OwlReader owlr = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl", "de");
+        //OwlReader owlr = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl", "de");
         WordNetReader wnh = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict", "en");
         fileReaders.add(sr);
-        fileReaders.add(owlr);
+        //fileReaders.add(owlr);
         fileReaders.add(wnh);
         files = new ArrayList<>();
         for(int i =0; i<2; i++){
@@ -39,9 +39,9 @@ public class EngToGerICD10Evaluation {
 
     @Test
     public void evaluation(){
-        //ArrayList<ArrayList<String>> output = evaluator.simpleTranslate(fileReaders,files,false);
-        //assertEquals(178, output.get(2).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Springer",new SynonymStrategy(),fileReaders,files,false);
-        assertEquals(179, output2.size());
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("DictEn",files,true);
+        assertEquals(179, output.get(0).size());
+        //ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Springer",new SynonymStrategy(),fileReaders,files,false);
+        //assertEquals(179, output2.size());
     }
 }
