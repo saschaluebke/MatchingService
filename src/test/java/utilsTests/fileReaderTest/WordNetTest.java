@@ -1,6 +1,5 @@
-package utilsTests;
+package utilsTests.fileReaderTest;
 
-import components.Relation;
 import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
@@ -8,7 +7,7 @@ import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utils.WordNetReader;
+import utils.ontology.WordNetReader;
 
 import java.util.ArrayList;
 

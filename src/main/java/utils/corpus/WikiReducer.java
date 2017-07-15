@@ -1,4 +1,4 @@
-package utils;
+package utils.corpus;
 
 import java.io.*;
 import java.util.ArrayList;

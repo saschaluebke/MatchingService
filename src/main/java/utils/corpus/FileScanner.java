@@ -1,11 +1,11 @@
-package utils;
+package utils.corpus;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Created by SashBot on 12.07.2017.
+ * To know how big parallel corpus is
  */
 public class FileScanner {
     private String path;

@@ -1,7 +1,7 @@
-package utilsTests;
+package utilsTests.corpusMakerTests;
 
 import org.junit.Test;
-import utils.SpringerCorpusMaker;
+import utils.corpus.SpringerCorpusMaker;
 
 import static org.junit.Assert.assertEquals;
 

@@ -1,9 +1,10 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;
 import database.DBHelper;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import utils.ontology.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,7 +69,7 @@ public class OwlReader implements FileReader {
 
         @Override
     public void getFileContent() {
-        int entryCount = -1;
+
         allSynonyms = new ArrayList<>();
         int lastId = dbh.getLastWordId(firstLanguage);
         //ArrayList<Word> currentWordsInDB = dbh.getAllWords(firstLanguage); Too slow for testing
@@ -80,26 +81,13 @@ public class OwlReader implements FileReader {
         ArrayList<Word> allWords = new ArrayList<>();
         ArrayList<Relation> allRelation = new ArrayList<>();
         ArrayList<String> allLines = getAllLines();
-
-        for(String line : allLines){
+        String line;
+        for(int entryCount = fromEntry; entryCount<toEntry; entryCount++){
+            line = allLines.get(entryCount);
 
             ArrayList<String> stringSynonyms = new ArrayList<>();
             String definition = "";
             String name = "";
-                    entryCount++;
-                    if (entryCount < fromEntry || entryCount > toEntry){
-                        if (entryCount > toEntry){
-                            break;
-                        }
-                        if (entryCount%10000 == 0){
-                            //System.out.println("EntryCount: "+entryCount);
-                        }
-
-                        continue;
-                    }
-
-                    //Get a class in classLines (a class have multiple lines)
-
 
             String firstLine = "<rdfs:label rdf:datatype=\"http://www.w3.org/2001/XMLSchema#string\"";
             if (line.contains(firstLine)){

@@ -1,4 +1,4 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;

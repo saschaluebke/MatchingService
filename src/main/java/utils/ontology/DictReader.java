@@ -1,4 +1,4 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;
@@ -30,7 +30,7 @@ public class DictReader implements FileReader{
         dbh = new DBHelper(new SimpleStrategy());
     }
 
-    @Override
+ @Override
     public void getFileContent() {
         int firstLanguageId = dbh.getLastWordId(languageFrom);
         int secondLanguageId = dbh.getLastWordId(languageTo);
@@ -59,8 +59,8 @@ int count = 0;
                 /**
                  * Moses doesn't like curly braces
                  */
-                String firstWord = StringCleaner.clean(splitString[0]);
-                String secondWord = StringCleaner.clean(splitString[1]);
+                String firstWord = splitString[0];
+                String secondWord = splitString[1];
 
                 firstLanguageId++;
                 firstWordList.add(new Word(firstLanguageId,firstWord,getFirstLanguage()));

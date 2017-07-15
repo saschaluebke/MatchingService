@@ -1,11 +1,12 @@
 package evaluation;
 
-import database.dbStrategy.simpleStrategy.SimpleStrategy;
-import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
-import utils.*;
+import utils.evaluation.Evaluator;
+import utils.ontology.FileReader;
+import utils.ontology.SpecialistReader;
+import utils.ontology.WordNetReader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,18 +24,20 @@ public class EngToGerICD10Evaluation {
     @BeforeClass
     public static void onceExecutedBeforeAll() {
         evaluator = new Evaluator("en","de",new MosesClient());
-        fileReaders = new ArrayList<>();
-        SpecialistReader sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON", "en");
+        /*
+       // fileReaders = new ArrayList<>();
+       // SpecialistReader sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON", "en");
         //OwlReader owlr = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl", "de");
-        WordNetReader wnh = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict", "en");
-        fileReaders.add(sr);
+       // WordNetReader wnh = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict", "en");
+       // fileReaders.add(sr);
         //fileReaders.add(owlr);
-        fileReaders.add(wnh);
+       // fileReaders.add(wnh);
         files = new ArrayList<>();
         for(int i =0; i<2; i++){
             files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion"+i+".txt"));
         }
         System.out.println("init Complete");
+        */
     }
 
     @Test

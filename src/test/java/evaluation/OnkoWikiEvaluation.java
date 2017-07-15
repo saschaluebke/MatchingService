@@ -1,26 +1,20 @@
 package evaluation;
 
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
-import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
-import utils.*;
+import utils.evaluation.OnkoWikiReader;
+import utils.ontology.OpenThesaurusReader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.W;
 import static org.junit.Assert.assertEquals;
 
 /**

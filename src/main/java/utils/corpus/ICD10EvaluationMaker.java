@@ -1,4 +1,4 @@
-package utils;
+package utils.corpus;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -34,8 +34,9 @@ public class ICD10EvaluationMaker {
                 count++;
                 if(count%modulo==0){
                     line = line.substring(8); //there are 8 chars for Identifiers in the data (not needed here).
-                    line = line.replace("[","");//no [] signs because of Moses!
-                    line = line.replace("]","");
+                    //line = StringCleaner.clean(line);
+                    //line = line.replace("[","");//no [] signs because of Moses!
+                    //line = line.replace("]","");
                     lines.add(line);
                     mainCount++;
                 }

@@ -1,4 +1,4 @@
-package utils;
+package utils.evaluation;
 
 import components.Relation;
 import components.Word;
@@ -7,12 +7,10 @@ import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
-import translators.MosesClient;
+import jxl.write.Formula;
+import jxl.write.WriteException;
 import translators.Translator;
-import utils.FileReader;
-import utils.OwlReader;
-import utils.SpecialistReader;
-import utils.WordNetReader;
+import utils.ontology.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -106,13 +104,14 @@ public class Evaluator {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            printSimpleEvaluation("SimpleFrom_"+files.get(0).getName()+"_translated"+trainingsDataName, output);
+            printSimpleWithExcel("SimpleFrom_"+files.get(0).getName()+"_translated"+trainingsDataName, output);
             fullOutput.add(output);
         }
         return fullOutput;
     }
 
-    public ArrayList<ArrayList<String>> synonymTranslate(String trainingsDataName, DBStrategy strategy, ArrayList<FileReader> fileReaders, ArrayList<File> files, boolean noInit){
+    public ArrayList<ArrayList<String>> synonymTranslate(String trainingsDataName, ArrayList<FileReader> fileReaders, ArrayList<File> files, boolean noInit){
+       /*
         if(noInit){
             dbh = new DBHelper(new SynonymStrategy(),translator);
         }else{
@@ -129,7 +128,8 @@ public class Evaluator {
             }
 
         }
-
+        */
+        dbh = new DBHelper(new SynonymStrategy(),translator);
         ArrayList<Word> allWords = dbh.getAllWords(fromLanguage);
         ArrayList<Relation> allRelations = dbh.getAllRelations(fromLanguage,fromLanguage);
 
@@ -158,6 +158,71 @@ public class Evaluator {
 
         }
         return output;
+    }
+
+    public void printSimpleWithExcel(String name, ArrayList<String> output){
+        ExcelWriter ew = new ExcelWriter("/out/"+name+".xls",name);
+
+        ew.addLabel(0,1,"Input");
+        ew.addLabel(1,1,"Output");
+        ew.addLabel(2,1,"Unverändert");
+        ew.addLabel(3,1,"Schlecht");
+        ew.addLabel(4,1,"Gut");
+        ew.addLabel(5,1,"Perfekt");
+
+        int sameCounter = 0;
+        for(int i=0;i<output.size();i++) {
+
+            String inputWord = input.get(i);
+            String outputWord = output.get(i);
+            String equalMarker = "0";
+            if (inputWord.contains(outputWord)) {
+                equalMarker = "X";
+                sameCounter++;
+            }
+            ew.addLabel(2,i+2,equalMarker);
+            ew.addLabel(0,i+2,inputWord);
+            ew.addLabel(1,i+2,outputWord);
+        }
+
+        ew.addNumber(2,0,sameCounter);
+
+
+        StringBuffer buf = new StringBuffer();
+        buf.append("SUM(E3:E200)");
+        Formula f = new Formula(3, 0, buf.toString());
+        try {
+            ew.getSheet().addCell(f);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
+        buf = new StringBuffer();
+        buf.append("SUM(F3:F200)");
+        f = new Formula(4, 0, buf.toString());
+        try {
+            ew.getSheet().addCell(f);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
+        buf = new StringBuffer();
+        buf.append("SUM(G3:G200)");
+        f = new Formula(5, 0, buf.toString());
+        try {
+            ew.getSheet().addCell(f);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ew.write();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void printSimpleEvaluation(String name, ArrayList<String> output){

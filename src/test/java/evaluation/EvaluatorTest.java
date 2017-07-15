@@ -4,10 +4,9 @@ import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
-import utils.Evaluator;
-import utils.FileReader;
-import utils.OpenThesaurusReader;
-import utils.SpecialistReader;
+import utils.evaluation.Evaluator;
+import utils.ontology.FileReader;
+import utils.ontology.OpenThesaurusReader;
 
 import java.io.File;
 import java.util.ArrayList;

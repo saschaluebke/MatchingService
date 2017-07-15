@@ -1,15 +1,11 @@
-package utilsTests;
+package utilsTests.fileReaderTest;
 
-import components.Relation;
-import components.Word;
 import database.DBHelper;
 import database.MySQLQuery;
-import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utils.FileReader;
-import utils.OwlReader;
+import utils.ontology.OwlReader;
 
 import java.util.ArrayList;
 
@@ -80,7 +76,7 @@ public class OwlReaderTest {
 
 
         //System.out.println(dbh.print("en","en"));
-        assertEquals(3175,dbh.getAllWords("de").size());
+        assertEquals(3171,dbh.getAllWords("de").size());
     }
 
 /*

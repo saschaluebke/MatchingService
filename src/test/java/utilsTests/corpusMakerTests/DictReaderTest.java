@@ -1,12 +1,11 @@
-package utilsTests;
+package utilsTests.corpusMakerTests;
 
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utils.DictReader;
-import utils.OwlReader;
+import utils.ontology.DictReader;
 
 import static org.junit.Assert.assertEquals;
 

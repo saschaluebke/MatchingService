@@ -1,7 +1,6 @@
-package utils;
+package utils.corpus;
 
 import java.io.*;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +36,14 @@ public class SpringerCorpusMaker{
 
 
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(listOfEnglishFiles[i]),"iso-8859-1")); //find out with file -i <filename>
-                listOfEnglishLines.add(br.readLine());
+                String line = br.readLine();
+                listOfEnglishLines.add(line);
                 br.close();
 
                 //for German
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(listOfGermanFiles[i]),"iso-8859-1"));
-                listOfGermanLines.add(br.readLine());
+                line = br.readLine();
+                listOfGermanLines.add(line);
 
                 br.close();
             }
@@ -73,7 +74,9 @@ public class SpringerCorpusMaker{
             for (int i = 0; i < listOfEnglishFiles.length; i++) {
                 ArrayList<String> newEnglishLines = getLinesFromFile(listOfEnglishFiles[i]);
                 ArrayList<String> newGermanLines = getLinesFromFile(listOfGermanFiles[i]);
+
                 if(newEnglishLines.size()==newGermanLines.size()){
+
                     listOfEnglishLines.addAll(newEnglishLines);
                     listOfGermanLines.addAll(newGermanLines);
                 }else{

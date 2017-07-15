@@ -1,12 +1,10 @@
 package database.dbStrategy;
 
-import components.MatchResult;
 import components.MatchResultSet;
 import components.Relation;
 import components.Word;
-import database.DBHelper;
 import translators.Translator;
-import utils.FileReader;
+import utils.ontology.FileReader;
 
 import java.util.ArrayList;
 

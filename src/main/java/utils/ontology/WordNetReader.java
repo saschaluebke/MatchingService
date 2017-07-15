@@ -1,23 +1,19 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;
 import database.DBHelper;
-import database.dbStrategy.simpleStrategy.SimpleStrategy;
-import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.*;
+import utils.ontology.FileReader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Scanner;
 
 /**
  * Created by sascha on 02.07.17.

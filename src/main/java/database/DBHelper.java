@@ -1,15 +1,12 @@
 package database;
 
-import components.MatchResult;
 import components.MatchResultSet;
 import components.Relation;
 import components.Word;
 import database.dbStrategy.DBStrategy;
 import translators.Translator;
-import utils.FileReader;
+import utils.ontology.FileReader;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DBHelper{
@@ -26,6 +23,7 @@ public class DBHelper{
     }
 
     public int putWord(Word word) {
+
         return dbStrategy.putWord(word);
     }
 
@@ -115,7 +113,12 @@ public class DBHelper{
         if(translator==null){
             System.out.println("Translator is null in DBHelper");
         }
-        return dbStrategy.translate(translator,input,allWords,allRelations);
+        /**
+         * Clean input from big chars and braces
+         */
+        input.setWord(input.getName().toLowerCase());
+
+        return dbStrategy.translate(translator, input,allWords,allRelations);
     }
 
     public String print(String language1, String language2){

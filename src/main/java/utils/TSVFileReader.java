@@ -2,7 +2,6 @@ package utils;
 
 import components.Relation;
 import components.Word;
-import database.DBHelper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //To read the source and target.tsv files in test/java/files
-public class TSVFileReader implements utils.FileReader {
+public class TSVFileReader implements utils.ontology.FileReader {
     ArrayList<String> fileContent = new ArrayList<>();
     String path;
     String language;

@@ -1,9 +1,10 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;
 import database.DBHelper;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import utils.ontology.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,31 +50,14 @@ public class SpecialistReader implements FileReader {
 
     @Override
     public void getFileContent() {
-        entryCount=-1;
+        entryCount = 0;
         wordlist = new ArrayList<>();
         allSynonyms = new ArrayList<>();
         int lastWordId = dbh.getLastWordId(language);
         ArrayList<String> allLines = getAllLines();
-        for(String line : allLines){
-
-            if(allSynonyms.size()>100000){
-                System.out.println(allSynonyms.size()+"above");
-            }
-                entryCount++;
-                if (entryCount < fromEntry || entryCount > toEntry){
-                    if (entryCount>toEntry){
-                        break;
-                    }
-                    if (entryCount%10000 == 0){
-                       //System.out.println("EntryCount: "+entryCount);
-                    }
-
-                    continue;
-                }
-
-            if(allSynonyms.size()>100000){
-                System.out.println(allSynonyms.size()+"above");
-            }
+        String line;
+        for(entryCount = fromEntry; entryCount<toEntry; entryCount++){
+            line = allLines.get(entryCount);
 
                 String firstline = "{base=";
                 String name = "";
@@ -87,9 +71,6 @@ public class SpecialistReader implements FileReader {
                 }
                 ArrayList<String> acronyms = new ArrayList<>();
 
-            if(allSynonyms.size()>100000){
-                System.out.println(allSynonyms.size()+"aboveAcronym");
-            }
 
                 while(line.contains("acronym_of=")){
                     int realend = -1;
@@ -120,10 +101,6 @@ public class SpecialistReader implements FileReader {
                     }
                 }
 
-            if(allSynonyms.size()>100000){
-                System.out.println(allSynonyms.size()+"aboveAbbreviation");
-            }
-
                 while(line.contains("abbreviation_of=")){
                     int realend = -1;
                     int end = line.indexOf("\t");
@@ -151,9 +128,6 @@ public class SpecialistReader implements FileReader {
                         line = line.substring(realend+1);
                     }
                 }
-            if(allSynonyms.size()>100000){
-                System.out.println(allSynonyms.size()+"aboveEnd");
-            }
 
                 lastWordId++;
                 Word w = new Word(lastWordId,name,language);
@@ -166,11 +140,6 @@ public class SpecialistReader implements FileReader {
                 }
 
                 allSynonyms.add(synonyms);
-            int counter = allSynonyms.size();
-            if(counter>100000){
-                System.out.println(allSynonyms.size());
-            }
-
             }
 
         }

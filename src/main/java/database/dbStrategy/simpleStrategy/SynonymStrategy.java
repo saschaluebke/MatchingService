@@ -6,14 +6,12 @@ import components.Relation;
 import components.Word;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
-import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import matching.Matcher;
 import translators.Translator;
-import utils.FileReader;
+import utils.ontology.FileReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 
 /**
  * Created by sashbot on 08.07.17.

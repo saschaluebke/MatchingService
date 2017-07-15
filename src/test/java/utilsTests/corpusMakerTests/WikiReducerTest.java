@@ -1,7 +1,7 @@
-package utilsTests;
+package utilsTests.corpusMakerTests;
 
 import org.junit.Test;
-import utils.WikiReducer;
+import utils.corpus.WikiReducer;
 
 import static org.junit.Assert.assertEquals;
 

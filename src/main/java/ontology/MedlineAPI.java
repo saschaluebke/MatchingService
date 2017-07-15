@@ -1,6 +1,5 @@
 package ontology;
 
-import components.Language;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -15,9 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+
 //Transliterated Title (TT) / Title (TI)
 public class MedlineAPI {
 
@@ -109,6 +106,7 @@ public class MedlineAPI {
                 Document doc = db.parse(ur.openStream());
                 System.out.println("Aus dem Doc genomen:");
                 System.out.println(doc.getNodeName());
+                System.out.println(doc.getElementsByTagName("heart"));
             } catch (SAXException e) {
                 e.printStackTrace();
             } catch (IOException e) {

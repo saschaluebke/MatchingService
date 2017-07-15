@@ -1,13 +1,11 @@
 package database.dbStrategy.simpleStrategy;
 
-import components.MatchResult;
 import components.MatchResultSet;
 import components.Relation;
 import components.Word;
 import database.MySQLQuery;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
-import matching.SimpleMatcher;
 import matching.distance.DistanceStrategy;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.IterateStrategy;
@@ -15,7 +13,7 @@ import matching.iterate.PerformanceStrategy;
 import matching.sorting.ScoreSort;
 import matching.sorting.SortStrategy;
 import translators.Translator;
-import utils.FileReader;
+import utils.ontology.FileReader;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -164,6 +162,7 @@ public class SimpleStrategy implements DBStrategy {
         StringBuilder querry = new StringBuilder("INSERT INTO wordlist_" + wordList.get(0).getLanguage() + " VALUES ");
         for (int i = 0; i < wordList.size(); i++) {
             Word w = wordList.get(i);
+            w.setWord(w.getName().toLowerCase());
             if ((w.getName().length() > MAXCHARS || w.getDescription().length() > MAXCHARS)) {
                 continue; //TODO: Dirty code please clean up!
             }

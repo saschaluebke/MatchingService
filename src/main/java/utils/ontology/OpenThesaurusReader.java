@@ -1,9 +1,8 @@
-package utils;
+package utils.ontology;
 
 import components.Relation;
 import components.Word;
-import database.DBHelper;
-import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import utils.ontology.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,48 +44,35 @@ public class OpenThesaurusReader implements FileReader {
 
         @Override
     public void getFileContent() {
-        int entryCount=-1;
+        //int entryCount=-1;
        ArrayList<String> allLines = getAllLines();
        words = new ArrayList<>();
        synonyms = new ArrayList<>();
-       for(String line : allLines){
-           entryCount++;
-                if (entryCount < fromEntry || entryCount >= toEntry){
-                    if (entryCount>=toEntry){
-                        break;
-                    }
-                    if (entryCount%10000 == 0){
-                        System.out.println("EntryCount: "+entryCount);
-                    }
+       String line;
+       for(int entryCount = fromEntry; entryCount<toEntry; entryCount++){
+           line = allLines.get(entryCount);
+           if (line.indexOf(";")>0){
+               String word = line.substring(0,line.indexOf(";"));
+               line = line.substring(line.indexOf(";")+1,line.length());
+               Word firstInput = new Word(0,word,firstLanguage);
+               words.add(firstInput);
+               ArrayList<Word> synonymList = new ArrayList<>();
 
-                    continue;
-                }
+               //When there is just one Word like Cat;cat then you have to create one Relation between Cat and cat
+               //And put both in the specific WordList
+               while(line.indexOf(";")>0){
+                   String synonym = line.substring(0,line.indexOf(";"));
+                   line = line.substring(line.indexOf(";")+1,line.length());
+                   Word synonymInput = new Word(0,synonym,firstLanguage);
+                   synonymList.add(synonymInput);
+               }
+               if(line.indexOf(";")<0 && !line.equals("")){
+                   synonymList.add(new Word(0,line,firstLanguage));
+               }
 
-                if (line.indexOf(";")>0){
-                    String word = line.substring(0,line.indexOf(";"));
-                    line = line.substring(line.indexOf(";")+1,line.length());
-                    Word firstInput = new Word(0,word,firstLanguage);
-                    words.add(firstInput);
-                    ArrayList<Word> synonymList = new ArrayList<>();
-
-                    //When there is just one Word like Cat;cat then you have to create one Relation between Cat and cat
-                    //And put both in the specific WordList
-                    while(line.indexOf(";")>0){
-                        String synonym = line.substring(0,line.indexOf(";"));
-                        line = line.substring(line.indexOf(";")+1,line.length());
-                        Word synonymInput = new Word(0,synonym,firstLanguage);
-                        synonymList.add(synonymInput);
-                    }
-                        if(line.indexOf(";")<0 && !line.equals("")){
-                            synonymList.add(new Word(0,line,firstLanguage));
-                    }
-
-                synonyms.add(synonymList);
-                }
-
-
-
-        }
+               synonyms.add(synonymList);
+           }
+       }
     }
 
     @Override

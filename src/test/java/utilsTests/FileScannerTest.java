@@ -1,7 +1,7 @@
 package utilsTests;
 
 import org.junit.Test;
-import utils.FileScanner;
+import utils.corpus.FileScanner;
 
 import static org.junit.Assert.assertEquals;
 
