@@ -26,7 +26,7 @@ public class OwlReaderTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
-        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","de");
+        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
 
     }
 /*
@@ -56,12 +56,24 @@ public class OwlReaderTest {
         assertEquals(326718,dbh.getAllRelations("de","de").size());
     }
 */
-
+/*
+    @Test
+    public void transferTest(){
+        int lines = owlReader.transferOWLFile();
+        assertEquals(121520,lines);
+    }
+*/
     @Test
     public void getAllWordsTest(){
+        //Test if the transfer file working right!
+
         ArrayList<String> allLines = owlReader.getAllLines();
         lineCount = allLines.size();
         assertEquals(121520,lineCount);
+
+        int allLinesCount = owlReader.getAllLinesCount();
+        assertEquals(121520,allLinesCount);
+
     }
 
     @Test
@@ -69,26 +81,27 @@ public class OwlReaderTest {
 
         //ArrayList<String> allLines = owlReader.getAllLines();
         //lineCount = allLines.size();
-        dbh.newLanguage("de");
+        dbh.newLanguage("en");
         owlReader.setFromEntry(0);
         owlReader.setToEntry(1000);
         dbh.storeFromFile(owlReader);
 
 
-        //System.out.println(dbh.print("en","en"));
-        assertEquals(3171,dbh.getAllWords("de").size());
+        //System.out.println(dbh.print("en","en"));3171
+        assertEquals(5112,dbh.getAllWords("en").size());
     }
 
-/*
+
     @Test
     public void synonymTest(){
 
-        ArrayList<String> allLines = owlReader.getAllLines();
-        lineCount = allLines.size();
+        //ArrayList<String> allLines = owlReader.getAllLines();
+        lineCount = 121520;
+        //lineCount = owlReader.getAllLinesCount();
         dbh.newLanguage("en");
-        int tmp=0;
-        for(int i = 0; i<lineCount+100000; i=i+100000){
-
+        int tmp=15960;
+        for(int i = 15970; i<lineCount+1000; i=i+10){
+            System.out.println("read "+i);
             owlReader.setFromEntry(tmp);
             owlReader.setToEntry(i);
             dbh.storeFromFile(owlReader);
@@ -96,9 +109,9 @@ public class OwlReaderTest {
         }
 
        //System.out.println(dbh.print("en","en"));
-       assertEquals(1591354,dbh.getAllWords("en").size());
+       assertEquals(308776,dbh.getAllWords("en").size());
     }
-*/
+
 
 }
 

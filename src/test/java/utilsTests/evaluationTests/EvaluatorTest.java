@@ -1,4 +1,4 @@
-package evaluation;
+package utilsTests.evaluationTests;
 
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
@@ -63,7 +63,7 @@ public class EvaluatorTest {
 
     @Test
     public void synonymTranslateTest(){
-        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Springer",new SynonymStrategy(),fileReaders,files,false);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Springer",fileReaders,files,false);
         String outString = output.get(0).get(0);
         outString = outString.trim();
         assertEquals("Hallo", outString);

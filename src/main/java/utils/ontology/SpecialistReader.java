@@ -100,7 +100,7 @@ public class SpecialistReader implements FileReader {
                         line = line.substring(realend+1);
                     }
                 }
-
+                int counter=0;
                 while(line.contains("abbreviation_of=")){
                     int realend = -1;
                     int end = line.indexOf("\t");
@@ -114,7 +114,7 @@ public class SpecialistReader implements FileReader {
                             continue;
                         }
                     }
-
+//TODO gleich reinschreiben!! geht nicht... Aber nach so tausend steps in sql dürfte gehen!
                     String abbreviation = line.substring(line.indexOf("abbreviation_of=")+16,end);
                     if (abbreviation.indexOf("|")>0){
                         abbreviation = abbreviation.substring(0,abbreviation.indexOf("|"));
@@ -126,6 +126,10 @@ public class SpecialistReader implements FileReader {
                         line = line.substring(end+1);
                     }else{
                         line = line.substring(realend+1);
+                    }
+                    counter++;
+                    if(counter > 10){
+                        break;
                     }
                 }
 

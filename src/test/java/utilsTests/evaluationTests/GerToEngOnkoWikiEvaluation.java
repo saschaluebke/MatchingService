@@ -1,4 +1,4 @@
-package evaluation;
+package utilsTests.evaluationTests;
 
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
@@ -40,7 +40,7 @@ public class GerToEngOnkoWikiEvaluation {
     public void evaluation(){
         //ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,false);
         //assertEquals(145, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Dict",new SynonymStrategy(),fileReaders,files,false);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Dict",fileReaders,files,false);
         assertEquals(145, output2.size());
     }
 }

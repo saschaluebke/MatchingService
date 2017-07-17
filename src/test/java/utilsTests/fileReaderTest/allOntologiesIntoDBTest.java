@@ -31,9 +31,9 @@ public class allOntologiesIntoDBTest {
         dbq.dropAllTables();
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
-        openThesaurusReader = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/TestOntology","de");
+        openThesaurusReader = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
         owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","de");
-        specialistReader = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/TestOntology","en");
+        specialistReader = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
         wordNetReader = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict","en");
         frList = new ArrayList<>();
         frList.add(openThesaurusReader);
@@ -43,20 +43,24 @@ public class allOntologiesIntoDBTest {
     }
 
     @Test
-    public void simpleTest(){
+    public void getAllOntologiesInDatabase(){
         dbh.newLanguage("en");
         dbh.newLanguage("de");
         for(FileReader fr : frList){
             int tmp = 0;
             int linesCount = fr.getAllLinesCount();
-            for(int i=1000 ; i<linesCount; i=i+1000){
+            for(int i=2000 ; i<linesCount; i=i+2000){
                 fr.setFromEntry(tmp);
                 fr.setToEntry(i);
                 dbh.storeFromFile(fr);
                 tmp = i;
             }
+            if (tmp+2000>linesCount){
+                fr.setFromEntry(tmp);
+                fr.setToEntry(linesCount);
+            }
             System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
         }
-        assertEquals(299233,dbh.getAllWords("en").size());
+        assertEquals(736505,dbh.getAllWords("en").size());
     }
 }

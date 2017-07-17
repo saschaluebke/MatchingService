@@ -14,9 +14,10 @@ public class FileScanner {
 
     public FileScanner(String path){
         this.path = System.getProperty("user.dir")+path;
+        loadData();
     }
 
-    public void loadData(){
+    private void loadData(){
         wordCount = 0;
         sentenceCount = 0;
         BufferedReader br = null;

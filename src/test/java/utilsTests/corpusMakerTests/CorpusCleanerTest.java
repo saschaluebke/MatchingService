@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import utils.corpus.CorpusCleaner;
 import utils.corpus.FileScanner;
+import utils.ontology.FileReader;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class CorpusCleanerTest {
     static CorpusCleaner cc;
-    static FileScanner fs;
     static ArrayList<String> paths;
 
     @BeforeClass
@@ -30,40 +30,68 @@ public class CorpusCleanerTest {
 
     @Test
     public void cleanAllCorpus(){
-        String truePath;
+        FileScanner fsDE,fsEN;
+        String truePathDE,truePathEN;
         int lineCountDE, newLineCountDE, lineCountEN, newLineCountEN;
         for(String path : paths){
-            truePath = path+".de";
-            fs = new FileScanner(truePath);
-            lineCountDE = fs.getLines();
-            cc = new CorpusCleaner(truePath);
-            cc.clean(cc.braces());
-            truePath = path+".deCleaned";
-            fs = new FileScanner(truePath);
-            newLineCountDE = fs.getLines();
-            assertEquals(lineCountDE,newLineCountDE);
+            truePathDE = path+".de";
+            truePathEN = path+".en";
+            fsDE = new FileScanner(truePathDE);
+            fsEN = new FileScanner(truePathEN);
+            lineCountDE = fsDE.getLines();
+            lineCountEN = fsEN.getLines();
+            cc = new CorpusCleaner(truePathDE,truePathEN);
+            cc.cleanCorpus(cc.braces());
+            truePathDE = path+".deCleaned";
+            truePathEN = path+".enCleaned";
+            fsDE = new FileScanner(truePathDE);
+            fsEN = new FileScanner(truePathEN);
+            newLineCountDE = fsDE.getLines();
+            newLineCountEN = fsEN.getLines();
 
-            System.out.println(truePath+" cleaned. "+ lineCountDE+" lines.");
-
-            truePath = path+".en";
-            fs = new FileScanner(truePath);
-            lineCountEN = fs.getLines();
-            cc = new CorpusCleaner(truePath);
-            cc.clean(cc.braces());
-            truePath = path+".enCleaned";
-            fs = new FileScanner(truePath);
-            newLineCountEN = fs.getLines();
-            assertEquals(lineCountEN,newLineCountEN);
-
-            System.out.println(truePath+" cleaned. "+lineCountEN+" lines.");
+            System.out.println(truePathDE+" cleaned. "+ lineCountDE+" lines.");
+            System.out.println(truePathEN+" cleaned. "+lineCountEN+" lines.");
 
             assertEquals(newLineCountDE,newLineCountEN);
         }
 
     }
 
+    /**
+     * This takes very long!
+     */
+    @Test
+    public void cleanWikiCorpus(){
+        FileScanner fsDE,fsEN;
+        String truePathDE,truePathEN;
+        int lineCountDE, newLineCountDE, lineCountEN, newLineCountEN;
+        String path = "/src/main/resources/translation/Wiki/Wikipedia";
+
+        truePathDE = path+".de";
+        truePathEN = path+".en";
+        fsDE = new FileScanner(truePathDE);
+        fsEN = new FileScanner(truePathEN);
+        lineCountDE = fsDE.getLines();
+        lineCountEN = fsEN.getLines();
+        cc = new CorpusCleaner(truePathDE,truePathEN);
+        cc.cleanCorpus(cc.braces());
+        truePathDE = path+".deCleaned";
+        truePathEN = path+".enCleaned";
+        fsDE = new FileScanner(truePathDE);
+        fsEN = new FileScanner(truePathEN);
+        newLineCountDE = fsDE.getLines();
+        newLineCountEN = fsEN.getLines();
+
+        System.out.println(truePathDE+" cleaned. "+ lineCountDE+" lines.");
+        System.out.println(truePathEN+" cleaned. "+lineCountEN+" lines.");
+
+        assertEquals(newLineCountDE,newLineCountEN);
+
+    }
+/*
     @Test
     public void justLowerCaseForBigCorpra(){
+
         String path = "/src/main/resources/translation/Wiki/Wikipedia";
 
         String truePath;
@@ -83,6 +111,7 @@ public class CorpusCleanerTest {
         System.out.println(truePath+" cleaned. "+lineCountEN+" lines.");
 
         assertEquals(lineCountDE,lineCountEN);
-    }
 
+    }
+*/
 }

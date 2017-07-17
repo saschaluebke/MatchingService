@@ -1,4 +1,4 @@
-package evaluation;
+package utilsTests.evaluationTests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

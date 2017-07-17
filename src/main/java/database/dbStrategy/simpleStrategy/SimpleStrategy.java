@@ -92,7 +92,7 @@ public class SimpleStrategy implements DBStrategy {
     public void putRelationList(ArrayList<Relation> relations, String language1, String language2) {
         ArrayList<String> parList = new ArrayList<>();
         if(relations==null || relations.size()<1){
-            System.out.println("SimpleStrategyError: "+relations+" null or 0");
+            System.out.println("SimpleStrategy: "+relations+" null or size 0.");
             return;
         }
         StringBuilder querry = new StringBuilder("INSERT INTO rel_" + language1+"_"+language2 + " VALUES ");
@@ -164,14 +164,23 @@ public class SimpleStrategy implements DBStrategy {
             Word w = wordList.get(i);
             w.setWord(w.getName().toLowerCase());
             if ((w.getName().length() > MAXCHARS || w.getDescription().length() > MAXCHARS)) {
-                continue; //TODO: Dirty code please clean up!
+                String description = w.getDescription();
+                if(description.length()>MAXCHARS){
+                    w.setDescription(w.getDescription().substring(0,MAXCHARS-1));
+                }
+                String name = w.getName();
+                if(name.length()>MAXCHARS){
+                    w.setWord(w.getName().substring(0,MAXCHARS-1));
+                    //TODO: What should I do with too long names...
+                }
+
             }
             String[] parTemp = {w.getName(), w.getDescription(), Integer.toString(w.getPrior()), Integer.toString(w.getCount())};
             parList.add(w.getName());
             parList.add(w.getDescription());
             parList.add(Integer.toString(w.getPrior()));
             parList.add(Integer.toString(w.getCount()));
-            if (i < wordList.size() - 1) {
+            if (i < wordList.size() -1) {
                 querry.append("(0, ?, ?, ?, ?),");
             } else {
                 querry.append("(0, ?, ?, ?, ?);");

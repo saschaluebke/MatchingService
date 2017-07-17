@@ -17,6 +17,7 @@ import java.util.ArrayList;
  * Created by sashbot on 08.07.17.
  */
 public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
+    private final int MINLENGTH=4;
     Matcher matcher;
 
     public SynonymStrategy(){
@@ -55,8 +56,9 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
 
             ArrayList<Relation> relations = new ArrayList<>();
             for(int i=0;i<words.size();i++){
+
                 Word word = words.get(i);
-                if(!stringsOfNewWords.contains(word.getName())){
+                if(word.getName().length()>=MINLENGTH && !stringsOfNewWords.contains(word.getName())){
                     lastId++;
                     word.setId(lastId);
                     newWordsForDB.add(word);
@@ -64,11 +66,14 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
                 }
                 ArrayList<Word> removedSynonyms = new ArrayList<>();
                 for(Word synonym : synonyms.get(i)){
-                    if(!stringsOfNewWords.contains(synonym.getName())){
+                    if(synonym.getName().length()>=MINLENGTH && !stringsOfNewWords.contains(synonym.getName())){
                         lastId++;
                         synonym.setId(lastId);
                         newWordsForDB.add(synonym);
                         stringsOfNewWords.add(synonym.getName());
+                        if (language.equals("en")){
+                            language = language;
+                        }
                     }else{
                         removedSynonyms.add(synonym);
                     }
@@ -77,7 +82,9 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
                 synonyms.get(i).removeAll(removedSynonyms);
 
                 //Create relations and put them into the relationList
-                synonyms.get(i).add(word);
+                if(word.getName().length()>=MINLENGTH){
+                    synonyms.get(i).add(word);
+                }
                 for(int x=0;x<synonyms.get(i).size();x++){
                     Word w = synonyms.get(i).get(x);
                     for(int y=0;y<synonyms.get(i).size();y++){
@@ -101,7 +108,6 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
                 Word lastWord = getWordById(lastIdinDB,language);
                 System.out.println("Last Word: "+lastWord.getName()+"/"+lastWord.getId());
             }
-
             putRelationList(relations,fr.getFirstLanguage(),fr.getSecondLanguage());
 
         }else if(fr.getWordList()!=null && fr.getSecondWordList()!=null && fr.getSynonyms()==null){
@@ -109,35 +115,6 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
         }
     }
 
-    /*
-    @Override
-    public ArrayList<String> translate(Translator translator, Word input) {
-        MatchResultSet mrs = matcher.getMatchingWordList(input,getAllWords(input.getLanguage()));
-        ArrayList<Integer> idOfPerfectMatch = new ArrayList<>();
-        for(ArrayList<MatchResult> matchResults : mrs.getMatchResults()){
-            if (matchResults.get(0).getScore()==0){
-                idOfPerfectMatch.add(matchResults.get(0).getID());
-            }
-        }
-        ArrayList<Relation> synonyms = getAllRelations(input.getLanguage(),input.getLanguage());
-        ArrayList<Integer> synonymsOfPerfectMatch = new ArrayList<>();
-        for(Relation r : synonyms){
-            if (idOfPerfectMatch.contains(r.getIdFrom())){
-                synonymsOfPerfectMatch.add(r.getIdTo());
-            }
-        }
-        synonymsOfPerfectMatch.addAll(idOfPerfectMatch);
-
-        //remove all dublicates
-        ArrayList<Integer> idTranslations = new ArrayList<Integer>(new LinkedHashSet<Integer>(synonymsOfPerfectMatch));
-        ArrayList<String> translations = new ArrayList<>();
-        for(int id : idTranslations){
-            translations.add(translator.translation(getWordById(id,input.getLanguage()).getName()));
-        }
-
-        return translations;
-    }
-   */
     /**
      * 1. Try to Match with WordList of same language then input
      * 2. When you find something equal look at the synonym table

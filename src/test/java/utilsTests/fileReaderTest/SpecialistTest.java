@@ -72,12 +72,13 @@ public void getAllLinesTest() {
     @Test
     public void synonymsTest() {
         sr = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
-        ArrayList<String> allLines = sr.getAllLines();
-        lines = allLines.size();
+        //ArrayList<String> allLines = sr.getAllLines();
+       // lines = allLines.size();
+        lines = 498432;
     dbh.newLanguage("en");
-    int tmp=0;
-    for(int i = 0; i<lines+100000; i=i+100000){
-
+    int tmp=20000;
+    for(int i = 20100; i<lines+1000; i=i+100){
+System.out.println("Read "+i);
         sr.setFromEntry(tmp);
         sr.setToEntry(i);
         dbh.storeFromFile(sr);

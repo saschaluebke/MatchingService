@@ -8,53 +8,53 @@ import java.util.ArrayList;
  */
 public class CorpusCleaner {
     static String[] specialSigns = {"[","{","]","}","*","=",")","(","\"",",","."};
-    private String path;
+    private String path1,path2;
     private ArrayList<String> lines;
     private int sentenceCount;
 
 
-    public CorpusCleaner(String path){
-        this.path = System.getProperty("user.dir")+path;
+    public CorpusCleaner(String path1,String path2){
+        this.path1 = System.getProperty("user.dir")+path1;
+        this.path2 = System.getProperty("user.dir")+path2;
         lines = new ArrayList<>();
     }
 
-    public int clean(String modus){
+    public int cleanCorpus(String modus){
         String encoding = "UTF-8";
-        int maxlines = 100;
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
+        BufferedReader reader1 = null;
+        BufferedReader reader2 = null;
+        BufferedWriter writer1 = null;
+        BufferedWriter writer2 = null;
         int count = 0;
         try {
 
-                reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), encoding));
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + "Cleaned"), encoding));
+            reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
+            reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(path2), encoding));
 
-            for (String line; (line = reader.readLine()) != null;) {
+            writer1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path1 + "Cleaned"), encoding));
+            writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path2 + "Cleaned"), encoding));
+            String line1;
+            String line2;
+            for (; (line1 = reader1.readLine()) != null;) {
                 count++;
+                line2= reader2.readLine();
 
-                if (modus.equals("lowerCase")){
-                    line = line.toLowerCase(); //TODO better design!
+                line1 = cleanLine(line1,modus);
+                line2 = cleanLine(line2,modus);
+
+                //Just skip line when both lines are too short or there are more numbers than letters
+                if((line1.length()>= 3 && line2.length()>= 3 ) && (letterOverNumbers(line1) && letterOverNumbers(line2))){
+                    writer1.write(line1);
+                    writer1.newLine();
+                    writer2.write(line2);
+                    writer2.newLine();
                 }
-
-                if (modus.equals("specialSigns")){
-                    line = line.toLowerCase();
-                    for(String sign : specialSigns){
-                        line = line.replace(sign,"");
-                    }
-                }
-
-                if (modus.equals("braces")){
-                    line = line.toLowerCase();
-                    line = cleanString(line);
-                }
-
-                writer.write(line);
-                writer.newLine();
             }
 
-            writer.close();
-            reader.close();
-
+            writer1.close();
+            reader1.close();
+            writer2.close();
+            reader2.close();
         } catch (UnsupportedEncodingException e) {
         e.printStackTrace();
     } catch (FileNotFoundException e) {
@@ -63,6 +63,45 @@ public class CorpusCleaner {
             e.printStackTrace();
         }
         return count;
+    }
+
+    private boolean letterOverNumbers(String line){
+        int letters=0;
+        int numbers=0;
+        for(char c : line.toCharArray()){
+            String s = String.valueOf(c);
+             //match a number with - and or decimal
+            if(s.matches("-?\\d+(\\.\\d+)?")){
+                numbers++;
+            }else{
+                letters++;
+            }
+        }
+        if(letters>=numbers){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private String cleanLine(String line, String modus){
+        if (modus.equals("lowerCase")){
+            line = line.toLowerCase();
+        }
+
+        if (modus.equals("specialSigns")){
+            line = line.toLowerCase();
+            for(String sign : specialSigns){
+                line = line.replace(sign,"");
+            }
+        }
+
+        if (modus.equals("braces")){
+            line = line.toLowerCase();
+            line = cleanBraces(line);
+        }
+
+        return line;
     }
 
     public String lowerCaseCorpus(){
@@ -76,7 +115,7 @@ public class CorpusCleaner {
     public String braces(){
         return "braces";
     }
-
+/*
     private void getData(){
         BufferedReader br = null;
         try {
@@ -110,8 +149,8 @@ public class CorpusCleaner {
             e.printStackTrace();
         }
     }
-
-    private String cleanString(String input) {
+*/
+    private String cleanBraces(String input) {
         input = input.toLowerCase();
 
         int bracketStart = input.indexOf("[");

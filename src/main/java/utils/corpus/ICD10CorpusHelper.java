@@ -1,5 +1,6 @@
 package utils.corpus;
 
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +25,23 @@ public class ICD10CorpusHelper implements CorpusHelper{
 
     @Override
     public ArrayList<String> searchCorpusAfter(String input) {
+        String encoding = "UTF-8";
+        BufferedReader reader = null;
+        try {
+
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), encoding));
+            for (String line; (line = reader.readLine()) != null;) {
+                if (line.contains(input)){
+                    //TODO
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null; //TODO
     }
 }
