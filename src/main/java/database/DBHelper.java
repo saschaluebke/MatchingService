@@ -2,8 +2,10 @@ package database;
 
 import components.MatchResultSet;
 import components.Relation;
+import components.TranslationResult;
 import components.Word;
 import database.dbStrategy.DBStrategy;
+import matching.Matcher;
 import translators.Translator;
 import utils.ontology.FileReader;
 
@@ -80,6 +82,13 @@ public class DBHelper{
         dbStrategy.removeWord(word,language);
     }
 
+    public Matcher getMatcher(){
+        return dbStrategy.getMatcher();
+    }
+    public void setMatcher(Matcher matcher){
+        dbStrategy.setMatcher(matcher);
+    }
+
     public boolean newLanguage(String language) {
         return dbStrategy.newLanguage(language);
     }
@@ -97,28 +106,21 @@ public class DBHelper{
         return dbStrategy.getWordList(name,language);
     }
 
-    public boolean updateTables(){
-        return dbStrategy.updateTables();
-    }
-
     public int getLastWordId(String language){
         return dbStrategy.getLastWordId(language);
     }
-/*
-    public ArrayList<String> translate(Word input){
-        return dbStrategy.translate(translator,input);
-    };
-*/
-    public ArrayList<String> translate(Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelations){
+
+    public ArrayList<String> translate(TranslationResult translationResult,ArrayList<Word> allWords, ArrayList<Relation> allRelations){
         if(translator==null){
             System.out.println("Translator is null in DBHelper");
         }
+        Word input = translationResult.getInput();
         /**
          * Clean input from big chars and braces
          */
         input.setWord(input.getName().toLowerCase());
 
-        return dbStrategy.translate(translator, input,allWords,allRelations);
+        return dbStrategy.translate(translationResult,translator,allWords,allRelations);
     }
 
     public String print(String language1, String language2){

@@ -46,7 +46,7 @@ public class EvaluatorTest {
 
     @Test
     public void simpleTranslateTest(){
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,false);
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,"","");
         String outString = output.get(0).get(0);
         outString = outString.trim();
         assertEquals("Hallo", outString);
@@ -63,7 +63,7 @@ public class EvaluatorTest {
 
     @Test
     public void synonymTranslateTest(){
-        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Springer",fileReaders,files,false);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Springer",files,"","");
         String outString = output.get(0).get(0);
         outString = outString.trim();
         assertEquals("Hallo", outString);
@@ -77,5 +77,8 @@ public class EvaluatorTest {
         //ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate(new SynonymStrategy(),fileReaders,files,false);
         //assertEquals(178, output2.get(2).size());
     }
+
+
+
 
 }

@@ -17,19 +17,14 @@ public class CorpusCleanerTest {
     static CorpusCleaner cc;
     static ArrayList<String> paths;
 
-    @BeforeClass
-    public static void onceExecutedBeforeAll() {
+    @Test
+    public void cleanAllCorpus(){
         paths = new ArrayList<>();
         paths.add("/src/main/resources/translation/Dict/dict");
         paths.add("/src/main/resources/translation/Emea/emea");
         paths.add("/src/main/resources/translation/ICD10/ICD10");
         paths.add("/src/main/resources/translation/News/News-Commentary11.de-en");
         paths.add("/src/main/resources/translation/Springer/Springer");
-        paths.add("/src/main/resources/translation/Wiki/Wikipedia");
-    }
-
-    @Test
-    public void cleanAllCorpus(){
         FileScanner fsDE,fsEN;
         String truePathDE,truePathEN;
         int lineCountDE, newLineCountDE, lineCountEN, newLineCountEN;
@@ -61,32 +56,57 @@ public class CorpusCleanerTest {
      * This takes very long!
      */
     @Test
-    public void cleanWikiCorpus(){
+    public void cleanBigCorpus(){
+        paths = new ArrayList<>();
+        paths.add("/src/main/resources/translation/Wiki/Wikipedia");
+        paths.add("/src/main/resources/translation/OpenSubtitles2016/OpenSubtitles2016.de-en");
+        paths.add("/src/main/resources/translation/Euparl/Europarl.de-en");
+        paths.add("/src/main/resources/translation/EUbookshop/EUbookshop.de-en");
+
         FileScanner fsDE,fsEN;
         String truePathDE,truePathEN;
         int lineCountDE, newLineCountDE, lineCountEN, newLineCountEN;
-        String path = "/src/main/resources/translation/Wiki/Wikipedia";
+        for(String path : paths){
+            truePathDE = path+".de";
+            truePathEN = path+".en";
+            fsDE = new FileScanner(truePathDE);
+            fsEN = new FileScanner(truePathEN);
+            lineCountDE = fsDE.getLines();
+            lineCountEN = fsEN.getLines();
+            cc = new CorpusCleaner(truePathDE,truePathEN);
+            cc.cleanCorpus(cc.braces());
+            truePathDE = path+".deCleaned";
+            truePathEN = path+".enCleaned";
+            fsDE = new FileScanner(truePathDE);
+            fsEN = new FileScanner(truePathEN);
+            newLineCountDE = fsDE.getLines();
+            newLineCountEN = fsEN.getLines();
 
-        truePathDE = path+".de";
-        truePathEN = path+".en";
-        fsDE = new FileScanner(truePathDE);
-        fsEN = new FileScanner(truePathEN);
-        lineCountDE = fsDE.getLines();
-        lineCountEN = fsEN.getLines();
-        cc = new CorpusCleaner(truePathDE,truePathEN);
-        cc.cleanCorpus(cc.braces());
-        truePathDE = path+".deCleaned";
-        truePathEN = path+".enCleaned";
-        fsDE = new FileScanner(truePathDE);
-        fsEN = new FileScanner(truePathEN);
-        newLineCountDE = fsDE.getLines();
-        newLineCountEN = fsEN.getLines();
+            System.out.println(truePathDE+" cleaned. "+ lineCountDE+" lines.");
+            System.out.println(truePathEN+" cleaned. "+lineCountEN+" lines.");
 
-        System.out.println(truePathDE+" cleaned. "+ lineCountDE+" lines.");
-        System.out.println(truePathEN+" cleaned. "+lineCountEN+" lines.");
+            assertEquals(newLineCountDE,newLineCountEN);
+        }
 
-        assertEquals(newLineCountDE,newLineCountEN);
+    }
 
+    @Test
+    public void cleanBracesTest(){
+        cc = new CorpusCleaner("/src/main/resources/translation/Wiki/Wikipedia","/src/main/resources/translation/Wiki/Wikipedia");
+        String bracles = cc.cleanString(")(hallo)");
+         assertEquals("",bracles);
+
+        bracles = cc.cleanString("(hallo))");
+        assertEquals("",bracles);
+
+        bracles = cc.cleanString("(hal)()()(h)()())(()()((((()))((/)(/)))((())");
+        assertEquals("",bracles);
+
+        bracles = cc.cleanString("(hallo)(Bla blub normaler Text(");
+        assertEquals("bla blub normaler text",bracles);
+
+        bracles = cc.cleanString("(hallo]{bla blub normaler text([]}");
+        assertEquals("hallo",bracles);
     }
 /*
     @Test

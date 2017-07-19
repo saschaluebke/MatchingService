@@ -56,7 +56,18 @@ public class MosesClient implements Translator {
         String[] container = translation.split("\\|");
         String output = "";
         int count=2;
-        for(String s : container){
+        for(int i=0;i<container.length;i++){
+            String s = container[i];
+            if(s.equals("UNK")){
+                i=i+3;
+                s = container[i];
+            }
+            if(count%2==0){
+                output = output + s;
+            }
+            count++;
+        }
+       /* for(String s : container){
             if(s.contains("UNK")){
                 return input;
             }else{
@@ -66,8 +77,10 @@ public class MosesClient implements Translator {
                 count++;
             }
             //System.out.println(output);
-        }
+        }*/
         output = output.replaceAll("  "," ");
+        output = output.toLowerCase();
+        output = output.trim();
         return output;
     }
 

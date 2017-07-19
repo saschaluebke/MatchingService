@@ -27,6 +27,7 @@ public class MySQLQuery {
         this.myDriver = myDriver;
         this.conName = conName;
         this.password = password;
+
     }
 
     public MySQLQuery(){

@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * There should be no braces or special signs in the corpus
  */
 public class CorpusCleaner {
-    static String[] specialSigns = {"[","{","]","}","*","=",")","(","\"",",","."};
+    static String[] specialSigns = {"[","{","]","}","*","=",")","(","\"",",",".",":","“","„"};
     private String path1,path2;
     private ArrayList<String> lines;
     private int sentenceCount;
@@ -42,8 +42,8 @@ public class CorpusCleaner {
                 line1 = cleanLine(line1,modus);
                 line2 = cleanLine(line2,modus);
 
-                //Just skip line when both lines are too short or there are more numbers than letters
-                if((line1.length()>= 3 && line2.length()>= 3 ) && (letterOverNumbers(line1) && letterOverNumbers(line2))){
+                //Just skip line when both lines are too short or there are more numbers (and spaces) than letters
+                if((line1.length()>= 5 && line2.length()>= 5 ) && (letterOverNumbers(line1) && letterOverNumbers(line2))){
                     writer1.write(line1);
                     writer1.newLine();
                     writer2.write(line2);
@@ -74,7 +74,11 @@ public class CorpusCleaner {
             if(s.matches("-?\\d+(\\.\\d+)?")){
                 numbers++;
             }else{
-                letters++;
+                if(s.equals(" ")){
+                    numbers++;
+                }else{
+                    letters++;
+                }
             }
         }
         if(letters>=numbers){
@@ -98,7 +102,7 @@ public class CorpusCleaner {
 
         if (modus.equals("braces")){
             line = line.toLowerCase();
-            line = cleanBraces(line);
+            line = cleanString(line);
         }
 
         return line;
@@ -150,60 +154,66 @@ public class CorpusCleaner {
         }
     }
 */
-    private String cleanBraces(String input) {
+    public String cleanString(String input) {
         input = input.toLowerCase();
 
-        int bracketStart = input.indexOf("[");
-        int curlyStart = input.indexOf("{");
-        int bracketEnd = input.indexOf("]")+1;
-        int curlyEnd = input.indexOf("}")+1;
-        int braceStart = -1;
-        int braceEnd = 0;
-        if((bracketStart != -1 && bracketEnd != 0 && bracketEnd>bracketEnd) ||
-                (curlyStart != -1 && curlyEnd != 0 && curlyEnd>curlyStart)){
-            do {
-                if (bracketStart == -1){
-                    bracketStart = Integer.MAX_VALUE;
-                }
-                if(curlyStart == -1){
-                    curlyStart = Integer.MAX_VALUE;
-                }
-                if(bracketStart<curlyStart){
-                    braceStart = bracketStart;
-                    braceEnd = bracketEnd;
-                }else if (curlyStart<bracketStart){
-                    braceStart = curlyStart;
-                    braceEnd = curlyEnd;
-                }else{
-                    break;
-                }
 
-                if (braceStart != -1) {
-                    if (braceEnd != 0) {
-                        String before = input.substring(0, braceStart);
-                        before = before.trim();
-                        String after = "";
-                        if(braceEnd<input.length() && braceEnd > braceStart){
-                            after = input.substring(braceEnd, input.length());
-                            after = after.trim();
-                        }
-
-                        input = before+" " + after;
-                    }
-                }
-
-                bracketStart = input.indexOf("[");
-                curlyStart = input.indexOf("{");
-                bracketEnd = input.indexOf("]")+1;
-                curlyEnd = input.indexOf("}")+1;
-            }while ((bracketStart != -1 && bracketEnd != 0) || (curlyStart != -1 && curlyEnd != 0));
-        }
+        input = cleanFromBraces(input,"(",")");
+        input = cleanFromBraces(input,"[","]");
+        input = cleanFromBraces(input,"{","}");
 
 
         for(String sign : specialSigns){
             input = input.replace(sign,"");
         }
         input = input.trim();
+
+        return input;
+    }
+
+    private String cleanFromBraces(String input, String braceOpen, String braceClosed){
+        int braceStart = input.indexOf(braceOpen);
+        int braceEnd = input.indexOf(braceClosed);
+        while(braceStart!=-1||braceEnd!=-1){
+String before = "";
+String after = "";
+if (braceStart<braceEnd){
+    if(braceStart<1){
+        if(braceStart==-1){
+            break; //No open Brace!
+        }
+    }else{
+        before= before = input.substring(0, braceStart);
+    }
+    before = before.trim();
+    if(braceEnd+1<input.length()){
+        after = input.substring(braceEnd+1, input.length());
+        after = after.trim();
+    }
+    input = before+" " + after;
+    input = input.trim();
+}else{
+    if(braceEnd<1){
+        if(braceEnd==-1){
+            break;//No closed Brace!
+        }
+
+        after=input.substring(1,input.length());
+    }else{
+        before=input.substring(0,braceEnd);
+        if(braceEnd+1<input.length()){
+            after = input.substring(braceEnd+1,input.length());
+        }
+
+    }
+
+
+
+}
+            input = before+after;
+            braceStart = input.indexOf(braceOpen);
+            braceEnd = input.indexOf(braceClosed);
+        }
 
         return input;
     }

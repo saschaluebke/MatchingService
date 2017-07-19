@@ -1,4 +1,4 @@
-package utilsTests;
+package utilsTests.corpusMakerTests;
 
 import org.junit.Test;
 import utils.corpus.FileScanner;

@@ -7,7 +7,6 @@ import jxl.CellView;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.format.UnderlineStyle;
-import jxl.write.Formula;
 import jxl.write.Label;
 import jxl.write.Number;
 import jxl.write.WritableCellFormat;
@@ -28,6 +27,7 @@ public class ExcelWriter {
         private String inputFile;
         private WritableWorkbook workbook;
         private WritableSheet excelSheet;
+        private WritableSheet findingsSheet;
 
     public ExcelWriter(String path, String label){
             setOutputFile(path);
@@ -42,8 +42,10 @@ public class ExcelWriter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            workbook.createSheet("Report", 0);
+            workbook.createSheet(label, 0);
+            workbook.createSheet("Findings",1);
             excelSheet = workbook.getSheet(0);
+            findingsSheet = workbook.getSheet(1);
 
             try {
                 createLabel(label);
@@ -66,7 +68,7 @@ public class ExcelWriter {
             workbook.close();
         }
 
-        private void createLabel(String label)
+        public void createLabel(String label)
                 throws WriteException {
             // Lets create a times font
             WritableFont times10pt = new WritableFont(WritableFont.TIMES, 10);
@@ -129,6 +131,17 @@ public class ExcelWriter {
             sheet.addCell(label);
         }
 
+    public void addNumber(int column, int row,
+                          Integer integer,WritableSheet sheet)  {
+        Number number;
+        number = new Number(column, row, integer, times);
+        try {
+            sheet.addCell(number);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+    }
+
         public void addNumber(int column, int row,
                                Integer integer)  {
             Number number;
@@ -150,4 +163,45 @@ public class ExcelWriter {
             }
         }
 
+    public void addLabel(int column, int row, String s,WritableSheet sheet)  {
+        Label label;
+        label = new Label(column, row, s, times);
+        try {
+            sheet.addCell(label);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBoldLabel(int column, int row, String s)  {
+        Label label;
+        WritableFont times10ptBoldUnderline = new WritableFont(
+                WritableFont.TIMES, 10, WritableFont.BOLD, false,
+                UnderlineStyle.SINGLE);
+        WritableCellFormat timesBoldUnderline = new WritableCellFormat(times10ptBoldUnderline);
+        label = new Label(column, row, s, timesBoldUnderline);
+        try {
+            excelSheet.addCell(label);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addBoldLabel(int column, int row, String s,WritableSheet sheet)  {
+        Label label;
+        WritableFont times10ptBoldUnderline = new WritableFont(
+                WritableFont.TIMES, 10, WritableFont.BOLD, false,
+                UnderlineStyle.SINGLE);
+        WritableCellFormat timesBoldUnderline = new WritableCellFormat(times10ptBoldUnderline);
+        label = new Label(column, row, s, timesBoldUnderline);
+        try {
+            sheet.addCell(label);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public WritableSheet getFindingsSheet() {
+        return findingsSheet;
+    }
 }

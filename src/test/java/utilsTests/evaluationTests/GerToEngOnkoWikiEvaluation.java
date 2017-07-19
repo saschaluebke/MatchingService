@@ -21,6 +21,7 @@ public class GerToEngOnkoWikiEvaluation {
     static Evaluator evaluator;
     static ArrayList<FileReader> fileReaders;
     static ArrayList<File> files;
+    static String trainingPath1,trainingPath2;
 
     @BeforeClass
     public static void onceExecutedBeforeAll() {
@@ -33,14 +34,16 @@ public class GerToEngOnkoWikiEvaluation {
             OnkoWikiReader owr = new OnkoWikiReader();
             files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt"));
         }
+        trainingPath2 = "/src/main/resources/translation/Emea/emea.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/Emea/emea.deCleaned";
         System.out.println("init Complete");
     }
 
     @Test
     public void evaluation(){
-        //ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,false);
-        //assertEquals(145, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Dict",fileReaders,files,false);
-        assertEquals(145, output2.size());
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Emea",files,trainingPath1,trainingPath2);
+        assertEquals(143, output.get(0).size());
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Emea",files,trainingPath1,trainingPath2);
+        assertEquals(143, output2.size());
     }
 }

@@ -1,12 +1,10 @@
 package database.dbStrategy.simpleStrategy;
 
-import components.MatchResult;
-import components.MatchResultSet;
-import components.Relation;
-import components.Word;
+import components.*;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
+import matching.iterate.WordStrategy;
 import translators.Translator;
 import utils.ontology.FileReader;
 
@@ -16,7 +14,9 @@ import java.util.ArrayList;
 /**
  * Created by sashbot on 08.07.17.
  */
-public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
+public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
+
+    private int inputNumb=0;
     private final int MINLENGTH=4;
     Matcher matcher;
 
@@ -33,21 +33,6 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
             ArrayList<Word> words = fr.getWordList();
             String language = words.get(0).getLanguage();
             ArrayList<ArrayList<Word>> synonyms = fr.getSynonyms();
-        /*    System.out.println(words.size());
-
-            for(int i= 0;i<words.size();i++){
-
-                if (synonyms.get(i)!=null){
-
-                    for(Word w : synonyms.get(i)){
-                        System.out.println(w.getName());
-                    }
-
-                }
-            }
-*/
-//Create a Wordlist with just new Words
-            //putWordList(words,words.get(0).getLanguage());
 
             //these list will be in the database so there must be no dublicates!
             ArrayList<Word> newWordsForDB = new ArrayList<>();
@@ -119,13 +104,35 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
      * 1. Try to Match with WordList of same language then input
      * 2. When you find something equal look at the synonym table
      * 3. Translate input and all of its synonyms
+     * 4. Put direktTranslation of input, matchings - and there translations and synonym of that matchings - and there translations into TranslationResult
      *
-     * @param translator
-     * @param input
-     * @return
+     * @return the real full return is in translationResult. Here the translations will be returned just for the Unit Test
      */
-    public ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords,
+    public ArrayList<String> translate(TranslationResult translationResult, Translator translator, ArrayList<Word> allWords,
                                        ArrayList<Relation> allRelation){
+        /**
+         * TODO: Hier müsste unterschieden werden zwischen einem matcher mit wordstrategy oder ohne
+         * mit word würde dann heißen dass man den input in wörter splittet und dann nach den einzelnen
+         * Matches und dann synonymen sucht!
+         */
+        Word input = translationResult.getInput();
+        if(matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())){
+            System.out.println("Use WordStrategy Split all input");
+            String[] splitted = input.getName().split("( )|(/)|(-)");
+            for(String s: splitted){
+                //TODO: wie soll ich das hier machen! Einfach unter einander?
+            }
+        }else{
+
+        }
+
+        SynonymTranslationResult str = (SynonymTranslationResult) translationResult;
+        ArrayList<String> matchings = new ArrayList<>();
+        ArrayList<String> matchingTranslations = new ArrayList<>();
+        ArrayList<ArrayList<String>> synonymNames = new ArrayList<>();
+        ArrayList<ArrayList<String>> synonmyTranslations = new ArrayList<>();
+
+
         MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
         ArrayList<Integer> idOfPerfectMatch = new ArrayList<>();
         TranslatorGetProperties tgp = new TranslatorGetProperties();
@@ -167,26 +174,54 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy {
         ArrayList<String> translations = new ArrayList<>();
         String inputTrans =translator.translation(input.getName());
         translations.add(inputTrans);
-        System.out.println("Input: "+input.getName()+" --> "+inputTrans);
-
+        inputNumb++;
+        System.out.println(inputNumb+"Input: "+input.getName()+" --> "+inputTrans);
+        String language = allWords.get(0).getLanguage();
         for(int id:idOfPerfectMatch){
-            for(Word w:allWords){
+            Word w = this.getWordById(id,language);
+            String trans = translator.translation(w.getName());
+
+            matchings.add(w.getName());
+            matchingTranslations.add(trans);
+
+            translations.add(trans);
+            System.out.println("Match: "+w.getName()+" --> "+trans);
+          /*  for(Word w:allWords){
                 if(id==w.getId()){
                     String trans = translator.translation(w.getName());
+
+                    matchings.add(w.getName());
+                    matchingTranslations.add(trans);
+
                     translations.add(trans);
                     System.out.println("Match: "+w.getName()+" --> "+trans);
                 }
-            }
+            }*/
         }
         for(int id:synonymsOfPerfectMatch){
+            ArrayList<String> synonymList = new ArrayList<>();
+            ArrayList<String> synonymTranslationList = new ArrayList<>();
             for(Word w : allWords){
                 if(id==w.getId()){
                     String trans = translator.translation(w.getName());
+
+                    synonymList.add(w.getName());
+                    synonymTranslationList.add(trans);
+
                     translations.add(trans);
                     System.out.println("Syn: "+w.getName()+" --> "+trans);
                 }
             }
+            synonymNames.add(synonymList);
+            synonmyTranslations.add(synonymTranslationList);
         }
+
+
+        str.setDirectTranslation(inputTrans);
+        str.setMatchings(matchings);
+        str.setMatchingTranslations(matchingTranslations);
+        str.setSynonyms(synonymNames);
+        str.setSynonymTranslations(synonmyTranslations);
 
         return translations;
 

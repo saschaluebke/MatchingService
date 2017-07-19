@@ -2,8 +2,10 @@ package database.dbStrategy.simpleStrategy;
 
 import components.MatchResultSet;
 import components.Relation;
+import components.TranslationResult;
 import components.Word;
 import database.MySQLQuery;
+import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
 import matching.distance.DistanceStrategy;
@@ -15,20 +17,23 @@ import matching.sorting.SortStrategy;
 import translators.Translator;
 import utils.ontology.FileReader;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SimpleStrategy implements DBStrategy {
-    final IterateStrategy iterateStrategy = new PerformanceStrategy();
-    final DistanceStrategy distanceStrategy = new LevenshteinNormalized();
-    final SortStrategy sortStrategy = new ScoreSort();
-
-    final int MAXCHARS = 100; //TODO in properties rein!
+    private int MAXCHARS;
     private Matcher matcher;
     MySQLQuery dbq;
 
     public SimpleStrategy() {
+        TranslatorGetProperties tgp = new TranslatorGetProperties();
+        try {
+            this.MAXCHARS = Integer.parseInt(tgp.getPropValues("database.maxchars"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dbq = new MySQLQuery();
         matcher = new Matcher(new PerformanceStrategy(), new LevenshteinNormalized(), new ScoreSort());
 //matcher = new SimpleMatcher();
@@ -36,15 +41,17 @@ public class SimpleStrategy implements DBStrategy {
             dbq.queryUpdate("CREATE TABLE languages"
                     + " (id INT NOT NULL AUTO_INCREMENT,name VARCHAR(45) NULL,"
                     + "PRIMARY KEY (id));", new String[0]);
-        } else {
-            //TODO: search for all other tables necessary
         }
     }
 
-    //TODO: Konstruktor für strategien? Methoden für strategien?
 
     public Matcher getMatcher() {
         return matcher;
+    }
+
+    @Override
+    public void setMatcher(Matcher matcher) {
+        this.matcher = matcher;
     }
 
 
@@ -55,7 +62,7 @@ public class SimpleStrategy implements DBStrategy {
         try {
 
             if ((word.getName().length() > MAXCHARS || word.getDescription().length() > MAXCHARS)) {
-                return -1; //TODO: Dirty code please clean up!
+                return -1;
             }
 
             String[] par1 = {word.getName(), word.getDescription(), Integer.toString(word.getPrior()), Integer.toString(word.getCount())};
@@ -76,7 +83,6 @@ public class SimpleStrategy implements DBStrategy {
         int id = -1;
         //enter Synonym
         if (word1.getLanguage().equals(word2.getLanguage())) {
-            //TODO: See prior and count
             String[] par1 = {Integer.toString(word1.getId()), Integer.toString(word2.getId()), Integer.toString(0), Integer.toString(0)};
             id = dbq.queryUpdate("INSERT INTO rel_" + word1.getLanguage() + "_" + word2.getLanguage() + " VALUES (0, ?, ? , ? ,?)", par1);
         } else //enter translation
@@ -112,41 +118,7 @@ public class SimpleStrategy implements DBStrategy {
         String[] pars = parList.toArray(new String[parList.size()]);
         dbq.queryUpdate(querry.toString(), pars);
     }
-/*
-    @Override
-    public int takeFromFileReader(FileReader fr) {
-        fr.getFileContent();
-        ArrayList<Word> wordList = fr.getWordList();
-        String firstLanguage = fr.getFirstLanguage();
-        String secondLanguage = fr.getSecondLanguage();
-        ArrayList<Word> wordList2 = fr.getSecondWordList();
-        ArrayList<Relation> translation1 = fr.getFirstTranslation();
-        ArrayList<Relation> translation2 = fr.getSecondTranslation();
 
-        if (wordList != null && wordList.size()>0){
-            putWordList(wordList,secondLanguage);
-        }
-        if (wordList2 != null && wordList2.size()>0){
-            putWordList(wordList2,secondLanguage);
-        }
-        if (translation1 != null && translation1.size()>0){
-            putRelationList(translation1,firstLanguage,secondLanguage);
-        }
-        if (translation2 != null && translation2.size()>0){
-            putRelationList(translation2, secondLanguage, firstLanguage);
-        }
-
-   /*
-        ArrayList<Word> wordList = new ArrayList<>();
-        for (String s : fr.getFileContent()) {
-            wordList.add(new Word(0, s, language)); //or just leave language = ""
-        }
-
-        putWordList(wordList,language);
-
-        return wordList.size();
-    }
-*/
     @Override
     public void storeFromFile(FileReader fr) {
         fr.getFileContent();
@@ -392,7 +364,7 @@ public class SimpleStrategy implements DBStrategy {
 
                 dbq.queryUpdate("CREATE TABLE wordlist_" + language + " "
                         + "(id INT NOT NULL AUTO_INCREMENT,name VARCHAR(100) NULL,"
-                        + "description VARCHAR(100) NULL,"
+                        + "description VARCHAR("+MAXCHARS+") NULL,"
                         + "prior INT NOT NULL, "
                         + "count INT NOT NULL, "
                         + "PRIMARY KEY (id));", par);
@@ -423,47 +395,25 @@ public class SimpleStrategy implements DBStrategy {
         String query = "SELECT MAX(id) FROM wordlist_" + language;
         return dbq.getLastWordId(query);
     }
-/*
+
+    /**
+     * Just take the input from translationResult and translate it.
+     *
+     * @return just the translationList nothing new into the translationResult
+     */
     @Override
-    public ArrayList<String> translate(Translator translator, Word input) {
-
-        Matcher matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
-        ArrayList<Word> allWords = getAllWords(translator.getFromLanguage());
-        MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
+    public ArrayList<String> translate(TranslationResult translationResult,Translator translator, ArrayList<Word> allWords, ArrayList<Relation> allRelation) {
         ArrayList<String> translations = new ArrayList<>();
-        for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
-            if(mrlist.get(0).getScore() == 0){
-               translations.add(getWordById(mrlist.get(0).getID(),translator.getFromLanguage()).getName());
-
-            }
-        }
-
+        String inputString = translationResult.getInput().getName();
+        inputString = inputString.toLowerCase();
+        inputString = inputString.trim();
+        String translation = translator.translation(inputString);
+        translation = translation.toLowerCase();
+        translation = translation.trim();
+        translations.add(translation);
         return translations;
     }
-*/
-    @Override
-    public ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords, ArrayList<Relation> allRelation) {
-        /**
-         * Just translate input
-         */
-        ArrayList<String> translations = new ArrayList<>();
-        translations.add(translator.translation(input.getName()));
-        return translations;
-        /*matcher = new Matcher(iterateStrategy, distanceStrategy, sortStrategy);
-        MatchResultSet mrs = matcher.getMatchingWordList(input,allWords);
-        ArrayList<String> translations = new ArrayList<>();
-        for(ArrayList<MatchResult> mrlist : mrs.getMatchResults()){
-            if(mrlist.get(0).getScore() == 0){
-                translations.add(getWordById(mrlist.get(0).getID(),translator.getFromLanguage()).getName());
 
-            }
-        }
-
-        return translations;
-        */
-    }
-
-    //TODO: Output of Translations and single Wordlists // error if to many
     public String print(String language1, String language2){
         StringBuilder output = new StringBuilder();
         if (language1.equals(language2)){

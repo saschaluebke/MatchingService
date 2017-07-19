@@ -28,8 +28,6 @@ public class WordStrategy implements IterateStrategy {
         matchResults = new ArrayList<>();
         String[] splitted = wordFromDB.getName().split(REGEX);
         for(String s: splitted){
-            //TODO: die Matchresults haben nicht die richtigen Werte für dbString
-            //da die String aufgespalten werden!
             CharacterStrategy cs = new CharacterStrategy();
             cs.setSearchString(searchString);
             cs.setWordFromDB(new Word(0,s,wordFromDB.getLanguage())); //TODO: man müsste bei den gespalteten Wörtern erstmal schauen ob es sie in der Datenbank schon gibt...

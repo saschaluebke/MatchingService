@@ -1,4 +1,4 @@
-package utilsTests;
+package utilsTests.evaluationTests;
 
 import jxl.write.WriteException;
 import org.junit.Test;
@@ -22,6 +22,11 @@ public class ExcelWriterTest {
         ew.addLabel(2,1,"schlecht");
         ew.addLabel(3,1,"gut");
         ew.addLabel(4,1,"perfekt");
+        try {
+            ew.createLabel("Synonyme");
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
 
         ew.addNumber(1,2,10);
 

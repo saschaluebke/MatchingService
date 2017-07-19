@@ -37,12 +37,10 @@ Melder Name Arzt
 Melder Ort
 Melder PLZ
 Melder-KH-Abt-Station-Praxis
-OP
 Intention der Operation
 OP Datum
 OP Komplikationen
 Operateur
-OPS
 OPS Version
 Organspezifische Module
 Modul Gliome
@@ -142,4 +140,4 @@ Untersuchungsdatum Verlauf
 Weitere Klassifikationen
 Hämatoonkologische und sonstige Klassifikationen Datum
 Hämatoonkologische und sonstige Klassifikationen Name
-            Hämatoonkologische und sonstige Klassifikationen Stadium
+Hämatoonkologische und sonstige Klassifikationen Stadium

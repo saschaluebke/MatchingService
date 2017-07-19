@@ -2,7 +2,9 @@ package database.dbStrategy;
 
 import components.MatchResultSet;
 import components.Relation;
+import components.TranslationResult;
 import components.Word;
+import matching.Matcher;
 import translators.Translator;
 import utils.ontology.FileReader;
 
@@ -32,10 +34,13 @@ public interface DBStrategy {
     boolean newLanguage(String name);
     boolean updateTables();
     int getLastWordId(String query);
-    //ArrayList<String> translate(Translator translator, Word input);
-    ArrayList<String> translate(Translator translator, Word input, ArrayList<Word> allWords,
-    ArrayList<Relation> allRelation);
 
+    ArrayList<String> translate( TranslationResult translationResult, Translator translator, ArrayList<Word> allWords,
+                                ArrayList<Relation> allRelation);
+
+
+    Matcher getMatcher();
+    void setMatcher(Matcher matcher);
     String print(String language1, String language2);
 
 }

@@ -13,6 +13,7 @@ public class Matcher {
     private SortStrategy sortStrategy;
     private DistanceStrategy distanceStrategy;
     private IterateStrategy iterateStrategy;
+    private MatchResultSet currentMatchingWordList;
 
     public Matcher(IterateStrategy iterateStrategy, DistanceStrategy distanceStrategy,SortStrategy sortStrategy){
         this.iterateStrategy = iterateStrategy;
@@ -66,5 +67,9 @@ public class Matcher {
 
     public IterateStrategy getIterateStrategy(){
         return this.iterateStrategy;
+    }
+
+    public MatchResultSet getCurrentMatchingWordList() {
+        return currentMatchingWordList;
     }
 }
