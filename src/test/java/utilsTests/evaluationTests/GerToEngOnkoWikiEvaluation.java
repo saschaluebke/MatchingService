@@ -1,6 +1,5 @@
 package utilsTests.evaluationTests;
 
-import database.dbStrategy.simpleStrategy.SynonymStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
@@ -34,16 +33,16 @@ public class GerToEngOnkoWikiEvaluation {
             OnkoWikiReader owr = new OnkoWikiReader();
             files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt"));
         }
-        trainingPath2 = "/src/main/resources/translation/Emea/emea.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/Emea/emea.deCleaned";
+        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
         System.out.println("init Complete");
     }
 
     @Test
     public void evaluation(){
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Emea",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10Test",files,trainingPath1,trainingPath2);
         assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Emea",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10Test",files,trainingPath1,trainingPath2);
         assertEquals(143, output2.size());
     }
 }

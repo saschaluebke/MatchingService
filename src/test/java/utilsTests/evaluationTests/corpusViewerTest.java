@@ -17,8 +17,9 @@ public class corpusViewerTest {
     public void hausTest(){
         cv = new CorpusViewer("/src/main/resources/translation/Wiki/Wikipedia.de","/src/main/resources/translation/Wiki/Wikipedia.en");
 
-        ArrayList<String> lines = cv.getLinesWithWord("Haus");
-        assertEquals(44386, lines.size());
-        cv.printWordFromCorpus("Haus");
+        ArrayList<ArrayList<String>> lines = cv.getLinesWithWord("begriffe ohne gruppenzugehörigkeit");
+        assertEquals(2, lines.size()); //two words stationen and automobil
+        assertEquals(472,lines.get(0).size()); //stationen is very often in the wikicorpus
+        assertEquals(0,lines.get(1).size()); // automobil is not in wikicorpus
     }
 }

@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public class CorpusViewer {
     private String path1, path2;
 
-    public CorpusViewer(String path1,String path2){
-        this.path1 = System.getProperty("user.dir")+path1;
-        this.path2 = System.getProperty("user.dir")+path2;
+    public CorpusViewer(String path1, String path2) {
+        this.path1 = System.getProperty("user.dir") + path1;
+        this.path2 = System.getProperty("user.dir") + path2;
     }
-
+/*
     public void printWordFromCorpus(String word){
         ArrayList<String> lines = getLinesWithWord(word);
         if(lines.size()<1){
@@ -28,37 +28,54 @@ public class CorpusViewer {
                 System.out.println(line1+" --> "+line2);
             }
         }
-    }
+    }*/
 
-    public ArrayList<String> getLinesWithWord(String word){
+    //TODO: Spalten im zweiten einfügen 1,2,3.. nach wörtern und dann die anzahl der gefundenen wörter eintragen
+
+    public ArrayList<ArrayList<String>> getLinesWithWord(String word) {
+        String[] words = word.split(" ");
         String encoding = "UTF-8";
-        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<ArrayList<String>> lines = new ArrayList<>();
         BufferedReader reader1;
         BufferedReader reader2;
-        try{
+        try {
             reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
             reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(path2), encoding));
             String line1;
             String line2;
             int lineNumber = 0;
-            for (; (line1 = reader1.readLine()) != null;) {
-                lineNumber++;
-                line2= reader2.readLine();
-                if(line1.contains(word)){
-                    line1 = lineNumber+": "+line1;
-                    lines.add(line1);
-                    lines.add(line2);
+            for (String w : words) {
+                ArrayList<String> wordLine = new ArrayList<>();
+
+               // if (w.length() > 4) {
+
+                    try {
+                        for (; (line1 = reader1.readLine()) != null; ) {
+                            lineNumber++;
+
+                            line2 = reader2.readLine();
+                            if (line1.contains(w)) {
+                                line1 = lineNumber + ": " + line1;
+                                wordLine.add(line1);
+                                wordLine.add(line2);
+                            }
+                        }
+                        lines.add(wordLine);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+          //  }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return lines;
     }
-
 }

@@ -24,9 +24,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * Created by sashbot on 13.07.17.
- */
 public class Evaluator {
     private String fromLanguage, toLanguage;
     private ArrayList<FileReader> fileReaders;
@@ -145,11 +142,37 @@ public class Evaluator {
         ew.addBoldLabel(3,1,"Schlecht");
         ew.addBoldLabel(4,1,"Gut");
         ew.addBoldLabel(5,1,"Perfekt");
-        ew.addBoldLabel(6,1,"FoundInDB");
+        ew.addBoldLabel(6,1,"InTraining");
         WritableSheet ws = ew.getFindingsSheet();
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
 
+        //TODO: das nicht im 2. sondern im 1. teil ganz hinten ausgeben.
+        int position=1;
+        for(int i=0;i<output.size();i++) {
+            String inputWord = input.get(i).toLowerCase();
+            ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
+            ew.addNumber(6,i+2,findings.size()/2);
+            for (int n = 0; n < findings.size(); n++) {
+                ArrayList<String> find = findings.get(n);
+                int size = findings.size();
+                if (size > position) {
+                    position = size;
+                }
+                ew.addNumber(n + 2, i + 2, findings.get(n).size(), ws);
+
+                //ew.addLabel(n+1,i+3,findings.get(n),ws);
+            }
+            //TODO: for schleife für den oberen titel mit 1,2,3..
+
+            for (int n = 1; n < position; n++) {
+                ew.addBoldLabel(n + 1, 1, String.valueOf(n),ws);
+                // ew.addBoldLabel(n+1,i+n+2,findings.get(i).get(n));//Bin mir nicht sicher ob das hinhaut!
+                //ich will hier die einzelnen bestandteile der wörter haben!
+                //wir haben zB bla blub - erste spalte erste zeile soll also bla und seine findings stehen
+                //blub soll eine zeile unten drunter kommen deshalb auch das diagonale n und i in row
+            }
+        }
         int sameCounter = 0;
         for(int i=0;i<output.size();i++) {
 
@@ -159,16 +182,13 @@ public class Evaluator {
             if(inputWord.length()<4){
                 inputWord = " "+inputWord+" ";
             }
-            ArrayList<String> findings = corpusViewer.getLinesWithWord(inputWord);
-            ew.addNumber(6,i+2,findings.size()/2);
-            if(findings.size()<1){
 
-                ew.addLabel(1,i+2,"-",ws);
-            }
-            for(int n=0;n<findings.size();n++){
+
+
+        /*    for(int n=0;n<findings.size()&&n<100;n++){
                 ew.addLabel(n+1,i+2,findings.get(n),ws);
             }
-
+*/
             String outputWord = output.get(i);
             int equalMarker = 0;
             if(outputWord.length()>inputWord.length()){
@@ -246,6 +266,10 @@ public class Evaluator {
         }
 
     }
+//TODO: Säubern keine Ausgabe mehr von Wörtern ob sie im Ding drinne sind nur noch ausgabe von Matchings und welches
+    //TODO: Wort wie oft gefunden wurde. 1/1/2/2/3/3 für die matchings dahin dann die Anzahl der gefunden matchings und der Synonyme
+    //TODO: Die Anzahl ist außerdem Brocken da also noch mal ganz genau hinschauen!
+
 
     public void printSynonymeWithExcel(String name,ArrayList<SynonymTranslationResult> strList){
         ExcelWriter ew = new ExcelWriter("/out/"+name+".xls",name);
@@ -258,7 +282,7 @@ public class Evaluator {
         ew.addBoldLabel(5,2,"Perfekt");
         ew.addBoldLabel(6,2,"Matches");
         ew.addBoldLabel(7,2,"Synonyme");
-        ew.addBoldLabel(8,2,"FoundInDB");
+        ew.addBoldLabel(8,2,"InTraining");
 
         ew.addNumber(1,0,input.size());
         WritableSheet ws = ew.getFindingsSheet();
@@ -281,19 +305,40 @@ public class Evaluator {
             if(inputWord.length()<4){
                 inputWord = " "+inputWord+" ";
             }
-                ArrayList<String> findings = corpusViewer.getLinesWithWord(inputWord);
+                ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
                 ew.addNumber(8,i+3,findings.size()/2);
                 if(findings.size()<1){
                     ew.addLabel(1,i+3,"-",ws);
                 }else{
                     allFindingsCount++;
                 }
+//TODO: nur im Simple das weiter verfolgen im Synonym anderes Sheet machen!
+                //TODO: positionszeiger mitrechnen lassen um überhaupt rauszufinden wie viele spalten man braucht um alle wörter zu zählen
+            //Dann mitrechnen
+                int position = 1;
                 for(int n=0;n<findings.size();n++){
-                    ew.addLabel(n+1,i+3,findings.get(n),ws);
+                    //TODO: ausgeben
+                    ArrayList<String> find = findings.get(n);
+                    int size = find.size();
+                    if(size>position){
+                        position = size;
+                    }
+                    ew.addNumber(n+1,i+3,size,ws);
+
+                    //ew.addLabel(n+1,i+3,findings.get(n),ws);
                 }
+                //TODO: for schleife für den oberen titel mit 1,2,3..
 
+            for(int n=1;n<position;n++){
+                ew.addBoldLabel(n+1,2,String.valueOf(n));
+            }
 
-
+            //TODO: for schleife für ausgegebenen Wörter
+/*
+            for(int n=position;n<findings.size();n++){
+                ew.addLabel();
+            }
+*/
             int equalMarker = 0;
             if(outputWord.length()>inputWord.length()){
                 if (outputWord.contains(inputWord)) {
@@ -329,7 +374,7 @@ public class Evaluator {
                 ArrayList<ArrayList<String>> synonymTranslationList = str.getSynonymTranslations();
                 ArrayList<String> matchings = str.getMatchings();
                 ArrayList<String> matchingTranslations = str.getMatchingTranslations();
-                int position = 8;
+                int pos = 8;
               //  if(inputWord.contains("other age-related cataract")){
                //     System.out.println(input.get(i));
                 //}
@@ -342,19 +387,19 @@ public class Evaluator {
                   //  if(inputWord.contains("other age-related cataract")){
                   //      System.out.println(input.get(i));
                   //  }
-                    position++;
-                    ew.addBoldLabel(position,i+3,match);
-                    position++;
-                    ew.addBoldLabel(position,i+3,matchTranslation);
+                    pos++;
+                    ew.addBoldLabel(pos,i+3,match);
+                    pos++;
+                    ew.addBoldLabel(pos,i+3,matchTranslation);
                     for(int synNumb=0; synNumb<synonymMatchList.size();synNumb++){
 
                         String synonym = synonymMatchList.get(synNumb);
                         String synonymTranslation = synonymTranslationMatchList.get(synNumb);
 
-                        position++;
-                        ew.addLabel(position,i+3,synonym);
-                        position++;
-                        ew.addLabel(position,i+3,synonymTranslation);
+                        pos++;
+                        ew.addLabel(pos,i+3,synonym);
+                        pos++;
+                        ew.addLabel(pos,i+3,synonymTranslation);
                     }
                 }
             }

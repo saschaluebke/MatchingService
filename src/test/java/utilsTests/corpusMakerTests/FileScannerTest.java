@@ -59,4 +59,20 @@ public class FileScannerTest {
         assertEquals(45456106,fs.getWordCount());
         assertEquals(2459662,fs.getLines());
     }
+
+    @Test
+    public void scanAllMax(){
+        fs = new FileScanner("/src/main/resources/translation/AllMax/training_language.de");
+        int deLines = fs.getLines();
+        int deWords = fs.getWordCount();
+        assertEquals(28946569,fs.getLines());
+        assertEquals(346202197,fs.getWordCount());
+        fs = new FileScanner("/src/main/resources/translation/AllMax/training_language.en");
+        int enLines = fs.getLines();
+        int enWords = fs.getWordCount();
+        assertEquals(38923205,fs.getWordCount());
+        assertEquals(28946569,fs.getLines());
+        System.out.println(deLines+"="+enLines+" & "+deWords+"="+enWords);
+
+    }
 }

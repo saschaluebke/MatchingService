@@ -50,9 +50,9 @@ public class EngToGerICD10Evaluation {
 
     @Test
     public void evaluation(){
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("DictEn",files,trainingPath1,trainingPath2);
-        assertEquals(179, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10Performance",files,trainingPath1,trainingPath2);
+        //ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10",files,trainingPath1,trainingPath2);
+        //assertEquals(179, output.get(0).size());
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10",files,trainingPath1,trainingPath2);
         assertEquals(179, output2.size());
         /*Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
