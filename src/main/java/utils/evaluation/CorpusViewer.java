@@ -31,6 +31,49 @@ public class CorpusViewer {
     }*/
 
     //TODO: Spalten im zweiten einfügen 1,2,3.. nach wörtern und dann die anzahl der gefundenen wörter eintragen
+    //For big Corpra
+    public ArrayList<Integer> getIntWithWord(String word){
+        ArrayList<Integer> lines = new ArrayList<>();
+        String[] words = word.split(" ");
+        String encoding = "UTF-8";
+        BufferedReader reader1;
+        BufferedReader reader2;
+        try {
+
+            for (String w : words) {
+                reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
+                reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(path2), encoding));
+                String line1;
+                String line2;
+                int sameCount = 0;
+                try {
+
+                    for (; (line1 = reader1.readLine()) != null; ) {
+
+                        line2 = reader2.readLine();
+                        if (line1.contains(w)) {
+                            sameCount++;
+                        }
+                    }
+
+                    lines.add(sameCount);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //  }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
 
     public ArrayList<ArrayList<String>> getLinesWithWord(String word) {
         String[] words = word.split(" ");
@@ -39,22 +82,24 @@ public class CorpusViewer {
         BufferedReader reader1;
         BufferedReader reader2;
         try {
-            reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
-            reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(path2), encoding));
-            String line1;
-            String line2;
-            int lineNumber = 0;
+
             for (String w : words) {
                 ArrayList<String> wordLine = new ArrayList<>();
-
+                reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
+                reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(path2), encoding));
+                String line1;
+                String line2;
+                int lineNumber = 0;
                // if (w.length() > 4) {
 
                     try {
+                        int heapSpace = 0;
                         for (; (line1 = reader1.readLine()) != null; ) {
                             lineNumber++;
 
                             line2 = reader2.readLine();
-                            if (line1.contains(w)) {
+                            if (line1.contains(w)&&heapSpace<1000) {
+                                heapSpace++;
                                 line1 = lineNumber + ": " + line1;
                                 wordLine.add(line1);
                                 wordLine.add(line2);

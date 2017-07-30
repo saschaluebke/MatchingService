@@ -7,10 +7,11 @@ import java.util.ArrayList;
  * There should be no braces or special signs in the corpus
  */
 public class CorpusCleaner {
-    static String[] specialSigns = {"[","{","]","}","*","=",")","(","\"",",",".",":","“","„"};
+    static String[] specialSigns = {"[","{","]","}","*","=",")","(","\"",",",".",":","“","„","≡"};
     private String path1,path2;
     private ArrayList<String> lines;
     private int sentenceCount;
+    public int size;
 
 
     public CorpusCleaner(String path1,String path2){
@@ -19,7 +20,51 @@ public class CorpusCleaner {
         lines = new ArrayList<>();
     }
 
+    public CorpusCleaner(String path1){
+        this.path1 = System.getProperty("user.dir")+path1;
+        lines = new ArrayList<>();
+    }
+
+    public int cleanSingleCorpus(String modus){
+
+        String encoding = "UTF-8";
+        BufferedReader reader1 = null;
+        BufferedWriter writer1 = null;
+        int count = 0;
+        try {
+            reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(path1), encoding));
+            writer1 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path1 + "Cleaned"), encoding));
+            String line1;
+            for (; (line1 = reader1.readLine()) != null;) {
+
+                int zufallszahl = (int)(Math.random() * 5);
+                if(zufallszahl==1){
+
+                    line1 = cleanLine(line1,modus);
+                    if(line1.length()>2){
+                        count++;
+                        writer1.write(line1+System.lineSeparator());
+                    }
+
+                }
+
+            }
+            writer1.close();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
     public int cleanCorpus(String modus){
+        if(path2 == null || path2.equals("")){
+
+            return cleanSingleCorpus(modus);
+        }
         String encoding = "UTF-8";
         BufferedReader reader1 = null;
         BufferedReader reader2 = null;

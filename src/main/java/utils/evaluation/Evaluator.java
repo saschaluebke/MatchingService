@@ -14,6 +14,9 @@ import jxl.write.WritableSheet;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import matching.Matcher;
+import matching.distance.LevenshteinNormalized;
+import matching.iterate.PerformanceStrategy;
+import matching.sorting.ScoreSort;
 import translators.Translator;
 import utils.ontology.FileReader;
 
@@ -32,18 +35,20 @@ public class Evaluator {
     private MySQLQuery sqlQuery;
     private Translator translator;
     private CorpusViewer corpusViewer;
+    private Matcher matcher;
 
 
     public Evaluator(String fromLanguage, String toLanguage, Translator translator){
         this.fromLanguage = fromLanguage;
         this.toLanguage = toLanguage;
         this.translator = translator;
+        this.matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(), new ScoreSort());
         sqlQuery = new MySQLQuery();
 
     }
 
     public void setMatcher(Matcher matcher){
-        dbh.setMatcher(matcher);
+        this.matcher = matcher;
     }
 
 
@@ -53,10 +58,12 @@ public class Evaluator {
         corpusViewer = new CorpusViewer(trainingPathEn,trainingPathDe);
         ArrayList<ArrayList<String>> fullOutput = new ArrayList<>();
         dbh = new DBHelper(new SimpleStrategy(),translator);
+        dbh.setMatcher(matcher);
         ArrayList<Word> allWords = dbh.getAllWords(fromLanguage);
         ArrayList<Relation> allRelations = dbh.getAllRelations(fromLanguage,fromLanguage);
         ArrayList<String> output = null;
-        for (int i = 1; i < files.size(); i++) {
+        boolean showFindings = true;
+        for (int i = 0; i < files.size(); i++) {
 
             output = new ArrayList<>();
             input = new ArrayList<>();
@@ -85,15 +92,19 @@ public class Evaluator {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            printSimpleWithExcel("SimpleFrom_"+files.get(0).getName()+"_translated"+trainingsDataName, output);
+            System.out.println("SimplePrint:"+files.get(i).getName());
+            printSimpleWithExcel("SimpleFrom_"+files.get(i).getName()+"_translated"+trainingsDataName, output,showFindings);
+            showFindings = false;
             fullOutput.add(output);
         }
         return fullOutput;
     }
 
+
     public ArrayList<ArrayList<String>> synonymTranslate(String trainingsDataName, ArrayList<File> files,
                                                          String trainingPathEn, String trainingPathDe){
         dbh = new DBHelper(new SynonymStrategy(),translator);
+        dbh.setMatcher(matcher);
         corpusViewer = new CorpusViewer(trainingPathEn,trainingPathDe);
         ArrayList<Word> allWords = dbh.getAllWords(fromLanguage);
         ArrayList<Relation> allRelations = dbh.getAllRelations(fromLanguage,fromLanguage);
@@ -101,11 +112,11 @@ public class Evaluator {
         ArrayList<ArrayList<String>> output = null;
         ArrayList<SynonymTranslationResult> strList = new ArrayList<>();
 
-        for (int i = 1; i < files.size(); i++) {
+        for (int i = 0; i < files.size(); i++) {
 
             output = new ArrayList<>();
             input = new ArrayList<>();
-
+            int count=0;
             try {
                 for (Scanner sc = new Scanner(files.get(i)); sc.hasNext(); ) {
                     String line = sc.nextLine();
@@ -114,10 +125,13 @@ public class Evaluator {
                     if (line.equals("")) {
 
                     } else {
+                        count++;
                         input.add(line);
                         Word inputWord = new Word(0, line, fromLanguage);
                         SynonymTranslationResult str = new SynonymTranslationResult(inputWord);
+                        dbh.setMatcher(matcher);
                         translation = dbh.translate(str,allWords,allRelations);
+                        System.out.println(count+": "+inputWord.getName()+" --> "+str.getDirectTranslation());
                         strList.add(str);
                         output.add(translation);
                     }
@@ -131,7 +145,7 @@ public class Evaluator {
         return output;
     }
 
-    public void printSimpleWithExcel(String name, ArrayList<String> output){
+    public void printSimpleWithExcel(String name, ArrayList<String> output, boolean showFindings){
         ExcelWriter ew = new ExcelWriter("/out/"+name+".xls",name);
 
         ew.addNumber(1,0,input.size());
@@ -139,31 +153,39 @@ public class Evaluator {
         ew.addBoldLabel(0,1,"Input");
         ew.addBoldLabel(1,1,"Output");
         ew.addBoldLabel(2,1,"Unverändert");
-        ew.addBoldLabel(3,1,"Schlecht");
-        ew.addBoldLabel(4,1,"Gut");
-        ew.addBoldLabel(5,1,"Perfekt");
-        ew.addBoldLabel(6,1,"InTraining");
+        ew.addBoldLabel(3,1,"FachGesamt");
+        ew.addBoldLabel(4,1,"FachScore");
+        ew.addBoldLabel(5,1,"AllgGesamt");
+        ew.addBoldLabel(6,1,"AllgScore");
+        ew.addBoldLabel(7,1,"InTraining");
         WritableSheet ws = ew.getFindingsSheet();
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
 
-        //TODO: das nicht im 2. sondern im 1. teil ganz hinten ausgeben.
         int position=1;
         for(int i=0;i<output.size();i++) {
             String inputWord = input.get(i).toLowerCase();
-            ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
-            ew.addNumber(6,i+2,findings.size()/2);
-            for (int n = 0; n < findings.size(); n++) {
-                ArrayList<String> find = findings.get(n);
-                int size = findings.size();
-                if (size > position) {
-                    position = size;
+            ArrayList<Integer> findings = corpusViewer.getIntWithWord(inputWord);
+            //ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
+            int findingCount=0;
+            if(showFindings){
+                for(int findingIndex=0;findingIndex<findings.size();findingIndex++){
+                    //  findingCount = findingCount + findings.get(findingIndex).size();
+                    findingCount = findingCount + findings.get(findingIndex);
                 }
-                ew.addNumber(n + 2, i + 2, findings.get(n).size(), ws);
-
-                //ew.addLabel(n+1,i+3,findings.get(n),ws);
+                ew.addNumber(7,i+2,findingCount);
+                for (int n = 0; n < findings.size(); n++) {
+                    // ArrayList<String> find = findings.get(n);
+                    int size = findings.size();
+                    if (size > position) {
+                        position = size;
+                    }
+                    //   ew.addNumber(n + 2, i + 2, findings.get(n).size(), ws);
+                    ew.addNumber(n+2,i+2,findings.get(n),ws);
+                    //ew.addLabel(n+1,i+3,findings.get(n),ws);
+                }
             }
-            //TODO: for schleife für den oberen titel mit 1,2,3..
+
 
             for (int n = 1; n < position; n++) {
                 ew.addBoldLabel(n + 1, 1, String.valueOf(n),ws);
@@ -183,12 +205,6 @@ public class Evaluator {
                 inputWord = " "+inputWord+" ";
             }
 
-
-
-        /*    for(int n=0;n<findings.size()&&n<100;n++){
-                ew.addLabel(n+1,i+2,findings.get(n),ws);
-            }
-*/
             String outputWord = output.get(i);
             int equalMarker = 0;
             if(outputWord.length()>inputWord.length()){
@@ -257,6 +273,15 @@ public class Evaluator {
             e.printStackTrace();
         }
 
+        buf = new StringBuffer();
+        buf.append("SUM(H3:H"+length+")");
+        f = new Formula(7, 0, buf.toString());
+        try {
+            ew.getSheet().addCell(f);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
         try {
             ew.write();
         } catch (IOException e) {
@@ -266,10 +291,6 @@ public class Evaluator {
         }
 
     }
-//TODO: Säubern keine Ausgabe mehr von Wörtern ob sie im Ding drinne sind nur noch ausgabe von Matchings und welches
-    //TODO: Wort wie oft gefunden wurde. 1/1/2/2/3/3 für die matchings dahin dann die Anzahl der gefunden matchings und der Synonyme
-    //TODO: Die Anzahl ist außerdem Brocken da also noch mal ganz genau hinschauen!
-
 
     public void printSynonymeWithExcel(String name,ArrayList<SynonymTranslationResult> strList){
         ExcelWriter ew = new ExcelWriter("/out/"+name+".xls",name);
@@ -277,24 +298,23 @@ public class Evaluator {
         ew.addBoldLabel(0,2,"Input");
         ew.addBoldLabel(1,2,"Output");
         ew.addBoldLabel(2,2,"Unverändert");
-        ew.addBoldLabel(3,2,"Schlecht");
-        ew.addBoldLabel(4,2,"Gut");
-        ew.addBoldLabel(5,2,"Perfekt");
-        ew.addBoldLabel(6,2,"Matches");
-        ew.addBoldLabel(7,2,"Synonyme");
-        ew.addBoldLabel(8,2,"InTraining");
+        ew.addBoldLabel(3,2,"Fachwörter");
+        ew.addBoldLabel(4,2,"FachScore");
+        ew.addBoldLabel(5,2,"Allgemein");
+        ew.addBoldLabel(6,2,"AllgemeinScore");
+        ew.addBoldLabel(7,2,"Matches");
+        ew.addBoldLabel(8,2,"Synonyme");
 
         ew.addNumber(1,0,input.size());
         WritableSheet ws = ew.getFindingsSheet();
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
-        int allFindingsCount = 0;
         int allSynonymCount =0;
         int allMatchCount = 0;
         int sameCounter = 0;
         for(int i=0;i<strList.size();i++) {
             SynonymTranslationResult str = strList.get(i);
-            String inputWord = input.get(i).toLowerCase();
+            String inputWord = str.getInput().getName().toLowerCase();
             //if(inputWord.contains("other age")){
             //    System.out.println(input.get(i));
             //}
@@ -305,16 +325,21 @@ public class Evaluator {
             if(inputWord.length()<4){
                 inputWord = " "+inputWord+" ";
             }
+            /*
                 ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
-                ew.addNumber(8,i+3,findings.size()/2);
+
+            //Total number of words that appear in the corpus
+            int totalFindings =0;
+            for(int findingIndex=0;findingIndex<findings.size();findingIndex++){
+                totalFindings = totalFindings + findings.get(findingIndex).size();
+            }
+                ew.addNumber(9,i+3,totalFindings);
                 if(findings.size()<1){
                     ew.addLabel(1,i+3,"-",ws);
                 }else{
                     allFindingsCount++;
                 }
-//TODO: nur im Simple das weiter verfolgen im Synonym anderes Sheet machen!
-                //TODO: positionszeiger mitrechnen lassen um überhaupt rauszufinden wie viele spalten man braucht um alle wörter zu zählen
-            //Dann mitrechnen
+
                 int position = 1;
                 for(int n=0;n<findings.size();n++){
                     //TODO: ausgeben
@@ -324,21 +349,8 @@ public class Evaluator {
                         position = size;
                     }
                     ew.addNumber(n+1,i+3,size,ws);
-
-                    //ew.addLabel(n+1,i+3,findings.get(n),ws);
                 }
-                //TODO: for schleife für den oberen titel mit 1,2,3..
-
-            for(int n=1;n<position;n++){
-                ew.addBoldLabel(n+1,2,String.valueOf(n));
-            }
-
-            //TODO: for schleife für ausgegebenen Wörter
-/*
-            for(int n=position;n<findings.size();n++){
-                ew.addLabel();
-            }
-*/
+                */
             int equalMarker = 0;
             if(outputWord.length()>inputWord.length()){
                 if (outputWord.contains(inputWord)) {
@@ -355,11 +367,11 @@ public class Evaluator {
             ew.addLabel(0,i+3,inputWord);
             ew.addLabel(1,i+3,outputWord);
 
-            int synonymCount=str.getSynonyms().size();
-            int matchCount=str.getMatchings().size();
+            int synonymCount=str.getSynonymCount();
+            int matchCount=str.getMatchingCount();
 
-            ew.addNumber(6,i+3,matchCount);
-            ew.addNumber(7,i+3,synonymCount);
+            ew.addNumber(7,i+3,matchCount);
+            ew.addNumber(8,i+3,synonymCount);
 
             if(synonymCount>0){
                 allSynonymCount++;
@@ -369,48 +381,47 @@ public class Evaluator {
             }
 
             //The rest of the row should be a list of Synonyms and there Translations
-            for(int n = 0; n<str.getSynonyms().size();n++){
-                ArrayList<ArrayList<String>> synonymList = str.getSynonyms();
-                ArrayList<ArrayList<String>> synonymTranslationList = str.getSynonymTranslations();
-                ArrayList<String> matchings = str.getMatchings();
-                ArrayList<String> matchingTranslations = str.getMatchingTranslations();
-                int pos = 8;
-              //  if(inputWord.contains("other age-related cataract")){
-               //     System.out.println(input.get(i));
-                //}
+            //TODO: Gib aus wie viele Matchings und wie viele Synonyme insgesamt + wie viele unterschiedliche Wörter insgesamt!
+            int pos2 = 1;
+            int pos=9;
+            for(int wordIndex = 0; wordIndex<str.getWords().size();wordIndex++){
+                ew.addBoldLabel(pos,i+3,"Word: "+str.getWords().get(wordIndex));
+                ew.addBoldLabel(pos2,i+3,String.valueOf(str.getMatchings().get(wordIndex).size()),ws);
+                pos2++;
+                //add up synonyms to get all synonyms of a specific
+                int synCount=0;
+                for(ArrayList<String> synList : str.getMatchingSynonyms().get(wordIndex)){
 
-                for(int matchNumb=0; matchNumb<matchings.size();matchNumb++){
-                    String match = matchings.get(matchNumb);
-                    String matchTranslation = matchingTranslations.get(matchNumb);
-                    ArrayList<String> synonymMatchList = synonymList.get(matchNumb);
-                    ArrayList<String> synonymTranslationMatchList = synonymTranslationList.get(matchNumb);
-                  //  if(inputWord.contains("other age-related cataract")){
-                  //      System.out.println(input.get(i));
-                  //  }
+                    synCount = synCount + synList.size();
+                }
+                //ew.addNumber(pos2,i+2,str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size(),ws);
+                ew.addNumber(pos2,i+3,synCount,ws);
+                pos2++;
+                pos++;
+
+
+                for(int matchingIndex = 0; matchingIndex<str.getMatchings().get(wordIndex).size();matchingIndex++){
+                    ew.addBoldLabel(pos,i+3,str.getMatchings().get(wordIndex).get(matchingIndex));
+
                     pos++;
-                    ew.addBoldLabel(pos,i+3,match);
-                    pos++;
-                    ew.addBoldLabel(pos,i+3,matchTranslation);
-                    for(int synNumb=0; synNumb<synonymMatchList.size();synNumb++){
-
-                        String synonym = synonymMatchList.get(synNumb);
-                        String synonymTranslation = synonymTranslationMatchList.get(synNumb);
-
+                    ew.addBoldLabel(pos,i+3,str.getTranslatedMatchings().get(wordIndex).get(matchingIndex));
+                    for(int synonymIndex = 0; synonymIndex<str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size();synonymIndex++){
+                        ew.addLabel(pos,i+3,str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex));
                         pos++;
-                        ew.addLabel(pos,i+3,synonym);
+                        ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
                         pos++;
-                        ew.addLabel(pos,i+3,synonymTranslation);
                     }
                 }
             }
+
+
            // if(inputWord.contains("other age-related cataract")){
            //     System.out.println(input.get(i));
            // }
         }
 
-        ew.addNumber(6,1,allMatchCount);
-        ew.addNumber(7,1,allSynonymCount);
-        ew.addNumber(8,1,allFindingsCount);
+        ew.addNumber(7,1,allMatchCount);
+        ew.addNumber(8,1,allSynonymCount);
         ew.addNumber(2,0,sameCounter);
 
 

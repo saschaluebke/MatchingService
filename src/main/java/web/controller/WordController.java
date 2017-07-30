@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO: Wie Seite Designen vorallem die Ergebnisse. Vielleicht in anderen Dateiformaten zugänglich machen?
- */
 @Controller
 public class WordController {
     static Logger log = Logger.getLogger(WordController.class.getName());
@@ -87,11 +84,6 @@ public class WordController {
         Word initialWord = new Word(0,word,from);
         Word putIn = new Word(0,wordPut,fromPut);
         putIn.setDescription(descPut);
-        //if (request.equals("cache list")){
-
-            //TODO Prior nachträglich verändern... übersetzungsliste verändern...
-
-       // }
          if (request.equals("Put Word")){
             putIn.setId(dbh.putWord(putIn));
             selectedWord = putIn;
@@ -138,8 +130,6 @@ public class WordController {
                     selectedWord = new Word(0,"!Only After Translation Request!","en");
 
                 }else{
-                    //TODO: was ist wenn es viele Homonyme gibt? -> Auch nach Description sehen.
-                    //TODO: Was soll wie sortiert werden?
                     ArrayList<Word> allWords =  dbh.getWordList(word,from);
 
 

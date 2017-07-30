@@ -91,6 +91,22 @@ public class CorpusCleanerTest {
     }
 
     @Test
+    public void cleanSnomed(){
+        paths = new ArrayList<>();
+        paths.add("/src/main/resources/evaluation/Snomed/SnomedCT");
+        for(String path : paths){
+
+            cc = new CorpusCleaner(path);
+            int lines = cc.cleanCorpus(cc.braces());
+
+            System.out.println(path+" cleaned. "+ lines+" lines.");
+
+            assertEquals(true,true);
+        }
+
+    }
+
+    @Test
     public void cleanBracesTest(){
         cc = new CorpusCleaner("/src/main/resources/translation/Wiki/Wikipedia","/src/main/resources/translation/Wiki/Wikipedia");
         String bracles = cc.cleanString(")(hallo)");
@@ -108,6 +124,10 @@ public class CorpusCleanerTest {
         bracles = cc.cleanString("(hallo]{bla blub normaler text([]}");
         assertEquals("hallo",bracles);
     }
+
+
+
+
 /*
     @Test
     public void justLowerCaseForBigCorpra(){

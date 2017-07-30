@@ -33,16 +33,27 @@ public class GerToEngOnkoWikiEvaluation {
             OnkoWikiReader owr = new OnkoWikiReader();
             files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/OnkoWiki/OnkoWikiDaten.txt"));
         }
-        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
+
         System.out.println("init Complete");
     }
 
     @Test
     public void evaluation(){
+        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10Test",files,trainingPath1,trainingPath2);
         assertEquals(143, output.get(0).size());
         ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10Test",files,trainingPath1,trainingPath2);
+        assertEquals(143, output2.size());
+    }
+
+    @Test
+    public void evaluationAl(){
+        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.en";
+        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.de";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("All",files,trainingPath1,trainingPath2);
+        assertEquals(143, output.get(0).size());
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("All",files,trainingPath1,trainingPath2);
         assertEquals(143, output2.size());
     }
 }
