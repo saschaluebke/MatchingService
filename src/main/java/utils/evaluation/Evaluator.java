@@ -83,9 +83,6 @@ public class Evaluator {
                         ArrayList<String> translation = dbh.translate(str, allWords, allRelations);
                         String trans = translation.get(0);
                         System.out.println(translation);
-                        if(counter>128){
-                            System.out.println("spasst");
-                        }
                         output.add(trans);
                     }
                 }
@@ -105,7 +102,6 @@ public class Evaluator {
                                                          String trainingPathEn, String trainingPathDe){
         dbh = new DBHelper(new SynonymStrategy(),translator);
         dbh.setMatcher(matcher);
-        corpusViewer = new CorpusViewer(trainingPathEn,trainingPathDe);
         ArrayList<Word> allWords = dbh.getAllWords(fromLanguage);
         ArrayList<Relation> allRelations = dbh.getAllRelations(fromLanguage,fromLanguage);
 
@@ -161,10 +157,12 @@ public class Evaluator {
         WritableSheet ws = ew.getFindingsSheet();
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
-
+        int counter = 0;
         int position=1;
         for(int i=0;i<output.size();i++) {
             String inputWord = input.get(i).toLowerCase();
+            counter++;
+            System.out.println(counter+output.get(i));
             ArrayList<Integer> findings = corpusViewer.getIntWithWord(inputWord);
             //ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
             int findingCount=0;
@@ -325,32 +323,7 @@ public class Evaluator {
             if(inputWord.length()<4){
                 inputWord = " "+inputWord+" ";
             }
-            /*
-                ArrayList<ArrayList<String>> findings = corpusViewer.getLinesWithWord(inputWord);
 
-            //Total number of words that appear in the corpus
-            int totalFindings =0;
-            for(int findingIndex=0;findingIndex<findings.size();findingIndex++){
-                totalFindings = totalFindings + findings.get(findingIndex).size();
-            }
-                ew.addNumber(9,i+3,totalFindings);
-                if(findings.size()<1){
-                    ew.addLabel(1,i+3,"-",ws);
-                }else{
-                    allFindingsCount++;
-                }
-
-                int position = 1;
-                for(int n=0;n<findings.size();n++){
-                    //TODO: ausgeben
-                    ArrayList<String> find = findings.get(n);
-                    int size = find.size();
-                    if(size>position){
-                        position = size;
-                    }
-                    ew.addNumber(n+1,i+3,size,ws);
-                }
-                */
             int equalMarker = 0;
             if(outputWord.length()>inputWord.length()){
                 if (outputWord.contains(inputWord)) {
@@ -380,8 +353,6 @@ public class Evaluator {
                 allMatchCount++;
             }
 
-            //The rest of the row should be a list of Synonyms and there Translations
-            //TODO: Gib aus wie viele Matchings und wie viele Synonyme insgesamt + wie viele unterschiedliche Wörter insgesamt!
             int pos2 = 1;
             int pos=9;
             for(int wordIndex = 0; wordIndex<str.getWords().size();wordIndex++){

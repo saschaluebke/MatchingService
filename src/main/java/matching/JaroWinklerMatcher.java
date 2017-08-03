@@ -4,19 +4,19 @@ import components.MatchResult;
 import components.MatchResultSet;
 import components.Word;
 import matching.distance.DistanceStrategy;
+import matching.distance.JaroWinkler;
 import matching.iterate.IterateStrategy;
 import matching.sorting.SortStrategy;
 
 import java.util.ArrayList;
 
-/**
- * Created by sashbot on 10.07.17.
- */
-public class SimpleMatcher extends Matcher {
-    public SimpleMatcher(IterateStrategy iterateStrategy, DistanceStrategy distanceStrategy, SortStrategy sortStrategy) {
+public class JaroWinklerMatcher  extends Matcher {
+    JaroWinkler jw = new JaroWinkler();
+
+    public JaroWinklerMatcher(IterateStrategy iterateStrategy, DistanceStrategy distanceStrategy, SortStrategy sortStrategy) {
         super(null, null, null);
     }
-    public SimpleMatcher(){
+    public JaroWinklerMatcher(){
         super(null, null, null);
     }
 
@@ -25,20 +25,19 @@ public class SimpleMatcher extends Matcher {
         ArrayList<ArrayList<MatchResult>> output = new ArrayList<>();
         String stringFromDB = wordFromDB.getName();
         ArrayList<MatchResult> mrlist = new ArrayList<>();
-        int index = 0;
-        index = matchIndex(searchWord.getName(),stringFromDB);
-                if(index!=-1){
-                    MatchResult mr = new MatchResult(wordFromDB,stringFromDB,1,index,
-                            searchWord.getName().length()+index,0,searchWord.getName().length());
-                    mrlist.add(mr);
-                    output.add(mrlist);
-                    mrs.setMatchResults(output);
-                }else{
-                    MatchResult mr = new MatchResult(wordFromDB,stringFromDB,0,0,
-                            searchWord.getName().length()+index,0,searchWord.getName().length());
-                    //mrlist.add(mr);
-                    //output.add(mrlist);
-                }
+        double index = 0;
+        String searchString = searchWord.getName();
+        String[] searchStrings = searchString.split(" ");
+        for(String string : searchStrings){
+            index = matchIndex(string,stringFromDB);
+            if(index<0.1){
+                MatchResult mr = new MatchResult(wordFromDB,stringFromDB,0,0,
+                        string.length()-1,0,string.length()-1);
+                mrlist.add(mr);
+                output.add(mrlist);
+                mrs.setMatchResults(output);
+            }
+        }
 
         mrs.setMatchResults(output);
         return mrs;
@@ -56,9 +55,9 @@ public class SimpleMatcher extends Matcher {
         return mrs;
     }
 
-    public int matchIndex(String search, String stringFromDB){
-        int index;
-        index = stringFromDB.indexOf(search);
+    public double matchIndex(String search, String stringFromDB){
+        double index;
+        index = jw.getDistance(search,stringFromDB);
         return index;
     }
 }

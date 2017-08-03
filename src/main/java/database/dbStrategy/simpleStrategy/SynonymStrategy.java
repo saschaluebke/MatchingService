@@ -127,7 +127,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
         //Split inputWord into several Words if the WordStrategy is chosen.
         matcher = getMatcher();
-        if(matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())){
+        if(matcher.getIterateStrategy() != null && matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())){
             matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
           //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = input.getName().split("( )|(/)|(-)");
@@ -143,7 +143,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         String directTranslation = translator.translation(input.getName());
 
 ArrayList<String> uniqueSynonymMatchings = new ArrayList<>();
-//TODO: Gleiche wörter: nicht speichern!!! grad bei synonymen nicht...
+ArrayList<String> uniqueMatchings = new ArrayList<>();
         for(int i=0;i<words.size();i++) {
             String currentInputString = words.get(i);
             Word currentWord;
@@ -167,18 +167,16 @@ ArrayList<String> uniqueSynonymMatchings = new ArrayList<>();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//Rausfinden ob Wortliste genauso sortiert ist wie es sein sollte und dann einfach aus dem index nehmen.
             for (ArrayList<MatchResult> matchResults : mrs.getMatchResults()) {
                 if (matchResults.size() > 0) {
                     ArrayList<String> synonymMatchings = new ArrayList<>();
                     ArrayList<String> translatedSynonymMatchings = new ArrayList<>();
                     for(MatchResult mr : matchResults){
-                        if (mr.getScore() < accuracy) {
+                        int matchID = mr.getID();
+                        Word w = allWords.get(matchResults.get(0).getID()-1);//SQL Index starts with 1
+                        if (mr.getScore() < accuracy && !(uniqueMatchings.contains(w.getName()))) {
                             matchCount++;
-                            int matchID = mr.getID();
-                           // Word w = this.getWordById(matchResults.get(0).getID(), language);
-                            //nehmen...
-                            Word w = allWords.get(matchResults.get(0).getID()-1);//TODO: testen ob das stimmt
+
                             String trans = translator.translation(w.getName());
                             matchings.add(w.getName());
                             translatedMatchings.add(trans);
@@ -186,13 +184,10 @@ ArrayList<String> uniqueSynonymMatchings = new ArrayList<>();
                             for (Relation r : allRelation) {
                                 if (matchID == r.getIdFrom()) {
                                     int synID = r.getIdFrom();
-                              //      for (Word word : allWords) {
-                                //        if (synID == word.getId()) {
                                     Word word = allWords.get(synID-1);
 
                                          if(!uniqueSynonymMatchings.contains(word.getName())){
                                              synCount++;
-                                             //String translat = translator.translation(w.getName());
                                              String translat = translator.translation(word.getName());
                                              synonymMatchings.add(word.getName());
                                              uniqueSynonymMatchings.add(word.getName());
@@ -202,8 +197,6 @@ ArrayList<String> uniqueSynonymMatchings = new ArrayList<>();
                                          }
 
                                         }
-                                //}
-                                //}
                             }
                             synonymMatchesOfWords.add(synonymMatchings);
                             translatedSynonymMatchesOfWords.add(translatedSynonymMatchings);

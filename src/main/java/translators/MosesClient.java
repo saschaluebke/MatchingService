@@ -110,6 +110,8 @@ public class MosesClient implements Translator {
         // The XML-RPC data type used by mosesserver is <struct>. In Java, this data type can be represented using HashMap.
         HashMap<String,String> mosesParams = new HashMap<String,String>();
         String textToTranslate = new String(input);
+        textToTranslate = textToTranslate.replace("[","");
+        textToTranslate = textToTranslate.replace("]","");
         mosesParams.put("text", textToTranslate);
         mosesParams.put("align", "true");
         mosesParams.put("report-all-factors", "true");

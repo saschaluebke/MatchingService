@@ -42,7 +42,7 @@ public class JaroWinkler implements DistanceStrategy {
         }
 
         int[] mtp = matches(s1, s2);
-        System.out.println(Arrays.toString(mtp));
+       // System.out.println(Arrays.toString(mtp));
         float m = mtp[0];
         if (m == 0) {
             return 0f;

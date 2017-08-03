@@ -1,9 +1,10 @@
-package utils.ontology;
+package utils.corpus;
 
 import components.Relation;
 import components.Word;
 import database.DBHelper;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
+import utils.ontology.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +16,7 @@ import java.util.Scanner;
 /**
  * To read Dict.cc source file
  **/
-public class DictReader implements FileReader{
+public class DictReader implements FileReader {
     int fromEntry, toEntry;
     DBHelper dbh;
     String languageFrom, languageTo;

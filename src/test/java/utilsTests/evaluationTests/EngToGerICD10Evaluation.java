@@ -44,11 +44,26 @@ public class EngToGerICD10Evaluation {
         //}
         //TODO: for debugging a smaller Input!
         files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion1.txtCleaned"));
-        files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion2.txtCleaned"));
-        files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion3.txtCleaned"));
+        //files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion2.txtCleaned"));
+        //files.add(new File("/home/sashbot/IdeaProjects/MatchingService/src/main/resources/evaluation/ICD10/icd10InputVersion3.txtCleaned"));
 
         System.out.println("init Complete");
 
+    }
+
+
+    @Test
+    public void evaluationICD10(){
+        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
+        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+      /*  Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("ICD10WordStr",files);
+        assertEquals(179, output3.size());*/
     }
 
     @Test
@@ -59,6 +74,50 @@ public class EngToGerICD10Evaluation {
         assertEquals(true, true);
         ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Emea",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
+        Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("EmeaWord",files,trainingPath1,trainingPath2);
+        assertEquals(209, output3.size());
+    }
+
+    @Test
+    public void evaluationAllMin(){
+        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
+        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMin",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_Word",files,trainingPath1,trainingPath2);
+        assertEquals(179, output3.size());
+    }
+
+    @Test
+    public void evaluationWiki(){
+        trainingPath1 = "/src/main/resources/translation/Wiki/Wikipedia.enCleaned";
+        trainingPath2 = "/src/main/resources/translation/Wiki/Wikipedia.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Wiki",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Wiki",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("Wiki_Word",files,trainingPath1,trainingPath2);
+        assertEquals(209, output3.size());
+    }
+
+
+
+    @Test
+    public void evaluationDict(){
+        trainingPath1 = "/src/main/resources/translation/Dict/dict.enCleaned";
+        trainingPath2 = "/src/main/resources/translation/Dict/dict.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Dict",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Dict",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
         /*Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("ICD10WordStr",files);
@@ -66,18 +125,19 @@ public class EngToGerICD10Evaluation {
     }
 
     @Test
-    public void evaluationICD10(){
-        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
-        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10",files,trainingPath1,trainingPath2);
+    public void evaluationSpringer(){
+        trainingPath1 = "/src/main/resources/translation/Springer/Springer.enCleaned";
+        trainingPath2 = "/src/main/resources/translation/Springer/Springer.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Springer",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
         /*Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("ICD10WordStr",files);
         assertEquals(179, output3.size());*/
     }
+
 
 
     @Test

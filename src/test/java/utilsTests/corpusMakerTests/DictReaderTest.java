@@ -5,7 +5,7 @@ import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SimpleStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utils.ontology.DictReader;
+import utils.corpus.DictReader;
 
 import static org.junit.Assert.assertEquals;
 
