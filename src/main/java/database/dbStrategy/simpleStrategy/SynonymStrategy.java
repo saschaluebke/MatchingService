@@ -21,15 +21,19 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
     private int inputNumb=0;
     private final int MINLENGTH=4;
-    Matcher matcher;
 
     public SynonymStrategy(){
         super();
-        matcher = getMatcher();
     }
 
     @Override
-    public void storeFromFile(FileReader fr){
+    public OntologyAnalysis storeFromFile(FileReader fr){
+        OntologyAnalysis ontologyAnalysis = new OntologyAnalysis();
+        int wordCount=0;
+        int synonymCount =0;
+        int wordWithoutSyns=0;
+        double varianz=0;
+        double averageSynPerWord=0;
 
         fr.getFileContent();
         if(fr.getWordList()!=null && fr.getWordList().size() > 0 && fr.getSynonyms()!=null && fr.getSecondWordList()==null){
@@ -51,6 +55,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                     word.setId(lastId);
                     newWordsForDB.add(word);
                     stringsOfNewWords.add(word.getName());
+                    wordCount++;
                 }
                 ArrayList<Word> removedSynonyms = new ArrayList<>();
                 for(Word synonym : synonyms.get(i)){
@@ -62,12 +67,17 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                         if (language.equals("en")){
                             language = language;
                         }
+
                     }else{
                         removedSynonyms.add(synonym);
                     }
                 }
 
                 synonyms.get(i).removeAll(removedSynonyms);
+
+
+
+
 
                 //Create relations and put them into the relationList
                 if(word.getName().length()>=MINLENGTH){
@@ -77,8 +87,12 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                     Word w = synonyms.get(i).get(x);
                     for(int y=0;y<synonyms.get(i).size();y++){
                         if(x!=y){
-                            Relation r = new Relation(0,w.getId(),synonyms.get(i).get(y).getId());
-                            relations.add(r);
+                            int synonymID = synonyms.get(i).get(y).getId();
+                            if(synonymID != 0){
+                                Relation r = new Relation(0,w.getId(),synonyms.get(i).get(y).getId());
+                                relations.add(r);
+                            }
+
                         }
                     }
 
@@ -98,9 +112,39 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
             }
             putRelationList(relations,fr.getFirstLanguage(),fr.getSecondLanguage());
 
+
+            double varianzTmp=0;
+            int wordIndex=0;
+            for(ArrayList<Word> syns : synonyms){
+                if(syns.size()==0){
+                    wordWithoutSyns++;
+                }else{
+                    if(syns.get(0).equals(words.get(wordIndex))){
+                        wordWithoutSyns++;
+                    }else{
+                        synonymCount = synonymCount +syns.size();
+                    }
+                }
+                wordIndex++;
+            }
+
+            averageSynPerWord = (double)synonymCount/(double)wordCount;
+
+            for(ArrayList<Word> syns : synonyms) {
+
+                varianzTmp = varianzTmp + (syns.size() - averageSynPerWord) * (syns.size() - averageSynPerWord);
+            }
+            varianz = varianzTmp/(wordCount-1);
+
         }else if(fr.getWordList()!=null && fr.getSecondWordList()!=null && fr.getSynonyms()==null){
             //TODO: insert Translations
         }
+        ontologyAnalysis.setWordCount(wordCount);
+        ontologyAnalysis.setSynCount(synonymCount);
+        ontologyAnalysis.setVarianz(varianz);
+        ontologyAnalysis.setWordsWithoutSyn(wordWithoutSyns);
+        ontologyAnalysis.setAverageOfSynPerWord(averageSynPerWord);
+        return ontologyAnalysis;
     }
 
 
@@ -126,9 +170,10 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         int synCount=0, matchCount=0;
 
         //Split inputWord into several Words if the WordStrategy is chosen.
-        matcher = getMatcher();
+        //matcher = getMatcher();
+        //System.out.println(this.matcher.getIterateStrategy().getClass().getName());
         if(matcher.getIterateStrategy() != null && matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())){
-            matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+            //matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
           //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = input.getName().split("( )|(/)|(-)");
             for(String s: splitted){
@@ -168,7 +213,7 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
                 e.printStackTrace();
             }
             for (ArrayList<MatchResult> matchResults : mrs.getMatchResults()) {
-                if (matchResults.size() > 0) {
+                if (matchResults != null && matchResults.size() > 0) {
                     ArrayList<String> synonymMatchings = new ArrayList<>();
                     ArrayList<String> translatedSynonymMatchings = new ArrayList<>();
                     for(MatchResult mr : matchResults){
@@ -176,14 +221,14 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
                         Word w = allWords.get(matchResults.get(0).getID()-1);//SQL Index starts with 1
                         if (mr.getScore() < accuracy && !(uniqueMatchings.contains(w.getName()))) {
                             matchCount++;
-
+                            uniqueMatchings.add(w.getName());
                             String trans = translator.translation(w.getName());
                             matchings.add(w.getName());
                             translatedMatchings.add(trans);
 
                             for (Relation r : allRelation) {
                                 if (matchID == r.getIdFrom()) {
-                                    int synID = r.getIdFrom();
+                                    int synID = r.getIdTo();
                                     Word word = allWords.get(synID-1);
 
                                          if(!uniqueSynonymMatchings.contains(word.getName())){

@@ -6,7 +6,10 @@ import matching.distance.DistanceStrategy;
 
 import java.util.ArrayList;
 
-public class WordStrategy implements IterateStrategy {
+/**
+ * Created by sashbot on 06.08.17.
+ */
+public class SimpleStrategy implements IterateStrategy {
     private final String REGEX = "( )|(/)"; //Split by space or /
     private String searchString;
     private Word wordFromDB;
@@ -25,11 +28,10 @@ public class WordStrategy implements IterateStrategy {
     @Override
     public ArrayList<MatchResult> getMatchList(DistanceStrategy distanceStrategy) {
         matchResults = new ArrayList<>();
-        String[] splitted = searchString.split(REGEX);
-        for(String string: splitted){
-            MatchResult newMatchResult = new MatchResult(wordFromDB,string,distanceStrategy.getDistance(searchString,wordFromDB.getName()),0,searchString.length(),0,wordFromDB.getName().length());
-            matchResults.add(newMatchResult);
-        }
+        double distance = distanceStrategy.getDistance(searchString, wordFromDB.getName());
+        MatchResult newMatchResult = new MatchResult(wordFromDB, searchString, distance, 0, searchString.length(), 0, wordFromDB.getName().length());
+        matchResults.add(newMatchResult);
+
         return matchResults;
     }
 }

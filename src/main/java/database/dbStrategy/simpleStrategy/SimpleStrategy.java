@@ -1,9 +1,6 @@
 package database.dbStrategy.simpleStrategy;
 
-import components.MatchResultSet;
-import components.Relation;
-import components.TranslationResult;
-import components.Word;
+import components.*;
 import database.MySQLQuery;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
@@ -24,7 +21,7 @@ import java.util.ArrayList;
 
 public class SimpleStrategy implements DBStrategy {
     private int MAXCHARS;
-    private Matcher matcher;
+    protected Matcher matcher;
     MySQLQuery dbq;
 
     public SimpleStrategy() {
@@ -120,12 +117,13 @@ public class SimpleStrategy implements DBStrategy {
     }
 
     @Override
-    public void storeFromFile(FileReader fr) {
+    public OntologyAnalysis storeFromFile(FileReader fr) {
         fr.getFileContent();
         ArrayList<Word> words = fr.getWordList();
         if (words != null && words.size()>0){
             putWordList(words,words.get(0).getLanguage());
         }
+        return null;
     }
 
     @Override

@@ -154,7 +154,7 @@ public class Evaluator {
         ew.addBoldLabel(5,1,"AllgGesamt");
         ew.addBoldLabel(6,1,"AllgScore");
         ew.addBoldLabel(7,1,"InTraining");
-        WritableSheet ws = ew.getFindingsSheet();
+        WritableSheet ws = ew.getSheet(1);
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
         int counter = 0;
@@ -304,12 +304,13 @@ public class Evaluator {
         ew.addBoldLabel(8,2,"Synonyme");
 
         ew.addNumber(1,0,input.size());
-        WritableSheet ws = ew.getFindingsSheet();
+        WritableSheet ws = ew.getSheet(1);
         ew.addBoldLabel(0,1,"Input",ws);
         ew.addBoldLabel(1,1,"Findings",ws);
         int allSynonymCount =0;
         int allMatchCount = 0;
         int sameCounter = 0;
+        int matchingSheetIndex=2;
         for(int i=0;i<strList.size();i++) {
             SynonymTranslationResult str = strList.get(i);
             String inputWord = str.getInput().getName().toLowerCase();
@@ -355,6 +356,11 @@ public class Evaluator {
 
             int pos2 = 1;
             int pos=9;
+
+            WritableSheet wsMatch;
+            matchingSheetIndex = ew.addSheet();
+            wsMatch = ew.getSheet(matchingSheetIndex);
+            int matchPosition=0;
             for(int wordIndex = 0; wordIndex<str.getWords().size();wordIndex++){
                 ew.addBoldLabel(pos,i+3,"Word: "+str.getWords().get(wordIndex));
                 ew.addBoldLabel(pos2,i+3,String.valueOf(str.getMatchings().get(wordIndex).size()),ws);
@@ -370,19 +376,32 @@ public class Evaluator {
                 pos2++;
                 pos++;
 
+                ew.addBoldLabel(matchPosition,0,str.getWords().get(wordIndex),wsMatch);
 
                 for(int matchingIndex = 0; matchingIndex<str.getMatchings().get(wordIndex).size();matchingIndex++){
-                    ew.addBoldLabel(pos,i+3,str.getMatchings().get(wordIndex).get(matchingIndex));
+                  //  ew.addBoldLabel(pos,i+3,str.getMatchings().get(wordIndex).get(matchingIndex));
+                   ew.addBoldLabel(matchPosition,1,str.getMatchings().get(wordIndex).get(matchingIndex),wsMatch);
+                    matchPosition++;
+                    //pos++;
+                    int synonymPos = 2;
+                        for(int synonymIndex = 0; synonymIndex<str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size();synonymIndex++){
+                            ew.addLabel(matchingIndex,synonymPos,String.valueOf(str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex)),wsMatch);
+                            synonymPos++;
+                            ew.addLabel(matchingIndex,synonymPos,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex),wsMatch);
+                            synonymPos++;
+                            ew.addLabel(matchingIndex,synonymPos," ",wsMatch);
+                            synonymPos++;
 
-                    pos++;
-                    ew.addBoldLabel(pos,i+3,str.getTranslatedMatchings().get(wordIndex).get(matchingIndex));
-                    for(int synonymIndex = 0; synonymIndex<str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size();synonymIndex++){
-                        ew.addLabel(pos,i+3,str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex));
-                        pos++;
-                        ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
-                        pos++;
+                            String synonym = str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex);
+                            String synonymTranslation = str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex);
+                            if(!synonym.equals(synonymTranslation)){
+                                ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
+                                pos++;
+                            }
+
                     }
                 }
+                matchPosition++;
             }
 
 

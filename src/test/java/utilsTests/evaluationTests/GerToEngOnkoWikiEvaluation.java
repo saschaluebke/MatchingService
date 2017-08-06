@@ -3,16 +3,18 @@ package utilsTests.evaluationTests;
 import matching.JaroWinklerMatcher;
 import matching.Matcher;
 import matching.SimpleMatcher;
+import matching.distance.EqualDistance;
 import matching.distance.JaroWinkler;
 import matching.distance.LevenshteinNormalized;
+import matching.distance.SubstringDistance;
 import matching.iterate.PerformanceStrategy;
+import matching.iterate.SimpleStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
 import utils.evaluation.Evaluator;
-import utils.evaluation.OnkoWikiReader;
 import utils.ontology.FileReader;
 import utils.ontology.OpenThesaurusReader;
 
@@ -42,120 +44,106 @@ public class GerToEngOnkoWikiEvaluation {
         System.out.println("init Complete");
     }
 
+    /**
+     * AllMin Evaluations
+     */
     @Test
-    public void evaluationICD10(){
-        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10",files,trainingPath1,trainingPath2);
-        assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("ICD10",files,trainingPath1,trainingPath2);
-        assertEquals(143, output2.size());
-    }
-
-    @Test
-    public void evaluationSpringer(){
-        trainingPath2 = "/src/main/resources/translation/Springer/Springer.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/Springer/Springer.deCleaned";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,trainingPath1,trainingPath2);
-        assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Springer",files,trainingPath1,trainingPath2);
-        assertEquals(143, output2.size());
-    }
-
-    @Test
-    public void evaluationDict(){
-        trainingPath2 = "/src/main/resources/translation/Dict/dict.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/Dict/dict.deCleaned";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Dict",files,trainingPath1,trainingPath2);
-        assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Dict",files,trainingPath1,trainingPath2);
-        assertEquals(143, output2.size());
-    }
-
-    @Test
-    public void evaluationEmea(){
-        trainingPath2 = "/src/main/resources/translation/Emea/emea.enCleaned";
-        trainingPath1 = "/src/main/resources/translation/Emea/emea.deCleaned";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Emea",files,trainingPath1,trainingPath2);
-        assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("Emea",files,trainingPath1,trainingPath2);
-        assertEquals(143, output2.size());
-    }
-/*
-    @Test
-    public void evaluationAllMin(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
+    public void evaluationAllMinSimple(){
+        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.en";
+        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.de";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMin",files,trainingPath1,trainingPath2);
+    }
+
+    @Test
+    public void evaluationSpringerPerformanceLevenshtein(){
+        Matcher matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("SpringerPerformanceLevenshtein",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
+    }
+
+    @Test
+    public void evaluationAllMinSynonymWordLevenshtein(){
         Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_Word",files,trainingPath1,trainingPath2);
-        assertEquals(143, output3.size());
+        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMin_WordLevenshtein",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
     }
-*/
 
     @Test
-    public void simpleMatchAllMin(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        Matcher matcher = new SimpleMatcher();
+    public void evaluationAllMinSynonymSimpleLevenshtein(){
+        Matcher matcher = new Matcher(new SimpleStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMinSimpleMatch",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_SimpleLevenshtein",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
     @Test
-    public void evaluationAllMinTranslate(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMinTranslate",files,trainingPath1,trainingPath2);
+    public void evaluationAllMinSynonymWordJW(){
+        Matcher matcher = new Matcher(new WordStrategy(),new JaroWinkler(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordJW",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
     @Test
-    public void evaluationAllMinSynonymLevenshtein(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMinLevenshtein",files,trainingPath1,trainingPath2);
+    public void evaluationAllMinSynonymWordSubstring(){
+        Matcher matcher = new Matcher(new WordStrategy(),new SubstringDistance(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordSubstring",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+    @Test
+    public void evaluationAllMinSynonymWordEqual(){
+        Matcher matcher = new Matcher(new WordStrategy(),new EqualDistance(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordEqual",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
     /**
-     * Noch nicht gemacht!
+     * AllMinEvaluations End
+     * Other Evaluations Begin
      */
+
     @Test
-    public void evaluationAllMinSynonymJaroWinkler(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        JaroWinklerMatcher matcher = new JaroWinklerMatcher();
-        evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMinJaroWinkler",files,trainingPath1,trainingPath2);
+    public void evaluationSpringerTranslate(){
+        trainingPath2 = "/src/main/resources/translation/Springer/Springer.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/Springer/Springer.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Springer",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
     @Test
-    public void evaluationAllMinWord(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
-        evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_Word",files,trainingPath1,trainingPath2);
+    public void evaluationDictTranslate(){
+        trainingPath2 = "/src/main/resources/translation/Dict/dict.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/Dict/dict.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Dict",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
-
-/*
     @Test
-    public void evaluationAl(){
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("All",files,trainingPath1,trainingPath2);
-        assertEquals(143, output.get(0).size());
-        ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("All",files,trainingPath1,trainingPath2);
-        assertEquals(143, output2.size());
+    public void evaluationICD10Translate(){
+        trainingPath2 = "/src/main/resources/translation/ICD10/ICD10.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/ICD10/ICD10.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("ICD10",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
     }
-    */
+
+    @Test
+    public void evaluationEmeaTranslate(){
+        trainingPath2 = "/src/main/resources/translation/Emea/emea.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/Emea/emea.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("Emea",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
+    public void evaluationNewsTranslate(){
+        trainingPath2 = "/src/main/resources/translation/News/News-Commentary11.de-en.enCleaned";
+        trainingPath1 = "/src/main/resources/translation/News/News-Commentary11.de-en.deCleaned";
+        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("News",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
 }

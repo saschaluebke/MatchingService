@@ -1,9 +1,6 @@
 package database;
 
-import components.MatchResultSet;
-import components.Relation;
-import components.TranslationResult;
-import components.Word;
+import components.*;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
 import translators.Translator;
@@ -37,8 +34,8 @@ public class DBHelper{
         dbStrategy.putRelationList(relations,language1,language2);
     }
 
-    public void storeFromFile(FileReader fr){
-        dbStrategy.storeFromFile(fr);
+    public OntologyAnalysis storeFromFile(FileReader fr){
+        return dbStrategy.storeFromFile(fr);
     }
 
     public void putWordList(ArrayList<Word> wordList, String language){
@@ -119,7 +116,6 @@ public class DBHelper{
          * Clean input from big chars and braces
          */
         input.setWord(input.getName().toLowerCase());
-
         return dbStrategy.translate(translationResult,translator,allWords,allRelations);
     }
 

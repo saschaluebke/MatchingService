@@ -30,10 +30,13 @@ public class PerformanceStrategy implements IterateStrategy {
             matchResults.add(new MatchResult(wordFromDB,searchString,distanceStrategy.getDistance(searchString,wordFromDB.getName()),0,wordFromDB.getName().length(),0,wordFromDB.getName().length()));
         }else{
 
-            //String[] splitted = dbString.split(REGEX);
-            for (int i = 0; i < wordFromDB.getName().length() - searchString.length()+1; i++) {
-                matchResults.add(new MatchResult(wordFromDB,searchString,distanceStrategy.getDistance(searchString,wordFromDB.getName().substring(i,i+searchString.length())),i,i+searchString.length(),0,searchString.length()));
+            String[] splitted = searchString.split(REGEX);
+            for(String currentString : splitted){
+                for (int i = 0; i < wordFromDB.getName().length() - currentString.length()+1; i++) {
+                    matchResults.add(new MatchResult(wordFromDB,currentString,distanceStrategy.getDistance(currentString,wordFromDB.getName().substring(i,i+currentString.length())),i,i+currentString.length(),0,currentString.length()));
+                }
             }
+
         }
         return matchResults;
     }

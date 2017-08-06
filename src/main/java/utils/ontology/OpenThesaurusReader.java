@@ -45,7 +45,8 @@ public class OpenThesaurusReader implements FileReader {
         @Override
     public void getFileContent() {
         //int entryCount=-1;
-       ArrayList<String> allLines = getAllLines();
+            OntologyCleaner oc = new OntologyCleaner();
+       ArrayList<String> allLines = oc.cleanLinesFromBraces(getAllLines());
        words = new ArrayList<>();
        synonyms = new ArrayList<>();
        String line;
@@ -55,7 +56,12 @@ public class OpenThesaurusReader implements FileReader {
                String word = line.substring(0,line.indexOf(";"));
                line = line.substring(line.indexOf(";")+1,line.length());
                Word firstInput = new Word(0,word,firstLanguage);
-               words.add(firstInput);
+               if(!words.contains(firstInput)){
+                   words.add(firstInput);
+               }else{
+                   continue;
+               }
+
                ArrayList<Word> synonymList = new ArrayList<>();
 
                //When there is just one Word like Cat;cat then you have to create one Relation between Cat and cat
@@ -64,7 +70,11 @@ public class OpenThesaurusReader implements FileReader {
                    String synonym = line.substring(0,line.indexOf(";"));
                    line = line.substring(line.indexOf(";")+1,line.length());
                    Word synonymInput = new Word(0,synonym,firstLanguage);
-                   synonymList.add(synonymInput);
+
+                   if(!firstInput.equals(synonymInput) && !firstInput.equals(synonymInput)){
+                       synonymList.add(synonymInput);
+                   }
+
                }
                if(line.indexOf(";")<0 && !line.equals("")){
                    synonymList.add(new Word(0,line,firstLanguage));

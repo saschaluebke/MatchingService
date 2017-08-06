@@ -6,6 +6,7 @@ import components.Word;
 import matching.distance.DistanceStrategy;
 import matching.distance.JaroWinkler;
 import matching.iterate.IterateStrategy;
+import matching.iterate.WordStrategy;
 import matching.sorting.SortStrategy;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class JaroWinklerMatcher  extends Matcher {
         super(null, null, null);
     }
     public JaroWinklerMatcher(){
-        super(null, null, null);
+        super(new WordStrategy(), null, null);
     }
 
     public MatchResultSet getMatchResult(Word searchWord, Word wordFromDB){
@@ -31,7 +32,7 @@ public class JaroWinklerMatcher  extends Matcher {
         for(String string : searchStrings){
             index = matchIndex(string,stringFromDB);
             if(index<0.1){
-                MatchResult mr = new MatchResult(wordFromDB,stringFromDB,0,0,
+                MatchResult mr = new MatchResult(wordFromDB,string,0,0,
                         string.length()-1,0,string.length()-1);
                 mrlist.add(mr);
                 output.add(mrlist);

@@ -1,6 +1,7 @@
 package utils.evaluation;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import jxl.CellView;
@@ -28,8 +29,10 @@ public class ExcelWriter {
         private WritableWorkbook workbook;
         private WritableSheet excelSheet;
         private WritableSheet findingsSheet;
+    private ArrayList<WritableSheet> sheets;
 
     public ExcelWriter(String path, String label){
+            sheets = new ArrayList<>();
             setOutputFile(path);
             File file = new File(inputFile);
             WorkbookSettings wbSettings = new WorkbookSettings();
@@ -45,8 +48,9 @@ public class ExcelWriter {
             workbook.createSheet(label, 0);
             workbook.createSheet("Findings",1);
             excelSheet = workbook.getSheet(0);
+            sheets.add(excelSheet);
             findingsSheet = workbook.getSheet(1);
-
+            sheets.add(findingsSheet);
             try {
                 createLabel(label);
             } catch (WriteException e) {
@@ -201,7 +205,19 @@ public class ExcelWriter {
         }
     }
 
-    public WritableSheet getFindingsSheet() {
-        return findingsSheet;
+    public WritableSheet getSheet(int i) {
+        if(sheets.size()>i){
+            return sheets.get(i);
+        }else{
+            return null;
+        }
+    }
+
+
+    public int addSheet() {
+        int sheetIndex = sheets.size();
+        workbook.createSheet(String.valueOf(sheets.size()+2),sheetIndex);
+        sheets.add(workbook.getSheet(sheetIndex));
+        return sheetIndex;
     }
 }

@@ -61,6 +61,59 @@ public class FileScannerTest {
     }
 
     @Test
+    public void scanEuroparl(){
+        fs = new FileScanner("/src/main/resources/translation/Euparl/Europarl.de-en.deCleaned");
+
+        assertEquals(45348994,fs.getWordCount());
+        assertEquals(1940172,fs.getLines());
+
+        fs = new FileScanner("/src/main/resources/translation/Euparl/Europarl.de-en.enCleaned");
+
+        assertEquals(48718438,fs.getWordCount());
+        assertEquals(1940172,fs.getLines());
+    }
+
+    @Test
+    public void scanSubtitle(){
+        fs = new FileScanner("/src/main/resources/translation/OpenSubtitles2016/OpenSubtitles2016.de-en.deCleaned");
+
+        assertEquals(83452654,fs.getWordCount());
+        assertEquals(13209409,fs.getLines());
+
+        fs = new FileScanner("/src/main/resources/translation/OpenSubtitles2016/OpenSubtitles2016.de-en.enCleaned");
+
+        assertEquals(87051274,fs.getWordCount());
+        assertEquals(13209409,fs.getLines());
+    }
+
+    @Test
+    public void euBookshop(){
+        fs = new FileScanner("/src/main/resources/translation/EUbookshop/EUbookshop.de-en.deCleaned");
+
+        assertEquals(164222141,fs.getWordCount());
+        assertEquals(9141225,fs.getLines());
+
+        fs = new FileScanner("/src/main/resources/translation/EUbookshop/EUbookshop.de-en.deCleaned");
+
+        assertEquals(164222141,fs.getWordCount());
+        assertEquals(9141225,fs.getLines());
+    }
+
+    @Test
+    public void News(){
+        fs = new FileScanner("/src/main/resources/translation/News/News-Commentary11.de-en.de");
+
+        assertEquals(5019086,fs.getWordCount());
+        assertEquals(223153,fs.getLines());
+
+        fs = new FileScanner("/src/main/resources/translation/News/News-Commentary11.de-en.en");
+
+        assertEquals(4923246,fs.getWordCount());
+        assertEquals(223153,fs.getLines());
+    }
+
+
+    @Test
     public void scanAllMax(){
         fs = new FileScanner("/src/main/resources/translation/AllMax/training_language.de");
         int deLines = fs.getLines();
