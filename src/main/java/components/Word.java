@@ -72,4 +72,9 @@ public class Word {
         variables.add("cout"); variables.add(Integer.toString(getCount()));
         return variables;
     }
+
+    @Override
+    public String toString(){
+        return getName();
+    }
 }

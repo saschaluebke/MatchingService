@@ -5,14 +5,12 @@ import database.MySQLQuery;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
 import matching.Matcher;
-import matching.distance.DistanceStrategy;
 import matching.distance.LevenshteinNormalized;
-import matching.iterate.IterateStrategy;
 import matching.iterate.PerformanceStrategy;
 import matching.sorting.ScoreSort;
-import matching.sorting.SortStrategy;
 import translators.Translator;
 import utils.ontology.FileReader;
+import utils.ontology.OntologyAnalysis;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -117,13 +115,12 @@ public class SimpleStrategy implements DBStrategy {
     }
 
     @Override
-    public OntologyAnalysis storeFromFile(FileReader fr) {
+    public void storeFromFile(FileReader fr) {
         fr.getFileContent();
         ArrayList<Word> words = fr.getWordList();
-        if (words != null && words.size()>0){
-            putWordList(words,words.get(0).getLanguage());
+        if (words != null && words.size()>0) {
+            putWordList(words, words.get(0).getLanguage());
         }
-        return null;
     }
 
     @Override
@@ -212,7 +209,7 @@ public class SimpleStrategy implements DBStrategy {
 
     @Override
     public MatchResultSet searchWord(Word word) {
-        MatchResultSet mrs = matcher.getMatchingWordList(word, getAllWords(word.getLanguage()));
+        MatchResultSet mrs = matcher.getMatchingWordList(word.getName(), getAllWords(word.getLanguage()));
         return mrs;
     }
 

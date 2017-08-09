@@ -31,10 +31,10 @@ public class Matcher {
         }
     }
 
-    public MatchResultSet getMatchResult(Word searchString, Word wordFromDB){
+    public MatchResultSet getMatchResult(String searchString, Word wordFromDB){
         MatchResultSet mrs = new MatchResultSet(iterateStrategy,distanceStrategy,sortStrategy);
         iterateStrategy.setWordFromDB(wordFromDB);
-        iterateStrategy.setSearchString(searchString.getName());
+        iterateStrategy.setSearchString(searchString);
 
         ArrayList<MatchResult> matchResults = iterateStrategy.getMatchList(distanceStrategy);
         ArrayList<MatchResult> sortedResults=null;
@@ -44,24 +44,32 @@ public class Matcher {
                 mrs.addMatchResults(sortedResults, wordFromDB);
                 return mrs;
 
+        }else if(matchResults.size() > 1){
+            sortedResults = sortStrategy.sort(matchResults);
+            if(sortedResults.get(0).getScore() < accuracy){
+                mrs.addMatchResults(sortedResults,wordFromDB);
+            }
+
+            return mrs;
         }else{
             return null;
         }
-        //sortedResults = sortStrategy.sort(matchResults);
-        //mrs.addMatchResults(sortedResults,wordFromDB);
 
-        //return mrs;
     }
 
 
 
-    public MatchResultSet getMatchingWordList(Word searchString, ArrayList<Word> words){
+    public MatchResultSet getMatchingWordList(String searchString, ArrayList<Word> words){
         MatchResultSet mrs = new MatchResultSet(iterateStrategy,distanceStrategy,sortStrategy);
         //int count=0;
         for(Word w: words){
             MatchResultSet result = getMatchResult(searchString,w);
-            if (result != null && result.getMatchResults().size()>0 ){
-                mrs.addMatchResults(result.getMatchResults().get(0), w);
+            if (mrs.getMatchResults().size()<1 && result != null && result.getMatchResults().size()>0 ){
+                ArrayList<MatchResult> mr = result.getMatchResults().get(0);
+                if (mr != null && mr.size()>0){
+                    mrs.addMatchResults(mr, w);
+                }
+
             }
         }
         return mrs;

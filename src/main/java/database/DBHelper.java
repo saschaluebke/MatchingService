@@ -5,6 +5,7 @@ import database.dbStrategy.DBStrategy;
 import matching.Matcher;
 import translators.Translator;
 import utils.ontology.FileReader;
+import utils.ontology.OntologyAnalysis;
 
 import java.util.ArrayList;
 
@@ -34,8 +35,8 @@ public class DBHelper{
         dbStrategy.putRelationList(relations,language1,language2);
     }
 
-    public OntologyAnalysis storeFromFile(FileReader fr){
-        return dbStrategy.storeFromFile(fr);
+    public void storeFromFile(FileReader fr){
+        dbStrategy.storeFromFile(fr);
     }
 
     public void putWordList(ArrayList<Word> wordList, String language){

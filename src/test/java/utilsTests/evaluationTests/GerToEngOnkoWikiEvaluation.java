@@ -9,6 +9,7 @@ import matching.distance.LevenshteinNormalized;
 import matching.distance.SubstringDistance;
 import matching.iterate.PerformanceStrategy;
 import matching.iterate.SimpleStrategy;
+import matching.iterate.WordPerformanceStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
@@ -56,10 +57,18 @@ public class GerToEngOnkoWikiEvaluation {
     }
 
     @Test
-    public void evaluationSpringerPerformanceLevenshtein(){
+    public void evaluationAllMinPerformanceLevenshtein(){
         Matcher matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("SpringerPerformanceLevenshtein",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin_PerformanceLevenshtein",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
+    public void evaluationAllMinWordPerformanceLevenshtein(){
+        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin_WordPerformanceLevenshtein",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
@@ -80,10 +89,26 @@ public class GerToEngOnkoWikiEvaluation {
     }
 
     @Test
+    public void evaluationAllMinSynonymSimpleJW(){
+        Matcher matcher = new Matcher(new SimpleStrategy(),new JaroWinkler(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_SimpleJaroWinkler",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
     public void evaluationAllMinSynonymWordJW(){
         Matcher matcher = new Matcher(new WordStrategy(),new JaroWinkler(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordJW",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
+    public void evaluationAllMinSynonymPerformanceJW(){
+        Matcher matcher = new Matcher(new PerformanceStrategy(),new JaroWinkler(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_PerformanceJW",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 
@@ -106,6 +131,8 @@ public class GerToEngOnkoWikiEvaluation {
      * AllMinEvaluations End
      * Other Evaluations Begin
      */
+
+
 
     @Test
     public void evaluationSpringerTranslate(){

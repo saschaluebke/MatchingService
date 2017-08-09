@@ -4,7 +4,7 @@ import components.*;
 import matching.Matcher;
 import translators.Translator;
 import utils.ontology.FileReader;
-import utils.ontology.OntologyCleaner;
+import utils.ontology.OntologyAnalysis;
 
 import java.util.ArrayList;
 
@@ -15,7 +15,7 @@ public interface DBStrategy {
     void putWordList(ArrayList<Word> wordList, String language);
     int putRelation(Word word1, Word word2);
     void putRelationList(ArrayList<Relation> relations, String language1, String language2);
-    OntologyAnalysis storeFromFile(FileReader fr);
+    void storeFromFile(FileReader fr);
 
     MatchResultSet searchWord(Word word);
     Word getWordById(int id, String language);

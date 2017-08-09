@@ -17,7 +17,11 @@ public class Sorter {
 
     static public ArrayList<MatchResult> matchResultQuickSort(ArrayList<MatchResult> results){
         quicksort(results,0,results.size()-1);
-        return results;
+        ArrayList<MatchResult> sortResult = new ArrayList<>();
+        if(results.size()>0){
+            sortResult.add(results.get(results.size()-1));
+        }
+        return sortResult;
     }
 
     private static void quicksort(ArrayList<MatchResult> list, int from, int to) {

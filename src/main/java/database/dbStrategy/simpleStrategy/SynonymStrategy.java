@@ -3,20 +3,16 @@ package database.dbStrategy.simpleStrategy;
 import components.*;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
-import matching.Matcher;
-import matching.distance.LevenshteinNormalized;
-import matching.iterate.PerformanceStrategy;
+import matching.iterate.WordPerformanceStrategy;
 import matching.iterate.WordStrategy;
-import matching.sorting.ScoreSort;
 import translators.Translator;
 import utils.ontology.FileReader;
+import utils.ontology.OntologyAnalysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by sashbot on 08.07.17.
- */
+
 public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
     private int inputNumb=0;
@@ -26,6 +22,258 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         super();
     }
 
+    @Override
+    public void storeFromFile(FileReader fr){
+        storeDublicatesStrategy(fr);
+
+        //Takes to long!
+        //storeFromFileJoinDublicatesStrategy(fr);
+
+    }
+
+    private void storeDublicatesStrategy(FileReader fr){
+
+        ArrayList<Word> wordsForDB = new ArrayList<>(); //insert new Words here
+        ArrayList<Relation> relationForDB = new ArrayList<>();
+        String language = fr.getFirstLanguage();
+        ArrayList<Word> allWords = getAllWords(language);
+        ArrayList<Relation> allRelations = getAllRelations(language,language);
+        int lastId = getLastWordId(language);
+
+        fr.getFileContent();
+        if(fr.getWordList()!=null && fr.getSynonyms()!=null && fr.getSecondWordList()==null) {
+            ArrayList<Word> wordsFromFile = fr.getWordList();
+            ArrayList<ArrayList<Word>> synonymsFromFile = fr.getSynonyms();
+
+            for(int wordIndex =0; wordIndex<wordsFromFile.size();wordIndex++){
+
+                Word w1 = wordsFromFile.get(wordIndex);
+                String s1 = w1.getName();
+                boolean findSameWord = false;
+                Word wordFromDB = null;
+                ArrayList<Word> relationsFromFile = synonymsFromFile.get(wordIndex);
+
+                for(int wordFromDBIndex = 0;wordFromDBIndex<allWords.size();wordFromDBIndex++){
+                    String stringFromDB = allWords.get(wordFromDBIndex).getName();
+
+                    if(s1.equals(stringFromDB)) {
+                        findSameWord = true;
+                        wordFromDB = allWords.get(wordFromDBIndex);
+                    }
+                }
+              if(findSameWord){
+
+                }else{
+                    /**
+                     * If new Word is NOT in DB:
+                     */
+                    lastId++;
+                    w1.setId(lastId);
+                    wordsForDB.add(w1);
+                    allWords.add(w1);
+                    //Relationen
+                    Word wordFromRelationFile=null;
+
+
+                    for(int fromRelationFileIndex = 0; fromRelationFileIndex<relationsFromFile.size();fromRelationFileIndex++){
+                        wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
+                        if(wordFromRelationFile.getName().equals(s1)){
+
+                        }else{
+                            lastId++;
+                            wordFromRelationFile.setId(lastId);
+                            wordsForDB.add(wordFromRelationFile);
+                            allWords.add(wordFromRelationFile);
+                            ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(w1, wordFromRelationFile, allRelations);
+                            relationForDB.addAll(newRelations);
+                            allRelations.addAll(newRelations);
+
+                        }
+                        }
+                    }
+                }
+            }
+
+
+
+        putWordList(wordsForDB,language);
+        putRelationList(relationForDB,language,language);
+    }
+
+
+    public void storeFromFileJoinDublicatesStrategy(FileReader fr){
+
+        ArrayList<Word> wordsForDB = new ArrayList<>(); //insert new Words here
+        ArrayList<Relation> relationForDB = new ArrayList<>();
+        String language = fr.getFirstLanguage();
+        ArrayList<Word> allWords = getAllWords(language);
+        ArrayList<Relation> allRelations = getAllRelations(language,language);
+        int lastId = getLastWordId(language);
+
+        fr.getFileContent();
+        if(fr.getWordList()!=null && fr.getSynonyms()!=null && fr.getSecondWordList()==null) {
+            ArrayList<Word> wordsFromFile = fr.getWordList();
+            ArrayList<ArrayList<Word>> synonymsFromFile = fr.getSynonyms();
+
+            for(int wordIndex =0; wordIndex<wordsFromFile.size();wordIndex++){
+
+                Word w1 = wordsFromFile.get(wordIndex);
+                String s1 = w1.getName();
+                boolean findSameWord = false;
+                Word wordFromDB = null;
+                ArrayList<Word> relationsFromFile = synonymsFromFile.get(wordIndex);
+/**TODO: wenn man relationen hinzufügt müssen diese mit allen verwanden relationen kaskadiert werden
+ * A 1      1 2     C kommt hinzu   3 1  hinzugeben
+ * B 2      2 1                     1 3
+ * C 3                              2 3
+ *                                  3 2
+ *
+ *Dazu liste holen mit gleichen id
+ * 0: einfach doppelt wie jetzt
+ * ab 1: doppelt + alle toId in liste dann liste abarbeiten!
+ *
+ * Is the new Word already in DB?
+ */
+                for(int wordFromDBIndex = 0;wordFromDBIndex<allWords.size();wordFromDBIndex++){
+                    String stringFromDB = allWords.get(wordFromDBIndex).getName();
+
+                    if(s1.equals(stringFromDB)) {
+                        findSameWord = true;
+                        wordFromDB = allWords.get(wordFromDBIndex);
+                    }
+                }
+                /**
+                 * If new Word is already in DB: are a Synonym of it in DB?
+                 */
+
+                if(findSameWord){
+
+                    Word wordFromRelationFile=null;
+                    Word wordFromAllWords = null;
+                    findSameWord = false;
+                    for(int fromRelationFileIndex = 0; fromRelationFileIndex<relationsFromFile.size();fromRelationFileIndex++){
+                        wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
+                        for(Word w2 : allWords){
+                            wordFromAllWords = w2;
+                            String stringFromAllWords = wordFromAllWords.getName();
+                            if(stringFromAllWords.equals(wordFromRelationFile.getName())){
+                                findSameWord = true;
+                                wordFromRelationFile = wordFromAllWords;
+                            }else{
+
+                            }
+                        }
+
+                    /**
+                     * If new Word and Synonym are in DB: Search if the relation is already in DB
+                     */
+                     if(findSameWord){
+
+
+                        ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(wordFromRelationFile, wordFromDB, allRelations);
+                        //newRelations.addAll(createRelationsFromNewSynonyms(wordFromDB, wordFromRelationFile, allRelations));
+
+                        relationForDB.addAll(newRelations);
+                        allRelations.addAll(newRelations);
+
+                    }else{
+                        /**
+                         * If new Word is in DB but not Synonym
+                         */
+
+                        lastId++;
+                        wordFromRelationFile.setId(lastId);
+                        wordsForDB.add(wordFromRelationFile);
+                        allWords.add(wordFromRelationFile);
+
+                        ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(wordFromRelationFile, wordFromDB, allRelations);
+                        relationForDB.addAll(newRelations);
+                        allRelations.addAll(newRelations);
+                    }
+                    }
+
+                }else{
+                    /**
+                     * If new Word is NOT in DB:
+                     */
+                    lastId++;
+                    w1.setId(lastId);
+                    wordsForDB.add(w1);
+                    allWords.add(w1);
+                    //Relationen
+                    findSameWord = false;
+                    Word wordFromRelationFile=null;
+                    Word wordFromAllWords = null;
+
+
+                    for(int fromRelationFileIndex = 0; fromRelationFileIndex<relationsFromFile.size();fromRelationFileIndex++){
+                        wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
+                       for(Word w2 : allWords){
+                            wordFromAllWords = w2;
+                            String stringFromAllWords = wordFromAllWords.getName();
+                            if(stringFromAllWords.equals(wordFromRelationFile.getName())){
+                                findSameWord = true;
+                               }
+                        }
+
+
+                    if(findSameWord){
+                        /**
+                         * if new Word is not but new Synonym is in DB
+                         */
+
+                        ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(w1, wordFromRelationFile, allRelations);
+                        relationForDB.addAll(newRelations);
+                        allRelations.addAll(newRelations);
+
+                    }else{
+                        /**
+                         * if new Word and Synonym is not in DB
+                         */
+                        lastId++;
+                        wordFromRelationFile.setId(lastId);
+                        wordsForDB.add(wordFromRelationFile);
+                        allWords.add(wordFromRelationFile);
+                        ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(w1, wordFromRelationFile, allRelations);
+                        relationForDB.addAll(newRelations);
+                        allRelations.addAll(newRelations);
+
+                    }
+                    }
+                }
+            }
+
+        }
+
+        putWordList(wordsForDB,language);
+        putRelationList(relationForDB,language,language);
+
+    }
+
+    private ArrayList<Relation> createRelationsFromNewSynonyms(Word wordInDB, Word newSynonym,  ArrayList<Relation> allRelations){
+        /**
+         * Search for Synonyms of the word if there are any these are synonyms for the new synonym too!
+         */
+
+        ArrayList<Relation> relations = new ArrayList<>();
+
+        relations.add(new Relation(0,newSynonym.getId(),wordInDB.getId()));
+        relations.add(new Relation(0,wordInDB.getId(),newSynonym.getId()));
+
+        for(Relation r : allRelations) {
+            if (r.getIdFrom() == newSynonym.getId()) {
+                relations.add(new Relation(0, r.getIdTo(), wordInDB.getId()));
+                relations.add(new Relation(0,wordInDB.getId(),r.getIdTo()));
+            }
+            if(r.getIdFrom() == wordInDB.getId()){
+                relations.add(new Relation(0, r.getIdTo(), newSynonym.getId()));
+                relations.add(new Relation(0,newSynonym.getId(),r.getIdTo()));
+            }
+        }
+        return relations;
+    }
+
+/*
     @Override
     public OntologyAnalysis storeFromFile(FileReader fr){
         OntologyAnalysis ontologyAnalysis = new OntologyAnalysis();
@@ -40,6 +288,12 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
             ArrayList<Word> words = fr.getWordList();
             String language = words.get(0).getLanguage();
             ArrayList<ArrayList<Word>> synonyms = fr.getSynonyms();
+
+
+
+
+
+
 
             //these list will be in the database so there must be no dublicates!
             ArrayList<Word> newWordsForDB = new ArrayList<>();
@@ -75,12 +329,8 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
                 synonyms.get(i).removeAll(removedSynonyms);
 
-
-
-
-
                 //Create relations and put them into the relationList
-                if(word.getName().length()>=MINLENGTH){
+                if(word.getName().length()>=MINLENGTH && !stringsOfNewWords.contains(word.getName())){
                     synonyms.get(i).add(word);
                 }
                 for(int x=0;x<synonyms.get(i).size();x++){
@@ -99,6 +349,17 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                 }
             }
 
+            ArrayList<Word> allWords = getAllWords(language);
+            int sameWords = 0;
+            for(Word w1 : newWordsForDB){
+                for(Word w2 : allWords){
+                    if(w1.getName().equals(w2.getName())){
+
+                    }
+
+                }
+            }
+            System.out.println("Same: "+sameWords);
             putWordList(newWordsForDB,language);
 
             //check if the auto-Identifier of MySQL is the same as in the newWords list
@@ -146,7 +407,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         ontologyAnalysis.setAverageOfSynPerWord(averageSynPerWord);
         return ontologyAnalysis;
     }
-
+*/
 
     /**
      * 1. Try to Match with WordList of same language then input
@@ -160,7 +421,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                                        ArrayList<Relation> allRelation){
         ArrayList<String> allTranslations = new ArrayList<>();
         SynonymTranslationResult str = (SynonymTranslationResult) translationResult;
-        String language = allWords.get(0).getLanguage();
+        String language = translator.getFromLanguage();
         ArrayList<String> words = new ArrayList<>();
         ArrayList<ArrayList<String>> matchingsOfWords = new ArrayList<>();
         ArrayList<ArrayList<String>> translatedMatchingsOfWords = new ArrayList<>();
@@ -172,7 +433,9 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         //Split inputWord into several Words if the WordStrategy is chosen.
         //matcher = getMatcher();
         //System.out.println(this.matcher.getIterateStrategy().getClass().getName());
-        if(matcher.getIterateStrategy() != null && matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())){
+        if(matcher.getIterateStrategy() != null &&
+                (matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())||
+                matcher.getIterateStrategy().getClass().equals(new WordPerformanceStrategy().getClass()))){
             //matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
           //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = input.getName().split("( )|(/)|(-)");
@@ -204,7 +467,14 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
 
 
             //Look in DB for matchings
-            MatchResultSet mrs = matcher.getMatchingWordList(currentWord, allWords);
+            MatchResultSet mrs = matcher.getMatchingWordList(currentInputString, allWords);
+            if(mrs.getMatchResults().size()>0){
+                System.out.println( mrs.getMatchResults().get(0).size());
+                System.out.println(mrs.getMatchResults().get(0).get(0).getScore());
+            }
+
+
+            //System.out.println(mrs.getMatchResults().get(0).get(0).getScore());
             TranslatorGetProperties tgp = new TranslatorGetProperties();
             double accuracy = 0;
             try {
@@ -222,9 +492,9 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
                         if (mr.getScore() < accuracy && !(uniqueMatchings.contains(w.getName()))) {
                             matchCount++;
                             uniqueMatchings.add(w.getName());
-                            String trans = translator.translation(w.getName());
+                           // String trans = translator.translation(w.getName());
                             matchings.add(w.getName());
-                            translatedMatchings.add(trans);
+                         //   translatedMatchings.add(trans);
 
                             for (Relation r : allRelation) {
                                 if (matchID == r.getIdFrom()) {

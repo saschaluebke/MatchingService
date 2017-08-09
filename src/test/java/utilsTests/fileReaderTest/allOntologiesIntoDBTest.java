@@ -1,15 +1,14 @@
 package utilsTests.fileReaderTest;
 
-import components.OntologyAnalysis;
+import components.Word;
+import utils.ontology.OntologyAnalysis;
 import database.DBHelper;
 import database.MySQLQuery;
 import database.dbStrategy.simpleStrategy.SynonymStrategy;
-import databaseTests.DBQueryTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import utils.ontology.*;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -44,6 +43,14 @@ public class allOntologiesIntoDBTest {
     }
 
     @Test
+    public void test(){
+        dbh.newLanguage("de");
+        TestReader tr = new TestReader();
+        dbh.storeFromFile(tr);
+        assertEquals(true,true);
+    }
+
+    @Test
     public void justOpenThesarus(){
         frList = new ArrayList<>();
         frList.add(openThesaurusReader);
@@ -51,26 +58,23 @@ public class allOntologiesIntoDBTest {
         double varianz=0,average=0;
         dbh.newLanguage("en");
         dbh.newLanguage("de");
+        ArrayList<Word> wordList = dbh.getAllWords("de");
         for(FileReader fr : frList){
             int tmp = 0;
             int linesCount = fr.getAllLinesCount();
-            for(int i=2000 ; i<linesCount; i=i+2000){
+            for(int i=1000 ; i<linesCount; i=i+1000){
+
+                System.out.println(i +" von "+linesCount+" erreicht.");
                 fr.setFromEntry(tmp);
                 fr.setToEntry(i);
-                OntologyAnalysis oa = dbh.storeFromFile(fr);
-                wordCount = wordCount + oa.getWordCount();
-                synCount = synCount + oa.getSynCount();
-                wordWithoutSyn = wordWithoutSyn + oa.getWordsWithoutSyn();
-                average = (average+oa.getAverageOfSynPerWord())/(double)2;
-                varianz = (varianz+oa.getVarianz())/(double)2;
+                dbh.storeFromFile(fr);
                 tmp = i;
             }
-            if (tmp+2000>linesCount){
-                fr.setFromEntry(tmp);
-                fr.setToEntry(linesCount);
-            }
+
             System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
         }
+
+        //TODO: Datenbank analyisieren.
         System.out.println("Wörter: "+wordCount+" Synonyme: "+synCount+" WörterOhneSyn: "+wordWithoutSyn);
         System.out.println("Mittel: "+average+" Varianz: "+varianz);
         assertEquals(0,dbh.getAllWords("en").size());
@@ -91,23 +95,14 @@ public class allOntologiesIntoDBTest {
             for(int i=2000 ; i<linesCount; i=i+2000){
                 fr.setFromEntry(tmp);
                 fr.setToEntry(i);
-                OntologyAnalysis oa = dbh.storeFromFile(fr);
-                wordCount = wordCount + oa.getWordCount();
-                synCount = synCount + oa.getSynCount();
-                wordWithoutSyn = wordWithoutSyn + oa.getWordsWithoutSyn();
-                average = (average+oa.getAverageOfSynPerWord())/(double)2;
-                varianz = (varianz+oa.getVarianz())/(double)2;
+                dbh.storeFromFile(fr);
                 tmp = i;
-            }
-            if (tmp+2000>linesCount){
-                fr.setFromEntry(tmp);
-                fr.setToEntry(linesCount);
             }
             System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
         }
         System.out.println("Wörter: "+wordCount+" Synonyme: "+synCount+" WörterOhneSyn: "+wordWithoutSyn);
         System.out.println("Mittel: "+average+" Varianz: "+varianz);
-        assertEquals(217674,dbh.getAllWords("en").size());
+        assertEquals(87296,dbh.getAllWords("en").size());
     }
 
     @Test

@@ -19,8 +19,8 @@ public class ScoreSort implements SortStrategy {
     @Override
     public ArrayList<MatchResult> sort(ArrayList<MatchResult> results) {
         ArrayList<MatchResult> sortedResults = new ArrayList<>();
-        sorter.matchResultQuickSort(results);
-        return results;
+
+        return sorter.matchResultQuickSort(results);
     }
 
     /**
