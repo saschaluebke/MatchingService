@@ -411,7 +411,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
     /**
      * 1. Try to Match with WordList of same language then input
-     * 2. When you find something equal look at the synonym table
+     * 2. When you find something equal, look at the synonym table
      * 3. Translate input and all of its synonyms
      * 4. Put direktTranslation of input, matchings - and there translations and synonym of that matchings - and there translations into TranslationResult
      *
@@ -419,6 +419,16 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
      */
     public ArrayList<String> translate(TranslationResult translationResult, Translator translator, ArrayList<Word> allWords,
                                        ArrayList<Relation> allRelation){
+        int maxMatches = 0;
+        double accuracy = 0.0;
+        TranslatorGetProperties tgp = new TranslatorGetProperties();
+        try {
+            accuracy = Double.parseDouble(tgp.getPropValues("Translate.accuracy"));
+            maxMatches = Integer.parseInt(tgp.getPropValues("Matcher.maxMatches"));
+           } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         ArrayList<String> allTranslations = new ArrayList<>();
         SynonymTranslationResult str = (SynonymTranslationResult) translationResult;
         String language = translator.getFromLanguage();
@@ -428,7 +438,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         ArrayList<ArrayList<ArrayList<String>>> synonymsOfMatchesOfWords = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<String>>> translatedSynonymsOfMatchesOfWords = new ArrayList<>();
         Word input = translationResult.getInput();
-        int synCount=0, matchCount=0;
+        int synCount=0, matchCount=0, realSynCount=0;
 
         //Split inputWord into several Words if the WordStrategy is chosen.
         //matcher = getMatcher();
@@ -468,20 +478,14 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
 
             //Look in DB for matchings
             MatchResultSet mrs = matcher.getMatchingWordList(currentInputString, allWords);
-            if(mrs.getMatchResults().size()>0){
+      /*      if(mrs.getMatchResults().size()>0){
                 System.out.println( mrs.getMatchResults().get(0).size());
                 System.out.println(mrs.getMatchResults().get(0).get(0).getScore());
-            }
+            }*/
 
 
             //System.out.println(mrs.getMatchResults().get(0).get(0).getScore());
-            TranslatorGetProperties tgp = new TranslatorGetProperties();
-            double accuracy = 0;
-            try {
-                accuracy = Double.parseDouble(tgp.getPropValues("Translate.accuracy"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
             for (ArrayList<MatchResult> matchResults : mrs.getMatchResults()) {
                 if (matchResults != null && matchResults.size() > 0) {
                     ArrayList<String> synonymMatchings = new ArrayList<>();
@@ -495,15 +499,18 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
                            // String trans = translator.translation(w.getName());
                             matchings.add(w.getName());
                          //   translatedMatchings.add(trans);
-
+                           if(matchCount <= maxMatches){
                             for (Relation r : allRelation) {
                                 if (matchID == r.getIdFrom()) {
                                     int synID = r.getIdTo();
                                     Word word = allWords.get(synID-1);
 
-                                         if(!uniqueSynonymMatchings.contains(word.getName())){
+                                         if(!uniqueSynonymMatchings.equals(word.getName())){
                                              synCount++;
                                              String translat = translator.translation(word.getName());
+                                             if(!translat.equals(word.getName())){
+                                                realSynCount++;
+                                             }
                                              synonymMatchings.add(word.getName());
                                              uniqueSynonymMatchings.add(word.getName());
                                              translatedSynonymMatchings.add(translat);
@@ -513,8 +520,13 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
 
                                         }
                             }
+                           }else{
+                               synonymMatchings.add("-");
+                               translatedSynonymMatchings.add("-");
+                           }
                             synonymMatchesOfWords.add(synonymMatchings);
                             translatedSynonymMatchesOfWords.add(translatedSynonymMatchings);
+
                         }
                     }
 
@@ -532,6 +544,7 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
         str.setMatchingSynonyms(synonymsOfMatchesOfWords);
         str.setMatchingSynonymtranslations(translatedSynonymsOfMatchesOfWords);
         str.setSynonymCount(synCount);
+        str.setRealSynCount(realSynCount);
         str.setMatchingCount(matchCount);
         str.setDirectTranslation(directTranslation);
         str.setWords(words);

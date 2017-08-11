@@ -17,15 +17,11 @@ public class Sorter {
 
     static public ArrayList<MatchResult> matchResultQuickSort(ArrayList<MatchResult> results){
         quicksort(results,0,results.size()-1);
-        ArrayList<MatchResult> sortResult = new ArrayList<>();
-        if(results.size()>0){
-            sortResult.add(results.get(results.size()-1));
-        }
-        return sortResult;
+        return results;
     }
 
     private static void quicksort(ArrayList<MatchResult> list, int from, int to) {
-        if (from < to) {
+        if (from > to) {
             int pivot = from;
             int left = from + 1;
             int right = to;
@@ -44,8 +40,8 @@ public class Sorter {
                 }
             }
             Collections.swap(list, pivot, left - 1);
-            quicksort(list, from, right - 1); // <-- pivot was wrong!
-            quicksort(list, right + 1, to);   // <-- pivot was wrong!
+            quicksort(list, from, right - 1);
+            quicksort(list, right + 1, to);
         }
     }
 

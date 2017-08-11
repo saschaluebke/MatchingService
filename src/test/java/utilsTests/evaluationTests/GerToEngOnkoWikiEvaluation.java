@@ -48,14 +48,14 @@ public class GerToEngOnkoWikiEvaluation {
     /**
      * AllMin Evaluations
      */
-    @Test
+ /*   @Test
     public void evaluationAllMinSimple(){
         trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.en";
         trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.de";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
-
+*/
     @Test
     public void evaluationAllMinPerformanceLevenshtein(){
         Matcher matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
@@ -105,6 +105,14 @@ public class GerToEngOnkoWikiEvaluation {
     }
 
     @Test
+    public void evaluationAllMinSynonymWordPerformanceJW(){
+        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new JaroWinkler(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordPerformanceJW",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
     public void evaluationAllMinSynonymPerformanceJW(){
         Matcher matcher = new Matcher(new PerformanceStrategy(),new JaroWinkler(),new ScoreSort());
         evaluator.setMatcher(matcher);
@@ -132,7 +140,7 @@ public class GerToEngOnkoWikiEvaluation {
      * Other Evaluations Begin
      */
 
-
+/*
 
     @Test
     public void evaluationSpringerTranslate(){
@@ -172,5 +180,5 @@ public class GerToEngOnkoWikiEvaluation {
         trainingPath1 = "/src/main/resources/translation/News/News-Commentary11.de-en.deCleaned";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("News",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
-    }
+    }*/
 }

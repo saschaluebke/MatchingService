@@ -18,6 +18,7 @@ public class Matcher {
     private IterateStrategy iterateStrategy;
     private MatchResultSet currentMatchingWordList;
     private double accuracy;
+    private int maxMatches;
 
     public Matcher(IterateStrategy iterateStrategy, DistanceStrategy distanceStrategy,SortStrategy sortStrategy){
         this.iterateStrategy = iterateStrategy;
@@ -26,6 +27,8 @@ public class Matcher {
         TranslatorGetProperties tgp = new TranslatorGetProperties();
         try {
             accuracy = Double.parseDouble(tgp.getPropValues("Translate.accuracy"));
+            maxMatches = Integer.parseInt(tgp.getPropValues("Matcher.maxMatches"));
+           // mrs.getMatchResults().size()<maxMatches && //TODO: Nicht die matches limitieren sondern die übersetzung
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,16 +41,17 @@ public class Matcher {
 
         ArrayList<MatchResult> matchResults = iterateStrategy.getMatchList(distanceStrategy);
         ArrayList<MatchResult> sortedResults=null;
-        if(matchResults.size()==1 && matchResults.get(0).getScore()<accuracy){
+      /*  if(matchResults.size()==1 && matchResults.get(0).getScore()<accuracy){
 
                 sortedResults = matchResults;
                 mrs.addMatchResults(sortedResults, wordFromDB);
                 return mrs;
 
-        }else if(matchResults.size() > 1){
+        }else*/ if(matchResults.size() >= 1){
             sortedResults = sortStrategy.sort(matchResults);
             if(sortedResults.get(0).getScore() < accuracy){
                 mrs.addMatchResults(sortedResults,wordFromDB);
+                //System.out.println(mrs.getMatchResults().get(0).size());
             }
 
             return mrs;
@@ -64,7 +68,7 @@ public class Matcher {
         //int count=0;
         for(Word w: words){
             MatchResultSet result = getMatchResult(searchString,w);
-            if (mrs.getMatchResults().size()<1 && result != null && result.getMatchResults().size()>0 ){
+            if (result != null && result.getMatchResults().size()>0 ){
                 ArrayList<MatchResult> mr = result.getMatchResults().get(0);
                 if (mr != null && mr.size()>0){
                     mrs.addMatchResults(mr, w);

@@ -17,7 +17,7 @@ public class SynonymTranslationResult implements TranslationResult{
     private ArrayList<ArrayList<String>> matchings;
     private ArrayList<ArrayList<String>> translatedMatchings;
     private ArrayList<String> words;
-    private int synonymCount;
+    private int synonymCount, realSynCount;
     private int matchingCount;
 
     public SynonymTranslationResult(Word input){
@@ -91,5 +91,13 @@ public class SynonymTranslationResult implements TranslationResult{
 
     public void setMatchingCount(int matchingCount) {
         this.matchingCount = matchingCount;
+    }
+
+    public int getRealSynCount() {
+        return realSynCount;
+    }
+
+    public void setRealSynCount(int realSynCount) {
+        this.realSynCount = realSynCount;
     }
 }

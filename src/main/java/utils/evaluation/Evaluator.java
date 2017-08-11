@@ -302,6 +302,7 @@ public class Evaluator {
         ew.addBoldLabel(6,2,"AllgemeinScore");
         ew.addBoldLabel(7,2,"Matches");
         ew.addBoldLabel(8,2,"Synonyme");
+        ew.addBoldLabel(9,2,"Syn_Übersetzt");
 
         ew.addNumber(1,0,input.size());
         WritableSheet ws = ew.getSheet(1);
@@ -342,10 +343,12 @@ public class Evaluator {
             ew.addLabel(1,i+3,outputWord);
 
             int synonymCount=str.getSynonymCount();
+            int realSynCount = str.getRealSynCount();
             int matchCount=str.getMatchingCount();
 
             ew.addNumber(7,i+3,matchCount);
             ew.addNumber(8,i+3,synonymCount);
+            ew.addNumber(9,i+3,realSynCount);
 
             if(synonymCount>0){
                 allSynonymCount++;
@@ -355,7 +358,7 @@ public class Evaluator {
             }
 
             int pos2 = 1;
-            int pos=9;
+            int pos=10;
 
             WritableSheet wsMatch;
             matchingSheetIndex = ew.addSheet();
@@ -479,6 +482,16 @@ public class Evaluator {
         } catch (WriteException e) {
             e.printStackTrace();
         }
+
+        buf = new StringBuffer();
+        buf.append("SUM(J3:J"+length+")");
+        f = new Formula(9, 0, buf.toString());
+        try {
+            ew.getSheet().addCell(f);
+        } catch (WriteException e) {
+            e.printStackTrace();
+        }
+
 
 
         try {
