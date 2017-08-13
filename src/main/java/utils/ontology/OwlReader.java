@@ -101,6 +101,9 @@ public class OwlReader implements FileReader {
                     //Get Word
                     if(( nextPart = line.indexOf("///")) != -1){
                         name = line.substring(0,nextPart);
+                       // if(name.length()<4){
+                       //     continue; //too short for matching algorithms
+                        //}
                         if(nextPart+3<line.length()){
                             line = line.substring(nextPart+3,line.length());
                         }else{
@@ -124,8 +127,17 @@ public class OwlReader implements FileReader {
                     //Get Synonyms
                     while(( nextPart = line.indexOf("///")) != -1){
                         String synonymString = line.substring(0,nextPart);
-                        Word synonym = new Word(0,synonymString,firstLanguage);
-                        synonyms.add(synonym);
+
+                        //Some Synonyms are the same word just in uppercase letters, but all words in DB are lowercase
+                        synonymString = synonymString.toLowerCase();
+                        if(!synonyms.contains(synonymString)) {
+                            Word synonym = new Word(0, synonymString, firstLanguage);
+                            //  if(synonym.getName().length() > 3){
+                            //     synonyms.add(synonym);
+                            //}
+
+                            synonyms.add(synonym);
+                        }
                         if(nextPart+3<line.length()){
                             line = line.substring(nextPart+3,line.length());
                         }else{

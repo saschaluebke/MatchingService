@@ -11,12 +11,12 @@ import java.util.ArrayList;
  */
 public class SynonymTranslationResult implements TranslationResult{
     private Word input;
-    private String directTranslation;
     private ArrayList<ArrayList<ArrayList<String>>> matchingSynonyms;
     private ArrayList<ArrayList<ArrayList<String>>> matchingSynonymtranslations;
     private ArrayList<ArrayList<String>> matchings;
     private ArrayList<ArrayList<String>> translatedMatchings;
     private ArrayList<String> words;
+    private String directTranslation;
     private int synonymCount, realSynCount;
     private int matchingCount;
 
@@ -24,17 +24,14 @@ public class SynonymTranslationResult implements TranslationResult{
         this.input = input;
     }
 
-    public String getDirectTranslation() {
-        return directTranslation;
-    }
-
-    public void setDirectTranslation(String directTranslations) {
-        this.directTranslation = directTranslations;
-    }
 
     @Override
     public Word getInput() {
         return input;
+    }
+
+    public void setInput(Word input){
+        this.input = input;
     }
 
     public ArrayList<ArrayList<ArrayList<String>>> getMatchingSynonyms() {
@@ -99,5 +96,13 @@ public class SynonymTranslationResult implements TranslationResult{
 
     public void setRealSynCount(int realSynCount) {
         this.realSynCount = realSynCount;
+    }
+
+    public String getDirectTranslation() {
+        return directTranslation;
+    }
+
+    public void setDirectTranslation(String directTranslation) {
+        this.directTranslation = directTranslation;
     }
 }

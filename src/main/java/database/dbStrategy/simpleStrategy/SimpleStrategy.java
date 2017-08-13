@@ -7,6 +7,8 @@ import database.dbStrategy.DBStrategy;
 import matching.Matcher;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.PerformanceStrategy;
+import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import translators.Translator;
 import utils.ontology.FileReader;
@@ -400,12 +402,61 @@ public class SimpleStrategy implements DBStrategy {
     public ArrayList<String> translate(TranslationResult translationResult,Translator translator, ArrayList<Word> allWords, ArrayList<Relation> allRelation) {
         ArrayList<String> translations = new ArrayList<>();
         String inputString = translationResult.getInput().getName();
-        inputString = inputString.toLowerCase();
-        inputString = inputString.trim();
-        String translation = translator.translation(inputString);
-        translation = translation.toLowerCase();
-        translation = translation.trim();
-        translations.add(translation);
+
+        //Moses can not handle special signs which put two words together
+
+        ArrayList<String> specialSigns = new ArrayList<>();
+        specialSigns.add("/");
+        specialSigns.add("-");
+        specialSigns.add("\\(");
+        specialSigns.add("\\)");
+
+        for(String specialSign : specialSigns){
+            String[] specialSplitted = inputString.split("("+specialSign+")");
+            if(specialSplitted.length > 1){
+                inputString = "";
+                for(int i = 0; i<specialSplitted.length;i++){
+                    String string = specialSplitted[i];
+                    if(i<specialSplitted.length-1){
+                        inputString = inputString + string + " " + specialSign + " ";
+                    }else{
+                        inputString = inputString + string;
+                    }
+                }
+            }
+        }
+        inputString = inputString.replace('\\',' ');
+        String directTranslation  = translator.translation(inputString);
+
+
+        //Split inputWord into several Words if the WordStrategy is chosen.
+        //matcher = getMatcher();
+        //System.out.println(this.matcher.getIterateStrategy().getClass().getName());
+
+        ArrayList<String> inputStringList = new ArrayList<>();
+
+        if(matcher.getIterateStrategy() != null &&
+                (matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())||
+                        matcher.getIterateStrategy().getClass().equals(new WordPerformanceStrategy().getClass()))){
+            //matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+            //  System.out.println("Use WordStrategy Split all input");
+            String[] splitted = inputString.split("( )|(/)|(-)");
+            for(String s: splitted){
+                if(s.length()>3){
+                    inputStringList.add(s);
+                }
+            }
+        }else{
+            inputStringList.add(inputString);
+        }
+
+
+        String output = "";
+        for(String input : inputStringList){
+            output = output + translator.translation(input) + " ";
+        }
+
+        translations.add(output);
         return translations;
     }
 

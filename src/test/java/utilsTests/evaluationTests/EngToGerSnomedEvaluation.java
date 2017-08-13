@@ -42,6 +42,7 @@ public class EngToGerSnomedEvaluation {
     /**
      * AllMin Evaluations
      */
+/*
     @Test
     public void evaluationAllMinSimple(){
         trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
@@ -49,12 +50,12 @@ public class EngToGerSnomedEvaluation {
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
-
+*/
     @Test
-    public void evaluationSpringerPerformanceLevenshtein(){
-        Matcher matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+    public void evaluationSpringerPerformanceLevenshtein() {
+        Matcher matcher = new Matcher(new PerformanceStrategy(), new LevenshteinNormalized(), new ScoreSort());
         evaluator.setMatcher(matcher);
-        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("SpringerPerformanceLevenshtein",files,trainingPath1,trainingPath2);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin_PerformanceLevenshtein", files, trainingPath1, trainingPath2);
         assertEquals(true, true);
     }
 
@@ -105,6 +106,7 @@ public class EngToGerSnomedEvaluation {
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordSubstring",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
+
     @Test
     public void evaluationAllMinSynonymWordEqual(){
         Matcher matcher = new Matcher(new WordStrategy(),new EqualDistance(),new ScoreSort());
@@ -117,7 +119,7 @@ public class EngToGerSnomedEvaluation {
      * AllMinEvaluations End
      * Other Evaluations Begin
      */
-
+/*
     @Test
     public void evaluationSpringerTranslate(){
         trainingPath1 = "/src/main/resources/translation/Springer/Springer.enCleaned";
@@ -157,5 +159,5 @@ public class EngToGerSnomedEvaluation {
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("News",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
-
+*/
 }

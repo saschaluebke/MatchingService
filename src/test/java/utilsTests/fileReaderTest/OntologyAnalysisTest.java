@@ -8,9 +8,6 @@ import utils.ontology.OntologyAnalysis;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by sashbot on 07.08.17.
- */
 public class OntologyAnalysisTest {
     static DBHelper dbh;
 
@@ -47,5 +44,27 @@ public class OntologyAnalysisTest {
         assertEquals(328,histogram[0]);
 
     }
+
+    @Test
+    public void onlyNCI(){
+        OntologyAnalysis ov = new OntologyAnalysis("NCI",dbh.getAllWords("en"),dbh.getAllRelations("en","en"));
+        int[] histogram = ov.scanOntologyForSynonyms();
+        ov.printHistogramm(histogram);
+        assertEquals(92,histogram.length);
+
+    }
+
+    @Test
+    public void onlySpecialist(){
+        OntologyAnalysis ov = new OntologyAnalysis("Specialist",dbh.getAllWords("en"),dbh.getAllRelations("en","en"));
+        int[] histogram = ov.scanOntologyForSynonyms();
+        ov.printHistogramm(histogram);
+        assertEquals(19,histogram.length);
+        assertEquals(19,histogram[15]);
+        assertEquals(328,histogram[0]);
+
+    }
+
+
 
 }

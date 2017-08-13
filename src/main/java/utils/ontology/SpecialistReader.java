@@ -11,9 +11,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * Created by sascha on 02.07.17.
- */
+//TODO: Testen!
 public class SpecialistReader implements FileReader {
     private ArrayList<Word> wordlist;
     private ArrayList<ArrayList<Word>> allSynonyms;
@@ -68,6 +66,9 @@ public class SpecialistReader implements FileReader {
                         end = line.indexOf("entry");
                     }
                     name = line.substring(firstline.length(),end);
+                    if(name.length() < 4){
+                        continue;
+                    }
                 }
                 ArrayList<String> acronyms = new ArrayList<>();
 
@@ -92,6 +93,9 @@ public class SpecialistReader implements FileReader {
                     }
 
                     //System.out.println(line.indexOf("acronym_of")+11+"/"+line.indexOf("|"));
+                    if(acronym.length() < 4){
+                        break;
+                    }
                     acronyms.add(acronym);
                     end = line.indexOf("\t");
                     if (realend==-1){
@@ -114,10 +118,13 @@ public class SpecialistReader implements FileReader {
                             continue;
                         }
                     }
-//TODO gleich reinschreiben!! geht nicht... Aber nach so tausend steps in sql dürfte gehen!
+
                     String abbreviation = line.substring(line.indexOf("abbreviation_of=")+16,end);
                     if (abbreviation.indexOf("|")>0){
                         abbreviation = abbreviation.substring(0,abbreviation.indexOf("|"));
+                    }
+                    if(abbreviation.length()<4){
+                        break;
                     }
                     acronyms.add(abbreviation);
                     //System.out.println(line.indexOf("acronym_of")+11+"/"+line.indexOf("|"));
@@ -135,14 +142,18 @@ public class SpecialistReader implements FileReader {
 
                 lastWordId++;
                 Word w = new Word(lastWordId,name,language);
-                wordlist.add(w);
+
                 ArrayList<Word> synonyms = new ArrayList<>();
                 for(String s : acronyms){
                     lastWordId++;
                     Word acronym = new Word(lastWordId,s,language);
                     synonyms.add(acronym);
                 }
-
+                if(synonyms.size()<1){
+                    continue;
+                   // System.out.println("Hallo");
+                }
+                wordlist.add(w);
                 allSynonyms.add(synonyms);
             }
 

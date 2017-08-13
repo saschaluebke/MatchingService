@@ -32,13 +32,13 @@ public class allOntologiesIntoDBTest {
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
         openThesaurusReader = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
-        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","de");
-        specialistReader = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
+        //owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
+        //specialistReader = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
         wordNetReader = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict","en");
         frList = new ArrayList<>();
         frList.add(openThesaurusReader);
-        frList.add(owlReader);
-       // frList.add(specialistReader);
+        //frList.add(owlReader);
+        //frList.add(specialistReader);
         frList.add(wordNetReader);
     }
 
@@ -58,7 +58,6 @@ public class allOntologiesIntoDBTest {
         double varianz=0,average=0;
         dbh.newLanguage("en");
         dbh.newLanguage("de");
-        ArrayList<Word> wordList = dbh.getAllWords("de");
         for(FileReader fr : frList){
             int tmp = 0;
             int linesCount = fr.getAllLinesCount();
@@ -82,7 +81,7 @@ public class allOntologiesIntoDBTest {
 
 
     @Test
-    public void justWordNet(){
+    public void onlyWordNet(){
         frList = new ArrayList<>();
         frList.add(wordNetReader);
         int wordCount=0,synCount=0,wordWithoutSyn=0;
@@ -106,6 +105,55 @@ public class allOntologiesIntoDBTest {
     }
 
     @Test
+    public void onlyNCI(){
+        frList = new ArrayList<>();
+        frList.add(owlReader);
+        int wordCount=0,synCount=0,wordWithoutSyn=0;
+        double varianz=0,average=0;
+        dbh.newLanguage("en");
+        dbh.newLanguage("de");
+        for(FileReader fr : frList){
+            int tmp = 0;
+            int linesCount = fr.getAllLinesCount();
+            for(int i=2000 ; i<linesCount; i=i+2000){
+                fr.setFromEntry(tmp);
+                fr.setToEntry(i);
+                dbh.storeFromFile(fr);
+                tmp = i;
+            }
+            System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
+        }
+        System.out.println("Wörter: "+wordCount+" Synonyme: "+synCount+" WörterOhneSyn: "+wordWithoutSyn);
+        System.out.println("Mittel: "+average+" Varianz: "+varianz);
+        assertEquals(87296,dbh.getAllWords("en").size());
+    }
+
+    @Test
+    public void onlySpecialist(){
+        frList = new ArrayList<>();
+        frList.add(specialistReader);
+        int wordCount=0,synCount=0,wordWithoutSyn=0;
+        double varianz=0,average=0;
+        dbh.newLanguage("en");
+        dbh.newLanguage("de");
+        for(FileReader fr : frList){
+            int tmp = 0;
+            int linesCount = fr.getAllLinesCount();
+            for(int i=2000 ; i<linesCount-10000; i=i+2000){
+                fr.setFromEntry(tmp);
+                fr.setToEntry(i);
+                dbh.storeFromFile(fr);
+                tmp = i;
+                System.out.println(i+" from "+linesCount);
+            }
+            System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
+        }
+        System.out.println("Wörter: "+wordCount+" Synonyme: "+synCount+" WörterOhneSyn: "+wordWithoutSyn);
+        System.out.println("Mittel: "+average+" Varianz: "+varianz);
+        assertEquals(498084,dbh.getAllWords("en").size());
+    }
+
+    @Test
     public void getAllOntologiesInDatabase(){
         dbh.newLanguage("en");
         dbh.newLanguage("de");
@@ -124,6 +172,6 @@ public class allOntologiesIntoDBTest {
             }
             System.out.println("Finish "+fr.getClass().getSimpleName()+" with "+linesCount+" lines.");
         }
-        assertEquals(217674,dbh.getAllWords("en").size());
+        assertEquals(388772,dbh.getAllWords("en").size());
     }
 }

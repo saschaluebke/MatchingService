@@ -320,6 +320,7 @@ public class Evaluator {
             //}
             String outputWord = str.getDirectTranslation();
 
+
                 ew.addLabel(0,i+3,inputWord);
                 ew.addLabel(0,i+3,inputWord,ws);
             if(inputWord.length()<4){
@@ -348,7 +349,7 @@ public class Evaluator {
 
             ew.addNumber(7,i+3,matchCount);
             ew.addNumber(8,i+3,synonymCount);
-            ew.addNumber(9,i+3,realSynCount);
+           int trulyRealSynCount=0;
 
             if(synonymCount>0){
                 allSynonymCount++;
@@ -365,6 +366,9 @@ public class Evaluator {
             wsMatch = ew.getSheet(matchingSheetIndex);
             int matchPosition=0;
             for(int wordIndex = 0; wordIndex<str.getWords().size();wordIndex++){
+               // if(str.getWords().get(wordIndex).equals("finding")){
+                //    System.out.println("HAb dich");
+                //}
                 ew.addBoldLabel(pos,i+3,"Word: "+str.getWords().get(wordIndex));
                 ew.addBoldLabel(pos2,i+3,String.valueOf(str.getMatchings().get(wordIndex).size()),ws);
                 pos2++;
@@ -380,33 +384,46 @@ public class Evaluator {
                 pos++;
 
                 ew.addBoldLabel(matchPosition,0,str.getWords().get(wordIndex),wsMatch);
-
+                matchPosition++;
+                int matchPositionTmp = matchPosition;
                 for(int matchingIndex = 0; matchingIndex<str.getMatchings().get(wordIndex).size();matchingIndex++){
                   //  ew.addBoldLabel(pos,i+3,str.getMatchings().get(wordIndex).get(matchingIndex));
+                    String tmp = str.getMatchings().get(wordIndex).get(matchingIndex);
                    ew.addBoldLabel(matchPosition,1,str.getMatchings().get(wordIndex).get(matchingIndex),wsMatch);
-                    matchPosition++;
-                    //pos++;
+                  // matchPosition++;
                     int synonymPos = 2;
+                    ArrayList<String> printSynListe = new ArrayList<>();
                         for(int synonymIndex = 0; synonymIndex<str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size();synonymIndex++){
-                            ew.addLabel(matchingIndex,synonymPos,String.valueOf(str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex)),wsMatch);
+                            tmp = str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex);
+                            ew.addLabel(matchPosition,synonymPos,String.valueOf(str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex)),wsMatch);
                             synonymPos++;
-                            ew.addLabel(matchingIndex,synonymPos,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex),wsMatch);
+                            ew.addLabel(matchPosition,synonymPos,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex),wsMatch);
                             synonymPos++;
-                            ew.addLabel(matchingIndex,synonymPos," ",wsMatch);
+                            ew.addLabel(matchPosition,synonymPos," ",wsMatch);
                             synonymPos++;
 
                             String synonym = str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex);
                             String synonymTranslation = str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex);
                             if(!synonym.equals(synonymTranslation)){
-                                ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
-                                pos++;
+                                if(!printSynListe.contains(synonymTranslation)){
+                                    printSynListe.add(str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
+                                    ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
+                                    pos++;
+                                    trulyRealSynCount++;
+                                }
+                                 //ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
+                                //pos++;
                             }
 
                     }
+                    matchPosition++;
                 }
-                matchPosition++;
-            }
+               // if(matchPositionTmp == matchPosition){
+               // matchPosition++;
+                //}
 
+            }
+            ew.addNumber(9,i+3,trulyRealSynCount);
 
            // if(inputWord.contains("other age-related cataract")){
            //     System.out.println(input.get(i));

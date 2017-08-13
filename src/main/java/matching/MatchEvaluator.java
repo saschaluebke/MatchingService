@@ -34,4 +34,16 @@ public class MatchEvaluator {
         }
     }
 
+    public void scaleUp(int multiplier){
+        ArrayList<String> newInput = new ArrayList<>();
+        for(int i=1; i<multiplier;i++){
+            for(String s : input){
+                newInput.add(s+s);
+            }
+        }
+
+        input = newInput;
+
+    }
+
 }

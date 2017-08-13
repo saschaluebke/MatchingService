@@ -24,14 +24,14 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
 
     @Override
     public void storeFromFile(FileReader fr){
-        storeDublicatesStrategy(fr);
+        storeHomonymsButNoShortcuts(fr);
 
         //Takes to long!
         //storeFromFileJoinDublicatesStrategy(fr);
 
     }
 
-    private void storeDublicatesStrategy(FileReader fr){
+    private void storeHomonymsButNoShortcuts(FileReader fr){
 
         ArrayList<Word> wordsForDB = new ArrayList<>(); //insert new Words here
         ArrayList<Relation> relationForDB = new ArrayList<>();
@@ -45,25 +45,25 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
             ArrayList<Word> wordsFromFile = fr.getWordList();
             ArrayList<ArrayList<Word>> synonymsFromFile = fr.getSynonyms();
 
-            for(int wordIndex =0; wordIndex<wordsFromFile.size();wordIndex++){
+            for(int wordIndex =0; wordIndex<wordsFromFile.size();wordIndex++) {
 
                 Word w1 = wordsFromFile.get(wordIndex);
                 String s1 = w1.getName();
                 boolean findSameWord = false;
                 Word wordFromDB = null;
                 ArrayList<Word> relationsFromFile = synonymsFromFile.get(wordIndex);
+                if (relationsFromFile.size() > 0){
+                    for (int wordFromDBIndex = 0; wordFromDBIndex < allWords.size(); wordFromDBIndex++) {
+                        String stringFromDB = allWords.get(wordFromDBIndex).getName();
 
-                for(int wordFromDBIndex = 0;wordFromDBIndex<allWords.size();wordFromDBIndex++){
-                    String stringFromDB = allWords.get(wordFromDBIndex).getName();
-
-                    if(s1.equals(stringFromDB)) {
-                        findSameWord = true;
-                        wordFromDB = allWords.get(wordFromDBIndex);
+                        if (s1.equals(stringFromDB)) {
+                            findSameWord = true;
+                            wordFromDB = allWords.get(wordFromDBIndex);
+                        }
                     }
-                }
-              if(findSameWord){
+                if (findSameWord) {
 
-                }else{
+                } else {
                     /**
                      * If new Word is NOT in DB:
                      */
@@ -71,33 +71,64 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
                     w1.setId(lastId);
                     wordsForDB.add(w1);
                     allWords.add(w1);
+
                     //Relationen
-                    Word wordFromRelationFile=null;
+                    Word wordFromRelationFile = null;
+                    if (w1.getName().length() < 4) {
+                        //It might be a shortcut!
+                        for (int fromRelationFileIndex = 0; fromRelationFileIndex < relationsFromFile.size(); fromRelationFileIndex++) {
+                            wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
+                            if (wordFromRelationFile.getName().equals(s1)) {
 
+                            } else {
 
-                    for(int fromRelationFileIndex = 0; fromRelationFileIndex<relationsFromFile.size();fromRelationFileIndex++){
-                        wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
-                        if(wordFromRelationFile.getName().equals(s1)){
+                                lastId++;
+                                wordFromRelationFile.setId(lastId);
+                                wordsForDB.add(wordFromRelationFile);
+                                allWords.add(wordFromRelationFile);
 
-                        }else{
-                            lastId++;
-                            wordFromRelationFile.setId(lastId);
-                            wordsForDB.add(wordFromRelationFile);
-                            allWords.add(wordFromRelationFile);
-                            ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(w1, wordFromRelationFile, allRelations);
-                            relationForDB.addAll(newRelations);
-                            allRelations.addAll(newRelations);
+                                //TODO: just relation to one site!
+                                ArrayList<Relation> newRelations = new ArrayList<>();
 
+                                newRelations.add(new Relation(0, w1.getId(), wordFromRelationFile.getId()));
+
+                                relationForDB.addAll(newRelations);
+                                allRelations.addAll(newRelations);
+
+                            }
                         }
+                    } else {
+
+                        for (int fromRelationFileIndex = 0; fromRelationFileIndex < relationsFromFile.size(); fromRelationFileIndex++) {
+                            wordFromRelationFile = relationsFromFile.get(fromRelationFileIndex);
+                            if (wordFromRelationFile.getName().equals(s1)) {
+
+                            } else {
+
+                                lastId++;
+                                wordFromRelationFile.setId(lastId);
+                                wordsForDB.add(wordFromRelationFile);
+                                allWords.add(wordFromRelationFile);
+                                ArrayList<Relation> newRelations = createRelationsFromNewSynonyms(w1, wordFromRelationFile, allRelations);
+                                relationForDB.addAll(newRelations);
+                                allRelations.addAll(newRelations);
+
+                            }
                         }
                     }
+                }
+
+            }
+
                 }
             }
 
 
+        if(wordsForDB.size() > 0){
+            putWordList(wordsForDB,language);
+            putRelationList(relationForDB,language,language);
+        }
 
-        putWordList(wordsForDB,language);
-        putRelationList(relationForDB,language,language);
     }
 
 
@@ -428,7 +459,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
            } catch (IOException e) {
             e.printStackTrace();
         }
-
+        ArrayList<String> directTranslations = new ArrayList<>();
         ArrayList<String> allTranslations = new ArrayList<>();
         SynonymTranslationResult str = (SynonymTranslationResult) translationResult;
         String language = translator.getFromLanguage();
@@ -437,8 +468,38 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
         ArrayList<ArrayList<String>> translatedMatchingsOfWords = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<String>>> synonymsOfMatchesOfWords = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<String>>> translatedSynonymsOfMatchesOfWords = new ArrayList<>();
+        int synCount=0, matchCount=0, realMatchCount=0, realSynCount=0;
+
         Word input = translationResult.getInput();
-        int synCount=0, matchCount=0, realSynCount=0;
+
+        //Moses can not handle special signs which put two words together
+
+        ArrayList<String> specialSigns = new ArrayList<>();
+        specialSigns.add("/");
+        specialSigns.add("-");
+        specialSigns.add("\\(");
+        specialSigns.add("\\)");
+
+        String inputString = input.getName();
+        for(String specialSign : specialSigns){
+            String[] specialSplitted = inputString.split("("+specialSign+")");
+            if(specialSplitted.length > 1){
+                inputString = "";
+                for(int i = 0; i<specialSplitted.length;i++){
+                    String string = specialSplitted[i];
+                    if(i<specialSplitted.length-1){
+                        inputString = inputString + string + " " + specialSign + " ";
+                    }else{
+                        inputString = inputString + string;
+                    }
+                }
+            }
+        }
+        inputString = inputString.replace('\\',' ');
+        input.setWord(inputString);
+        System.out.println("Direct:" + inputString);
+        String directTranslation  = translator.translation(inputString);
+
 
         //Split inputWord into several Words if the WordStrategy is chosen.
         //matcher = getMatcher();
@@ -450,7 +511,7 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
           //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = input.getName().split("( )|(/)|(-)");
             for(String s: splitted){
-                if(s.length()>4){
+                if(s.length()>3){
                     words.add(s);
                 }
             }
@@ -458,11 +519,11 @@ public class SynonymStrategy extends SimpleStrategy implements DBStrategy{
             words.add(input.getName());
         }
 
-        String directTranslation = translator.translation(input.getName());
-
 ArrayList<String> uniqueSynonymMatchings = new ArrayList<>();
 ArrayList<String> uniqueMatchings = new ArrayList<>();
+
         for(int i=0;i<words.size();i++) {
+            realMatchCount = 0;
             String currentInputString = words.get(i);
             Word currentWord;
             if (words.size() == 1) {
@@ -490,47 +551,68 @@ ArrayList<String> uniqueMatchings = new ArrayList<>();
                 if (matchResults != null && matchResults.size() > 0) {
                     ArrayList<String> synonymMatchings = new ArrayList<>();
                     ArrayList<String> translatedSynonymMatchings = new ArrayList<>();
-                    for(MatchResult mr : matchResults){
+                    for (MatchResult mr : matchResults) {
+                        int synonymCounting = 0;
                         int matchID = mr.getID();
-                        Word w = allWords.get(matchResults.get(0).getID()-1);//SQL Index starts with 1
+                        Word w = allWords.get(matchResults.get(0).getID() - 1);//SQL Index starts with 1
                         if (mr.getScore() < accuracy && !(uniqueMatchings.contains(w.getName()))) {
                             matchCount++;
                             uniqueMatchings.add(w.getName());
-                           // String trans = translator.translation(w.getName());
+                            // String trans = translator.translation(w.getName());
                             matchings.add(w.getName());
-                         //   translatedMatchings.add(trans);
-                           if(matchCount <= maxMatches){
-                            for (Relation r : allRelation) {
-                                if (matchID == r.getIdFrom()) {
-                                    int synID = r.getIdTo();
-                                    Word word = allWords.get(synID-1);
-
-                                         if(!uniqueSynonymMatchings.equals(word.getName())){
-                                             synCount++;
-                                             String translat = translator.translation(word.getName());
-                                             if(!translat.equals(word.getName())){
-                                                realSynCount++;
-                                             }
-                                             synonymMatchings.add(word.getName());
-                                             uniqueSynonymMatchings.add(word.getName());
-                                             translatedSynonymMatchings.add(translat);
-
-                                             allTranslations.add(translat);
-                                         }
-
-                                        }
+                            //   translatedMatchings.add(trans);
+                            boolean matchFlag = false;
+                            boolean moreSyns = true;
+                            if (realMatchCount >= maxMatches) {
+                                moreSyns = false;
                             }
-                           }else{
-                               synonymMatchings.add("-");
-                               translatedSynonymMatchings.add("-");
-                           }
+                                for (Relation r : allRelation) {
+                                    if (matchID == r.getIdFrom()) {
+                                        synonymCounting++;
+                                        int synID = r.getIdTo();
+                                        Word word = allWords.get(synID - 1);
+                                        String wordString = word.getName();
+                                        if (!uniqueSynonymMatchings.equals(word.getName())) {
+                                            synCount++;
+
+                                            //System.out.println("Syn: " + word.getName());
+                                            String translat;
+                                            if (moreSyns) {
+                                                translat = translator.translation(word.getName());
+                                            } else {
+
+                                                wordString = ("["+word.getName()+"]");
+                                                translat = "["+word.getName()+"]";
+                                            }
+
+                                            if (!translat.equals(wordString)) {
+                                                realSynCount++;
+                                            }
+                                            if (!matchFlag) {
+                                                realMatchCount++;
+                                                matchFlag = true;
+                                            }
+                                            synonymMatchings.add(wordString);
+                                            uniqueSynonymMatchings.add(wordString);
+                                            translatedSynonymMatchings.add(translat);
+
+                                            allTranslations.add(translat);
+                                        }
+
+
+                                    }
+                                }
+                         //  } else {
+                           //    synonymMatchings.add("-");
+                            //    translatedSynonymMatchings.add("-");
+                          // }
                             synonymMatchesOfWords.add(synonymMatchings);
                             translatedSynonymMatchesOfWords.add(translatedSynonymMatchings);
 
                         }
                     }
 
-                    }
+                }
 
             }
             synonymsOfMatchesOfWords.add(synonymMatchesOfWords);

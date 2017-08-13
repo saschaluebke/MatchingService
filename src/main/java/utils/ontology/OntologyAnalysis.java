@@ -72,7 +72,14 @@ public class OntologyAnalysis {
 
     public int[] scanOntologyForSynonyms() {
         int[] histogram = new int[1];
+        int count=0;
         for (Word w : allWords) {
+            count++;
+            if(count%2500 == 1){
+                System.out.println(count +" of "+allWords.size());
+            }
+
+
             int synCount = getSynCount(w);
             if (synCount >= histogram.length) {
                 int[] tmp = histogram;

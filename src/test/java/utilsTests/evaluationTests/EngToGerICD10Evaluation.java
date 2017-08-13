@@ -3,6 +3,8 @@ package utilsTests.evaluationTests;
 import matching.Matcher;
 import matching.distance.Levenshtein;
 import matching.distance.LevenshteinNormalized;
+import matching.iterate.SimpleStrategy;
+import matching.iterate.WordPerformanceStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
@@ -50,9 +52,17 @@ public class EngToGerICD10Evaluation {
 
     @Test
     public void evaluationAllMinSimple(){
-        trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.en";
-        trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.de";
-        ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
+        Matcher matcher = new Matcher(new SimpleStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin",files,trainingPath1,trainingPath2);
+        assertEquals(true, true);
+    }
+
+    @Test
+    public void evaluationAllMinWordPerformance(){
+        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin_WordPerformance",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
 

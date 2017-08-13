@@ -6,7 +6,9 @@ import components.Word;
 import database.DBHelper;
 import database.TranslatorGetProperties;
 import matching.distance.DistanceStrategy;
+import matching.distance.EqualDistance;
 import matching.iterate.IterateStrategy;
+import matching.iterate.SimpleStrategy;
 import matching.sorting.SortStrategy;
 
 import java.io.IOException;
@@ -35,12 +37,18 @@ public class Matcher {
     }
 
     public MatchResultSet getMatchResult(String searchString, Word wordFromDB){
-        MatchResultSet mrs = new MatchResultSet(iterateStrategy,distanceStrategy,sortStrategy);
-        iterateStrategy.setWordFromDB(wordFromDB);
-        iterateStrategy.setSearchString(searchString);
+        MatchResultSet mrs;
+        if(searchString.length() < 4){
+            mrs = new MatchResultSet(new SimpleStrategy(),new EqualDistance(),sortStrategy);
 
-        ArrayList<MatchResult> matchResults = iterateStrategy.getMatchList(distanceStrategy);
-        ArrayList<MatchResult> sortedResults=null;
+        }else {
+            mrs = new MatchResultSet(iterateStrategy, distanceStrategy, sortStrategy);
+        }
+            iterateStrategy.setWordFromDB(wordFromDB);
+            iterateStrategy.setSearchString(searchString);
+
+            ArrayList<MatchResult> matchResults = iterateStrategy.getMatchList(distanceStrategy);
+            ArrayList<MatchResult> sortedResults=null;
       /*  if(matchResults.size()==1 && matchResults.get(0).getScore()<accuracy){
 
                 sortedResults = matchResults;
@@ -48,18 +56,22 @@ public class Matcher {
                 return mrs;
 
         }else*/ if(matchResults.size() >= 1){
-            sortedResults = sortStrategy.sort(matchResults);
-            if(sortedResults.get(0).getScore() < accuracy){
-                mrs.addMatchResults(sortedResults,wordFromDB);
-                //System.out.println(mrs.getMatchResults().get(0).size());
-            }
+                sortedResults = sortStrategy.sort(matchResults);
+                if(sortedResults.get(0).getScore() < accuracy){
+                    mrs.addMatchResults(sortedResults,wordFromDB);
+                    //System.out.println(mrs.getMatchResults().get(0).size());
+                }
 
-            return mrs;
-        }else{
-            return null;
+
+
+                return mrs;
+            }else{
+                return null;
+            }
         }
 
-    }
+
+
 
 
 
