@@ -48,14 +48,14 @@ public class GerToEngOnkoWikiEvaluation {
     /**
      * AllMin Evaluations
      */
- /*   @Test
+    @Test
     public void evaluationAllMinSimple(){
         trainingPath2 = "/src/main/resources/translation/AllMin/allCleaned.en";
         trainingPath1 = "/src/main/resources/translation/AllMin/allCleaned.de";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("AllMin",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
-*/
+
     @Test
     public void evaluationAllMinPerformanceLevenshtein(){
         Matcher matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());

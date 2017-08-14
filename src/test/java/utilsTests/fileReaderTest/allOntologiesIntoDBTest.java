@@ -32,12 +32,12 @@ public class allOntologiesIntoDBTest {
         dbq.truncate("languages");
         dbh = new DBHelper(new SynonymStrategy());
         openThesaurusReader = new OpenThesaurusReader("/src/main/resources/ontologies/openThesaurus/openthesaurus.txt","de");
-        //owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
+        owlReader = new OwlReader("/src/main/resources/ontologies/NCI/NCI.owl","en");
         //specialistReader = new SpecialistReader("/src/main/resources/ontologies/SpecialistLexicon/LEXICON","en");
         wordNetReader = new WordNetReader("/src/main/resources/ontologies/WordNet/WordNet-3.0/dict","en");
         frList = new ArrayList<>();
         frList.add(openThesaurusReader);
-        //frList.add(owlReader);
+        frList.add(owlReader);
         //frList.add(specialistReader);
         frList.add(wordNetReader);
     }
@@ -125,7 +125,7 @@ public class allOntologiesIntoDBTest {
         }
         System.out.println("Wörter: "+wordCount+" Synonyme: "+synCount+" WörterOhneSyn: "+wordWithoutSyn);
         System.out.println("Mittel: "+average+" Varianz: "+varianz);
-        assertEquals(87296,dbh.getAllWords("en").size());
+        assertEquals(301791,dbh.getAllWords("en").size());
     }
 
     @Test

@@ -75,7 +75,7 @@ public class OntologyAnalysis {
         int count=0;
         for (Word w : allWords) {
             count++;
-            if(count%2500 == 1){
+            if(count%50 == 0){
                 System.out.println(count +" of "+allWords.size());
             }
 
