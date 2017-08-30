@@ -1,16 +1,14 @@
 package utilsTests.evaluationTests;
 
-import matching.JaroWinklerMatcher;
 import matching.Matcher;
-import matching.SimpleMatcher;
 import matching.distance.EqualDistance;
 import matching.distance.JaroWinkler;
 import matching.distance.LevenshteinNormalized;
-import matching.distance.SubstringDistance;
 import matching.iterate.PerformanceStrategy;
 import matching.iterate.SimpleStrategy;
 import matching.iterate.WordPerformanceStrategy;
 import matching.iterate.WordStrategy;
+import matching.sorting.IntervalSort;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -122,7 +120,7 @@ public class GerToEngOnkoWikiEvaluation {
 
     @Test
     public void evaluationAllMinSynonymWordSubstring(){
-        Matcher matcher = new Matcher(new WordStrategy(),new SubstringDistance(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordStrategy(),new SubstringDistance(),new IntervalSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordSubstring",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
@@ -137,10 +135,11 @@ public class GerToEngOnkoWikiEvaluation {
 
     /**
      * AllMinEvaluations End
-     * Other Evaluations Begin
+     *
+     * Other Evaluations Begin (Every Test from now on need a specific Moses Server!
      */
 
-/*
+
 
     @Test
     public void evaluationSpringerTranslate(){
@@ -180,5 +179,5 @@ public class GerToEngOnkoWikiEvaluation {
         trainingPath1 = "/src/main/resources/translation/News/News-Commentary11.de-en.deCleaned";
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("News",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
-    }*/
+    }
 }

@@ -2,8 +2,9 @@ package utilsTests.evaluationTests;
 
 import matching.Matcher;
 import matching.distance.JaroWinkler;
-import matching.distance.LevenshteinNormalized;
 import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordStrategy;
+import matching.sorting.IntervalSort;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,6 +42,15 @@ public class GerToEngTest {
         Matcher matcher = new Matcher(new WordPerformanceStrategy(), new JaroWinkler(), new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Test_WordPerformanceJaroWinkler", files, trainingPath1, trainingPath2);
+        assertEquals(true, true);
+    }
+
+
+    @Test
+    public void evaluationSpringerSubstring() {
+        Matcher matcher = new Matcher(new WordStrategy(), new SubstringDistance(), new IntervalSort());
+        evaluator.setMatcher(matcher);
+        ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Test_WordSubstring", files, trainingPath1, trainingPath2);
         assertEquals(true, true);
     }
 }

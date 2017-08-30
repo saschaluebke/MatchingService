@@ -2,6 +2,7 @@ package matching.sorting;
 
 import com.fasterxml.jackson.databind.deser.DataFormatReaders;
 import components.MatchResult;
+import components.MatchResultSet;
 import utils.Sorter;
 
 import javax.swing.text.MutableAttributeSet;
@@ -13,44 +14,25 @@ import java.util.Collections;
  */
 public class IntervalSort implements SortStrategy{
     Sorter sorter;
-    private double min, max;
 
-    public IntervalSort(double min, double max){
-        sorter = new Sorter("Size");
-        this.setMax(max);
-        this.setMin(min);
+    public IntervalSort(){
+        sorter = new Sorter("SIZE");
     }
 
     @Override
     public ArrayList<MatchResult> sort(ArrayList<MatchResult> results) {
-        ArrayList<MatchResult> sortedResults = new ArrayList<>();
-        for (MatchResult mr : results){
-            if (mr.getScore() > getMin() && mr.getScore() < getMax()){
-                sortedResults.add(mr);
-            }
 
-            sorter.matchResultQuickSort(sortedResults);
+        if(results.size()>1){
+            sorter.matchResultQuickSort(results);
         }
-        return sortedResults;
+
+        return results;
     }
 
     @Override
-    public double getMin() {
-        return min;
+    public MatchResultSet sortList(MatchResultSet mrs) {
+        sorter.matchResultSetQuicksort(mrs);
+        return mrs;
     }
 
-    @Override
-    public void setMin(double min) {
-        this.min = min;
-    }
-
-    @Override
-    public double getMax() {
-        return max;
-    }
-
-    @Override
-    public void setMax(double max) {
-        this.max = max;
-    }
 }

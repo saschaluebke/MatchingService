@@ -51,7 +51,7 @@ public class allOntologiesIntoDBTest {
     }
 
     @Test
-    public void justOpenThesarus(){
+    public void onlyOpenThesarus(){
         frList = new ArrayList<>();
         frList.add(openThesaurusReader);
         int wordCount=0,synCount=0,wordWithoutSyn=0;

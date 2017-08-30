@@ -390,11 +390,16 @@ public class Evaluator {
                   //  ew.addBoldLabel(pos,i+3,str.getMatchings().get(wordIndex).get(matchingIndex));
                     String tmp = str.getMatchings().get(wordIndex).get(matchingIndex);
                    ew.addBoldLabel(matchPosition,1,str.getMatchings().get(wordIndex).get(matchingIndex),wsMatch);
-                  // matchPosition++;
-                    int synonymPos = 2;
-                    ArrayList<String> printSynListe = new ArrayList<>();
+                   ew.addLabel(matchPosition,2,str.getTranslatedMatchings().get(wordIndex).get(matchingIndex),wsMatch);
+
+                   // ArrayList<String> printSynListe = new ArrayList<>();
+                //    printSynListe.add(str.getTranslatedMatchings().get(wordIndex).get(matchingIndex));
+                    ew.addLabel(pos,i+3,str.getTranslatedMatchings().get(wordIndex).get(matchingIndex));
+                    pos++;
+                    int synonymPos = 4;
+
                         for(int synonymIndex = 0; synonymIndex<str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).size();synonymIndex++){
-                            tmp = str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex);
+
                             ew.addLabel(matchPosition,synonymPos,String.valueOf(str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex)),wsMatch);
                             synonymPos++;
                             ew.addLabel(matchPosition,synonymPos,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex),wsMatch);
@@ -405,12 +410,13 @@ public class Evaluator {
                             String synonym = str.getMatchingSynonyms().get(wordIndex).get(matchingIndex).get(synonymIndex);
                             String synonymTranslation = str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex);
                             if(!synonym.equals(synonymTranslation)){
-                                if(!printSynListe.contains(synonymTranslation)){
-                                    printSynListe.add(str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
+                               // if(!printSynListe.contains(synonymTranslation)){
+                                   // printSynListe.add(str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
                                     ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
                                     pos++;
                                     trulyRealSynCount++;
-                                }
+                                    break; //just one synonym
+                              //  }
                                  //ew.addLabel(pos,i+3,str.getMatchingSynonymtranslations().get(wordIndex).get(matchingIndex).get(synonymIndex));
                                 //pos++;
                             }

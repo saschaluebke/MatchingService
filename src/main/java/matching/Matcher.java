@@ -56,13 +56,16 @@ public class Matcher {
                 return mrs;
 
         }else*/ if(matchResults.size() >= 1){
-                sortedResults = sortStrategy.sort(matchResults);
-                if(sortedResults.get(0).getScore() < accuracy){
+              // sortedResults = sortStrategy.sort(matchResults);
+            if(matchResults.get(0).getScore() < accuracy){
+                mrs.addMatchResults(matchResults,wordFromDB);
+            }
+/*                if(sortedResults.get(0).getScore() < accuracy){
                     mrs.addMatchResults(sortedResults,wordFromDB);
                     //System.out.println(mrs.getMatchResults().get(0).size());
                 }
 
-
+*/
 
                 return mrs;
             }else{
@@ -88,6 +91,10 @@ public class Matcher {
 
             }
         }
+        if(mrs.getMatchResults().size()>0){
+            mrs = sortStrategy.sortList(mrs);
+        }
+
         return mrs;
     }
 

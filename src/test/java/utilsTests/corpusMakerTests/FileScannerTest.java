@@ -22,6 +22,19 @@ public class FileScannerTest {
     }
 
     @Test
+    public void scanICD10(){
+        fs = new FileScanner("/src/main/resources/translation/ICD10/ICD10.deCleaned");
+
+        assertEquals(58726,fs.getWordCount());
+        assertEquals(10793,fs.getLines());
+
+        fs = new FileScanner("/src/main/resources/translation/ICD10/ICD10.enCleaned");
+
+        assertEquals(57638,fs.getWordCount());
+        assertEquals(10793,fs.getLines());
+    }
+
+    @Test
     public void scanDict(){
         fs = new FileScanner("/src/main/resources/translation/Dict/dict.de");
 

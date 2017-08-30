@@ -1,26 +1,17 @@
 package matcherTests;
 
-import com.fasterxml.jackson.databind.deser.DataFormatReaders;
-import components.MatchResult;
 import components.MatchResultSet;
-import components.SynonymTranslationResult;
 import components.Word;
 import matching.MatchEvaluator;
 import matching.Matcher;
 import matching.distance.JaroWinkler;
 import matching.distance.LevenshteinNormalized;
-import matching.distance.SubstringDistance;
-import matching.iterate.CharacterStrategy;
-import matching.iterate.WordPerformanceStrategy;
-import matching.iterate.WordStrategy;
-import matching.sorting.IntervalSort;
+import matching.iterate.*;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,6 +30,40 @@ static ArrayList<Word> input;
             input.add(new Word(0,inputString,"en"));
         }
     }
+
+    @Test
+    public void SimpleJWStrategyTest() {
+        Matcher matcher = new Matcher(new SimpleStrategy(), new JaroWinkler(),new ScoreSort());
+        for(Word in : input){
+            MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
+        }
+    }
+
+    @Test
+    public void SimpleLevenshteinStrategyTest() {
+        Matcher matcher = new Matcher(new SimpleStrategy(), new LevenshteinNormalized(),new ScoreSort());
+        for(Word in : input){
+            MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
+        }
+    }
+
+
+    @Test
+    public void SimpleIterLevenshteinStrategyTest() {
+        Matcher matcher = new Matcher(new PerformanceStrategy(), new LevenshteinNormalized(),new ScoreSort());
+        for(Word in : input){
+            MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
+        }
+    }
+
+    @Test
+    public void SimpleIterJWStrategyTest() {
+        Matcher matcher = new Matcher(new PerformanceStrategy(), new JaroWinkler(),new ScoreSort());
+        for(Word in : input){
+            MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
+        }
+    }
+
 
     @Test
     public void WordStrategyTest() {

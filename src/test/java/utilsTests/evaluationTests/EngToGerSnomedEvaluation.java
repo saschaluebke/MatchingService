@@ -1,12 +1,11 @@
 package utilsTests.evaluationTests;
 
-import matching.JaroWinklerMatcher;
 import matching.Matcher;
 import matching.distance.EqualDistance;
 import matching.distance.JaroWinkler;
 import matching.distance.LevenshteinNormalized;
-import matching.distance.SubstringDistance;
 import matching.iterate.*;
+import matching.sorting.IntervalSort;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,7 +100,7 @@ public class EngToGerSnomedEvaluation {
 
     @Test
     public void evaluationAllMinSynonymWordSubstring(){
-        Matcher matcher = new Matcher(new WordStrategy(),new SubstringDistance(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordStrategy(),new SubstringDistance(),new IntervalSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordSubstring",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
@@ -117,9 +116,10 @@ public class EngToGerSnomedEvaluation {
 
     /**
      * AllMinEvaluations End
-     * Other Evaluations Begin
+
+     * Other Evaluations Begin (Every Test from now on need a specific Moses Server!
      */
-/*
+
     @Test
     public void evaluationSpringerTranslate(){
         trainingPath1 = "/src/main/resources/translation/Springer/Springer.enCleaned";
@@ -159,5 +159,5 @@ public class EngToGerSnomedEvaluation {
         ArrayList<ArrayList<String>> output = evaluator.simpleTranslate("News",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
     }
-*/
+
 }

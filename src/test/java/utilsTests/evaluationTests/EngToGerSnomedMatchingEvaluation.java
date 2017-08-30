@@ -1,7 +1,6 @@
 package utilsTests.evaluationTests;
 
 import matching.Matcher;
-import matching.SimpleMatcher;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;

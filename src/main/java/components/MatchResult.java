@@ -82,6 +82,8 @@ public class MatchResult implements Comparable<MatchResult> {
         return targetEnd-targetStart;
     }
 
+    public int getSourceSize() {return sourceEnd-sourceStart;}
+
     @Override
     public int compareTo(MatchResult other) {
         return (this.getSourceEnd()-this.getSourceStart()+this.getTargetEnd()-this.getTargetStart())

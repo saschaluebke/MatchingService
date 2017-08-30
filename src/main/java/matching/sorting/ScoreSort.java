@@ -1,6 +1,7 @@
 package matching.sorting;
 
 import components.MatchResult;
+import components.MatchResultSet;
 import utils.Sorter;
 
 import java.util.ArrayList;
@@ -22,26 +23,9 @@ public class ScoreSort implements SortStrategy {
         return sortedResults;
     }
 
-    /**
-     * Interval of min max size makes no sense when only sorting by score!
-     */
     @Override
-    public double getMin() {
-        return 0;
+    public MatchResultSet sortList(MatchResultSet mrs) {
+       return  sorter.matchResultSetQuicksort(mrs);
     }
 
-    @Override
-    public void setMin(double min) {
-
-    }
-
-    @Override
-    public double getMax() {
-        return 0;
-    }
-
-    @Override
-    public void setMax(double max) {
-
-    }
 }
