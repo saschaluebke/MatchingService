@@ -3,11 +3,10 @@ package database.dbStrategy.simpleStrategy;
 import components.*;
 import database.TranslatorGetProperties;
 import database.dbStrategy.DBStrategy;
-import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.iterate.WordStrategy;
 import translators.Translator;
 import utils.ontology.FileReader;
-import utils.ontology.OntologyAnalysis;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -627,7 +626,7 @@ String directTranslation = translator.translation(input.getName());
         //System.out.println(this.matcher.getIterateStrategy().getClass().getName());
         if(matcher.getIterateStrategy() != null &&
                 (matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())||
-                matcher.getIterateStrategy().getClass().equals(new WordPerformanceStrategy().getClass()))){
+                matcher.getIterateStrategy().getClass().equals(new WordSimpleStrategy().getClass()))){
             //matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
           //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = input.getName().split("( )|(/)|(-)");

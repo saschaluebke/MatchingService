@@ -75,7 +75,7 @@ static ArrayList<Word> input;
 
     @Test
     public void WordPerformanceStrategyTest() {
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(), new LevenshteinNormalized(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(), new LevenshteinNormalized(),new ScoreSort());
         for(Word in : input){
             MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
         }
@@ -91,7 +91,7 @@ static ArrayList<Word> input;
 
     @Test
     public void WordPerformanceJWStrategyTest() {
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(), new JaroWinkler(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(), new JaroWinkler(),new ScoreSort());
         for(Word in : input){
             MatchResultSet mrs = matcher.getMatchingWordList(in.getName(), input);
         }

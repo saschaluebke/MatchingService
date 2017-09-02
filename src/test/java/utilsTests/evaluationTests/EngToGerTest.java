@@ -2,8 +2,7 @@ package utilsTests.evaluationTests;
 
 import matching.Matcher;
 import matching.distance.LevenshteinNormalized;
-import matching.iterate.PerformanceStrategy;
-import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class EngToGerTest {
 
     @Test
     public void evaluationSpringerPerformanceLevenshtein() {
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(), new LevenshteinNormalized(), new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(), new LevenshteinNormalized(), new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Test_PerformanceLevenshtein", files, trainingPath1, trainingPath2);
         assertEquals(true, true);

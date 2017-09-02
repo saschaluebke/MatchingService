@@ -4,6 +4,7 @@ import matching.Matcher;
 import matching.distance.EqualDistance;
 import matching.distance.JaroWinkler;
 import matching.distance.LevenshteinNormalized;
+import matching.distance.SubstringDistance;
 import matching.iterate.*;
 import matching.sorting.IntervalSort;
 import matching.sorting.ScoreSort;
@@ -68,7 +69,7 @@ public class EngToGerSnomedEvaluation {
 
     @Test
     public void evaluationAllMinSynonymWordPerformanceLevenshtein(){
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output2 = evaluator.synonymTranslate("AllMin_WordPerformanceLevenshtein",files,trainingPath1,trainingPath2);
         assertEquals(true, true);
@@ -91,8 +92,8 @@ public class EngToGerSnomedEvaluation {
     }
 
     @Test
-    public void evaluationAllMinSynonymWordPerformanceJW(){
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new JaroWinkler(),new ScoreSort());
+    public void evaluationAllMinSynonymWordSimpleJW(){
+        Matcher matcher = new Matcher(new WordSimpleStrategy(),new JaroWinkler(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("AllMin_WordPerformanceJW",files,trainingPath1,trainingPath2);
         assertEquals(true, true);

@@ -7,12 +7,11 @@ import database.dbStrategy.DBStrategy;
 import matching.Matcher;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.PerformanceStrategy;
-import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.ScoreSort;
 import translators.Translator;
 import utils.ontology.FileReader;
-import utils.ontology.OntologyAnalysis;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -437,7 +436,7 @@ public class SimpleStrategy implements DBStrategy {
 
         if(matcher.getIterateStrategy() != null &&
                 (matcher.getIterateStrategy().getClass().equals(new WordStrategy().getClass())||
-                        matcher.getIterateStrategy().getClass().equals(new WordPerformanceStrategy().getClass()))){
+                        matcher.getIterateStrategy().getClass().equals(new WordSimpleStrategy().getClass()))){
             //matcher = new Matcher(new PerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
             //  System.out.println("Use WordStrategy Split all input");
             String[] splitted = inputString.split("( )|(/)|(-)");

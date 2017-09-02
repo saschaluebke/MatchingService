@@ -1,19 +1,15 @@
 package utilsTests.evaluationTests;
 
 import matching.Matcher;
-import matching.distance.Levenshtein;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.SimpleStrategy;
-import matching.iterate.WordPerformanceStrategy;
-import matching.iterate.WordStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import translators.MosesClient;
 import utils.evaluation.Evaluator;
 import utils.ontology.FileReader;
-import utils.ontology.SpecialistReader;
-import utils.ontology.WordNetReader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,7 +56,7 @@ public class EngToGerICD10Evaluation {
 
     @Test
     public void evaluationAllMinWordPerformance(){
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("AllMin_WordPerformance",files,trainingPath1,trainingPath2);
         assertEquals(true, true);

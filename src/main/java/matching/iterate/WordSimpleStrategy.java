@@ -11,14 +11,14 @@ import java.util.ArrayList;
 /**
  * Created by sashbot on 06.08.17.
  */
-public class WordPerformanceStrategy extends WordStrategy implements IterateStrategy {
+public class WordSimpleStrategy extends WordStrategy implements IterateStrategy {
     private final String REGEX = "( )|(/)"; //Split by space or /
     private String searchString;
     private Word wordFromDB;
     private ArrayList<MatchResult> matchResults;
     private double accuracy = 0;
 
-    public WordPerformanceStrategy(){
+    public WordSimpleStrategy(){
         TranslatorGetProperties tgp = new TranslatorGetProperties();
         accuracy = 0;
         try {

@@ -2,7 +2,7 @@ package utilsTests.evaluationTests;
 
 import matching.Matcher;
 import matching.distance.JaroWinkler;
-import matching.iterate.WordPerformanceStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.IntervalSort;
 import matching.sorting.ScoreSort;
@@ -39,7 +39,7 @@ public class GerToEngTest {
 
     @Test
     public void evaluationSpringerPerformanceLevenshtein() {
-        Matcher matcher = new Matcher(new WordPerformanceStrategy(), new JaroWinkler(), new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(), new JaroWinkler(), new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output = evaluator.synonymTranslate("Test_WordPerformanceJaroWinkler", files, trainingPath1, trainingPath2);
         assertEquals(true, true);
