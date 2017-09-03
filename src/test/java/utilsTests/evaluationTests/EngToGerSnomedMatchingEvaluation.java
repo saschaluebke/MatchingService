@@ -2,7 +2,7 @@ package utilsTests.evaluationTests;
 
 import matching.Matcher;
 import matching.distance.LevenshteinNormalized;
-import matching.iterate.WordStrategy;
+import matching.iterate.WordSimpleStrategy;
 import matching.sorting.ScoreSort;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class EngToGerSnomedMatchingEvaluation {
     public void levenshteinWordMatching(){
         trainingPath1 = "/src/main/resources/translation/Springer/Springer.enCleaned";
         trainingPath2 = "/src/main/resources/translation/Springer/Springer.deCleaned";
-        Matcher matcher = new Matcher(new WordStrategy(),new LevenshteinNormalized(),new ScoreSort());
+        Matcher matcher = new Matcher(new WordSimpleStrategy(),new LevenshteinNormalized(),new ScoreSort());
         evaluator.setMatcher(matcher);
         ArrayList<ArrayList<String>> output3 = evaluator.synonymTranslate("ICD10WordStr",files,trainingPath1,trainingPath2);
         assertEquals(209, output3.size());

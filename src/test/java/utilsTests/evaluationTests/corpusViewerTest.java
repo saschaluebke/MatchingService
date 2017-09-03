@@ -7,9 +7,6 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by sashbot on 17.07.17.
- */
 public class corpusViewerTest {
     static CorpusViewer cv;
 

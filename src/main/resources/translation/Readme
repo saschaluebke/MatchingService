@@ -1,0 +1,4 @@
+Die Verzeichnisse sind größtenteils leer da die daten zu groß wären. Aber in jedem Verzeichnis ist eine Readme mit dem link wo die Daten zu finden sind.
+
+Dann müssen sie durch ein Clean schritt laufen unter src/main/java/utils/corpus ist die CorpusCleaner Klasse zu finden! Unter utilsTests/corpusmakertests die testcases dazu.
+

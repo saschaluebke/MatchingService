@@ -1,1 +1,9 @@
-https://wordnet.princeton.edu/wordnet/download/current-version/#nix
+Die Verzeichnisse für die Thesauri sind leer aber in den Readmes steht wo sie runter zu laden sind.
+
+Unter src/main/java/utils/ontology sind FileReader Klassen die Helfen die einzelnen Ontologien zu lesen und in die Datenbank einzufügen.
+
+Unter src/test/java/utilsTests/fileReaderTest/allOntologieIntoDatabaseTest findet man Einzelne Tests (Methoden) die den jeweiligen Thesauri komplett
+in die Datenbank Ã¼bertragen. Wie man in jeder der Methoden erkennen kann, ist die FileReader Klasse dazu da die Daten zu lesen und die Methode "storeFromFile"
+von der "DBHelper" Klasse dazu da die Daten in die Datenbank zu Ã¼bertragen.
+
+!!! Es sind aber auch SQL Dumps vorhanden diese AufwÃ¤ndige Prozedur muss also nicht durchlaufen werden es reicht den jewiligen Dump zu importieren. !!!

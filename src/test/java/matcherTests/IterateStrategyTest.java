@@ -5,7 +5,7 @@ import components.Word;
 import matching.distance.DistanceStrategy;
 import matching.distance.LevenshteinNormalized;
 import matching.iterate.CharacterStrategy;
-import matching.iterate.WordStrategy;
+import matching.iterate.WordSimpleStrategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class IterateStrategyTest  {
 
     @Test
     public void wordStrategyTest() {
-        WordStrategy ws = new WordStrategy();
+        WordSimpleStrategy ws = new WordSimpleStrategy();
         ws.setWordFromDB(new Word(0,"Hallöchen Ich bin Sascha","de"));
         ws.setSearchString("Hallo");
         ArrayList<MatchResult> results = ws.getMatchList(distanceStrategy);

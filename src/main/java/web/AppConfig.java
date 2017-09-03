@@ -13,7 +13,7 @@ import translators.Transltr;
 @ComponentScan
 public class AppConfig {
     public static void main(String[] args) {
-//TODO: This is just a Dirty initial call
+
         MySQLQuery dbq = new MySQLQuery();
         DBHelper dbh = new DBHelper(new SimpleStrategy());
         dbq.dropAllTables();

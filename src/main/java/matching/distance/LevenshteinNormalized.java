@@ -27,7 +27,8 @@ public class LevenshteinNormalized implements DistanceStrategy {
         if (m_len == 0) {
             return 0;
         }
-
+        double lev = l.getDistance(s1,s2);
+        double result = l.getDistance(s1,s2) /m_len;
         return l.getDistance(s1, s2) / m_len;
     }
 }

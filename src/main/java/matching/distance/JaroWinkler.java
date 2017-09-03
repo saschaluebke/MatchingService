@@ -113,7 +113,8 @@ public class JaroWinkler implements DistanceStrategy {
                 break;
             }
         }
-        return new int[]{matches, transpositions / 2, prefix, max.length()};
+        int[] result = new int[]{matches, transpositions / 2, prefix, max.length()};
+        return result;
     }
 
 

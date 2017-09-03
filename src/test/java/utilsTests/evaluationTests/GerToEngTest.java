@@ -2,6 +2,7 @@ package utilsTests.evaluationTests;
 
 import matching.Matcher;
 import matching.distance.JaroWinkler;
+import matching.distance.SubstringDistance;
 import matching.iterate.WordSimpleStrategy;
 import matching.iterate.WordStrategy;
 import matching.sorting.IntervalSort;
